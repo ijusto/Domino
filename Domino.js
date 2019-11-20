@@ -24,9 +24,10 @@ var shaderProgram = null;
 
 var cubeVertexPositionBuffer = null;
 
-var cubeVertexIndexBuffer = null;
+var cubeVertexIndexBuffer_front = null;
+var cubeVertexIndexBuffer_others = null;
 
-var cubeVertexTextureCoordBuffer;
+var cubeVertexTextureCoordBuffer0, cubeVertexTextureCoordBuffer1;
 
 // The global transformation parameters
 
@@ -128,14 +129,15 @@ vertices = [
 
 // Notice how they are assigne to the corresponding vertices
 
-var textureCoords = [
+var textureCoords_dots_face = [
 
           // Front face
           0.0, 0.0,
           0.5, 0.0,
           0.5, 1,
-          0.0, 1/*,
-
+          0.0, 1
+];
+var textureCoords_other_faces = [
           // Back face
           1.0, 0.0,
           1.0, 1.0,
@@ -164,15 +166,16 @@ var textureCoords = [
           0.0, 0.0,
           1.0, 0.0,
           1.0, 1.0,
-          0.0, 1.0,*/
+          0.0, 1.0
 ];
 
 // Vertex indices defining the triangles
         
-var cubeVertexIndices = [
+var cubeVertexIndices_front = [
 
-            0, 1, 2,      0, 2, 3,    // Front face
-
+            0, 1, 2,      0, 2, 3    // Front face
+	];
+var cubeVertexIndices_others = [
             4, 5, 6,      4, 6, 7,    // Back face
 
             8, 9, 10,     8, 10, 11,  // Top face
@@ -210,17 +213,27 @@ function handleLoadedTexture(texture) {
 }
 
 
-var webGLTexture;
+var webGLTexture_dots_face, webGLTexture_back_face;
 
-function initTexture() {
+function initTextures() {
 	
-	webGLTexture = gl.createTexture();
-	webGLTexture.image = new Image();
-	webGLTexture.image.onload = function () {
-		handleLoadedTexture(webGLTexture)
+	webGLTexture_dots_face = gl.createTexture();
+	webGLTexture_dots_face.image = new Image();
+	webGLTexture_dots_face.image.onload = function () {
+		handleLoadedTexture(webGLTexture_dots_face)
 	};
 
-	webGLTexture.image.src = "76779614_494325374507260_8321649502805032960_n.png";
+	webGLTexture_dots_face.image.src = "76779614_494325374507260_8321649502805032960_n.png";
+
+
+	webGLTexture_back_face = gl.createTexture();
+	webGLTexture_back_face.image = new Image();
+	webGLTexture_back_face.image.onload = function () {
+		handleLoadedTexture(webGLTexture_back_face)
+	};
+
+	webGLTexture_back_face.image.src = "77135314_608402826575523_7353092974072299520_n.png";
+
 }
 
 //----------------------------------------------------------------------------
@@ -238,20 +251,37 @@ function initBuffers() {
 	cubeVertexPositionBuffer.numItems = vertices.length / 3;			
 
 	// Textures
-		
-    cubeVertexTextureCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
- 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-    cubeVertexTextureCoordBuffer.itemSize = 2;
-    cubeVertexTextureCoordBuffer.numItems = 4;//24;
+
+	//other faces
+	cubeVertexTextureCoordBuffer1 = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer1);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords_other_faces), gl.STATIC_DRAW);
+	cubeVertexTextureCoordBuffer1.itemSize = 2;
+	cubeVertexTextureCoordBuffer1.numItems = 20;
+
+	// front face
+    cubeVertexTextureCoordBuffer0 = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer0);
+ 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords_dots_face), gl.STATIC_DRAW);
+    cubeVertexTextureCoordBuffer0.itemSize = 2;
+    cubeVertexTextureCoordBuffer0.numItems = 4;//24;
+
 
 	// Vertex indices
-	
-    cubeVertexIndexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-    cubeVertexIndexBuffer.itemSize = 1;
-    cubeVertexIndexBuffer.numItems = 36;
+
+	cubeVertexIndexBuffer_front = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_front);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices_front), gl.STATIC_DRAW);
+	cubeVertexIndexBuffer_front.itemSize = 1;
+	cubeVertexIndexBuffer_front.numItems = 6;
+
+	cubeVertexIndexBuffer_others = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_others);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices_others), gl.STATIC_DRAW);
+	cubeVertexIndexBuffer_others.itemSize = 1;
+	cubeVertexIndexBuffer_others.numItems = 30;
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -290,21 +320,39 @@ function drawModel( angleXX, angleYY, angleZZ,
 
 	// NEW --- Textures
 	
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer0);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer0.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, webGLTexture);
+    gl.bindTexture(gl.TEXTURE_2D, webGLTexture_dots_face);
         
     gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+	// The vertex indices
+
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_front);
+
+	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
+
+	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer_front.numItems, gl.UNSIGNED_SHORT, 0);
+
+	// NEW --- Textures
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer1);
+	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer1.itemSize, gl.FLOAT, false, 0, 0);
+
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, webGLTexture_back_face);
+
+	gl.uniform1i(shaderProgram.samplerUniform, 0);
     
     // The vertex indices
     
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_others);
 
 	// Drawing the triangles --- NEW --- DRAWING ELEMENTS 
 	
-	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);	
+	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer_others.numItems, gl.UNSIGNED_SHORT, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -411,7 +459,7 @@ function drawScene() {
 		primitiveType );
 
 	// Instance 8 --- middle board
-	drawModel(0,0, angleZZ,//-angleXX, angleYY, angleZZ,
+	drawModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx, ty, tz,
 		mvMatrix,
@@ -893,7 +941,7 @@ function runWebGL() {
 	
 	initBuffers();
 	
-	initTexture();
+	initTextures();
 	
 	tick();		// A timer controls the rendering / animation    
 
