@@ -223,7 +223,7 @@ function initTextures() {
 		handleLoadedTexture(webGLTexture_dots_face)
 	};
 
-	webGLTexture_dots_face.image.src = "76779614_494325374507260_8321649502805032960_n.png";
+	webGLTexture_dots_face.image.src = "peca1_6.png";
 
 
 	webGLTexture_back_face = gl.createTexture();
