@@ -55,6 +55,12 @@ var sy = 0.10;
 
 var sz = 0.10;
 
+var scx = 0.05;
+
+var scy = 0.05;
+
+var scz = 0.05;
+
 // NEW - Animation controls
 
 var rotationXX_ON = 1;
@@ -186,7 +192,14 @@ var cubeVertexIndices_others = [
 
             20, 21, 22,   20, 22, 23  // Left face
 ];
-         
+
+var pecas = ["peca0_0.png", "peca0_1.png", "peca0_2.png", "peca0_3.png", "peca0_4.png", "peca0_5.png", "peca0_6.png",
+	"peca1_1.png", "peca1_2.png", "peca1_3.png", "peca1_4.png", "peca1_5.png", "peca1_6.png",
+	"peca2_2.png", "peca2_3.png", "peca2_4.png", "peca2_5.png", "peca2_6.png",
+	"peca3_3.png", "peca3_4.png", "peca3_5.png", "peca3_6.png",
+	"peca4_4.png", "peca4_5.png", "peca4_6.png",
+	"peca5_5.png", "peca5_6.png",
+	"peca6_6.png"]
          
 //----------------------------------------------------------------------------
 //
@@ -223,7 +236,8 @@ function initTextures() {
 		handleLoadedTexture(webGLTexture_dots_face)
 	};
 
-	webGLTexture_dots_face.image.src = "peca1_6.png";
+	var peca = Math.floor(Math.random() * 28);
+	webGLTexture_dots_face.image.src = pecas[peca];
 
 
 	webGLTexture_back_face = gl.createTexture();
@@ -234,6 +248,12 @@ function initTextures() {
 
 	webGLTexture_back_face.image.src = "77135314_608402826575523_7353092974072299520_n.png";
 
+}
+
+function changeTexture(){
+	var peca = Math.floor(Math.random() * pecas.length);
+	webGLTexture_dots_face.image.src = pecas[peca];
+	pecas.splice(peca, 1);
 }
 
 //----------------------------------------------------------------------------
@@ -287,7 +307,13 @@ function initBuffers() {
 //----------------------------------------------------------------------------
 
 //  Drawing the model
-
+function wait(ms){
+	var start = new Date().getTime();
+	var end = start;
+	while(end < start + ms) {
+		end = new Date().getTime();
+	}
+}
 function drawModel( angleXX, angleYY, angleZZ, 
 					sx, sy, sz,
 					tx, ty, tz,
@@ -323,9 +349,10 @@ function drawModel( angleXX, angleYY, angleZZ,
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer0);
     gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer0.itemSize, gl.FLOAT, false, 0, 0);
 
+
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, webGLTexture_dots_face);
-        
+	gl.bindTexture(gl.TEXTURE_2D, webGLTexture_dots_face);
+
     gl.uniform1i(shaderProgram.samplerUniform, 0);
 
 	// The vertex indices
@@ -408,8 +435,8 @@ function drawScene() {
 	// And with diferent transformation parameters !!
 	
 	// Call the drawModel function !!
-	
 	// Instance 1 --- left bottom
+
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 	           sx, sy, sz,
 	           tx-(8.7*sx), ty-0.7, tz,
@@ -462,6 +489,57 @@ function drawScene() {
 	drawModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx*sx, ty, tz,
+		mvMatrix,
+		primitiveType );
+
+	//Computer pieces
+
+	// Instance 1 --- left bottom
+	drawModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tx-(18*scx), ty+0.8, tz,
+		mvMatrix,
+		primitiveType );
+
+	// Instance 2 --- left bottom
+	drawModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tx-(16.5*scx), ty+0.8, tz,
+		mvMatrix,
+		primitiveType );
+
+	// Instance 3 --- left bottom
+	drawModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tx-(15*scx), ty+0.8, tz,
+		mvMatrix,
+		primitiveType );
+
+	// Instance 4 --- left bottom
+	drawModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tx-(13.5*scx), ty+0.8, tz,
+		mvMatrix,
+		primitiveType );
+
+	// Instance 5 --- left bottom
+	drawModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tx-(12*scx), ty+0.8, tz,
+		mvMatrix,
+		primitiveType );
+
+	// Instance 6 --- left bottom
+	drawModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tx-(10.5*scx), ty+0.8, tz,
+		mvMatrix,
+		primitiveType );
+
+	// Instance 7 --- left bottom
+	drawModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tx-(9*scx), ty+0.8, tz,
 		mvMatrix,
 		primitiveType );
 
@@ -546,6 +624,10 @@ function handleKeys() {
 		
 		sz = sy = sx;
 
+		scx *= 0.99;
+
+		scz = scy = scx;
+
 	}
 	if (currentlyPressedKeys[34]) {
 		
@@ -554,6 +636,10 @@ function handleKeys() {
 		sx *= 1.01;
 		
 		sz = sy = sx;
+
+		scx *= 1.01;
+
+		scz = scy = scx;
 	}
 	if (currentlyPressedKeys[37]) {
 		
@@ -867,11 +953,17 @@ function setEventListeners( canvas ){
 
 		angleZZ = 0.0;
 
-		sx = 0.25;
+		sx = 0.1;
 
-		sy = 0.25;
+		sy = 0.1;
 
-		sz = 0.25;
+		sz = 0.1;
+
+		scx = 0.05;
+
+		scy = 0.05;
+
+		scz = 0.05;
 		
 		rotationXX_ON = 0;
 		
