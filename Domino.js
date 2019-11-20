@@ -412,56 +412,56 @@ function drawScene() {
 	// Instance 1 --- left bottom
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 	           sx, sy, sz,
-	           tx-0.87, ty-0.7, tz,
+	           tx-(8.7*sx), ty-0.7, tz,
 	           mvMatrix,
 	           primitiveType );
 
 	// Instance 2 --- left bottom
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.70, ty-0.7, tz,
+		tx-(7.0*sx), ty-0.7, tz,
 		mvMatrix,
 		primitiveType );
 
 	// Instance 3 --- left bottom
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.53, ty-0.7, tz,
+		tx-(5.3*sx), ty-0.7, tz,
 		mvMatrix,
 		primitiveType );
 
 	// Instance 4 --- left bottom
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.36, ty-0.7, tz,
+		tx-(3.6*sx), ty-0.7, tz,
 		mvMatrix,
 		primitiveType );
 
 	// Instance 5 --- left bottom
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.19, ty-0.7, tz,
+		tx-(1.9*sx), ty-0.7, tz,
 		mvMatrix,
 		primitiveType );
 
 	// Instance 6 --- left bottom
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.02, ty-0.7, tz,
+		tx-(0.2*sx), ty-0.7, tz,
 		mvMatrix,
 		primitiveType );
 
 	// Instance 7 --- left bottom
 	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx+0.15, ty-0.7, tz,
+		tx+(1.5*sx), ty-0.7, tz,
 		mvMatrix,
 		primitiveType );
 
 	// Instance 8 --- middle board
 	drawModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx, ty, tz,
+		tx*sx, ty, tz,
 		mvMatrix,
 		primitiveType );
 
@@ -542,15 +542,16 @@ function handleKeys() {
 		
 		// Page Up
 		
-		sx *= 0.9;
+		sx *= 0.99;
 		
 		sz = sy = sx;
+
 	}
 	if (currentlyPressedKeys[34]) {
 		
 		// Page Down
 		
-		sx *= 1.1;
+		sx *= 1.01;
 		
 		sz = sy = sx;
 	}
@@ -755,7 +756,7 @@ function setEventListeners( canvas ){
 		// Switching the direction
 		
 		if( rotationXX_DIR === 1 ) {
-			
+
 			rotationXX_DIR = -1;
 		}
 		else {
@@ -928,6 +929,7 @@ function initWebGL( canvas ) {
 }
 
 //----------------------------------------------------------------------------
+
 
 function runWebGL() {
 	
