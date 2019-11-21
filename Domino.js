@@ -213,17 +213,25 @@ function handleLoadedTexture(texture) {
 }
 
 
-var webGLTexture_dots_face, webGLTexture_back_face;
+var webGLTexture_dots_face_0_2, webGLTexture_back_face;
+var textures_imgs = {};
 
 function initTextures() {
 	
-	webGLTexture_dots_face = gl.createTexture();
-	webGLTexture_dots_face.image = new Image();
-	webGLTexture_dots_face.image.onload = function () {
-		handleLoadedTexture(webGLTexture_dots_face)
+	webGLTexture_dots_face_0_2 = gl.createTexture();
+	webGLTexture_dots_face_0_2.image = new Image();
+	webGLTexture_dots_face_0_2.image.onload = function () {
+		handleLoadedTexture(webGLTexture_dots_face_0_2)
 	};
 
-	webGLTexture_dots_face.image.src = "76779614_494325374507260_8321649502805032960_n.png";
+	var i, j, key;
+	for(i=0; i<7; i++){
+		for(j=1; i<7; i++) {
+			key = i+"-"+j;
+			textures_imgs[key] = key+"png";
+		}
+	}
+	webGLTexture_dots_face_0_2.image.src = "0_2.png";
 
 
 	webGLTexture_back_face = gl.createTexture();
@@ -288,11 +296,12 @@ function initBuffers() {
 
 //  Drawing the model
 
-function drawModel( angleXX, angleYY, angleZZ, 
-					sx, sy, sz,
-					tx, ty, tz,
-					mvMatrix,
-					primitiveType ) {
+function drawDominoModel(angleXX, angleYY, angleZZ,
+						 sx, sy, sz,
+						 tx, ty, tz,
+						 mvMatrix,
+						 primitiveType,
+						 front_face_texture) {
 
     // Pay attention to transformation order !!
     
@@ -324,7 +333,7 @@ function drawModel( angleXX, angleYY, angleZZ,
     gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer0.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, webGLTexture_dots_face);
+    gl.bindTexture(gl.TEXTURE_2D, front_face_texture);
         
     gl.uniform1i(shaderProgram.samplerUniform, 0);
 
@@ -410,60 +419,69 @@ function drawScene() {
 	// Call the drawModel function !!
 	
 	// Instance 1 --- left bottom
-	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 	           sx, sy, sz,
 	           tx-0.87, ty-0.7, tz,
 	           mvMatrix,
-	           primitiveType );
+	           primitiveType,
+			   webGLTexture_dots_face_0_2);
 
 	// Instance 2 --- left bottom
-	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx-0.70, ty-0.7, tz,
 		mvMatrix,
-		primitiveType );
+		primitiveType,
+		webGLTexture_dots_face_0_2);
 
 	// Instance 3 --- left bottom
-	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx-0.53, ty-0.7, tz,
 		mvMatrix,
-		primitiveType );
+		primitiveType,
+		webGLTexture_dots_face_0_2);
 
 	// Instance 4 --- left bottom
-	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx-0.36, ty-0.7, tz,
 		mvMatrix,
-		primitiveType );
+		primitiveType,
+		webGLTexture_dots_face_0_2);
 
 	// Instance 5 --- left bottom
-	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx-0.19, ty-0.7, tz,
 		mvMatrix,
-		primitiveType );
+		primitiveType,
+		webGLTexture_dots_face_0_2);
 
 	// Instance 6 --- left bottom
-	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx-0.02, ty-0.7, tz,
 		mvMatrix,
-		primitiveType );
+		primitiveType,
+		webGLTexture_dots_face_0_2);
 
 	// Instance 7 --- left bottom
-	drawModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx+0.15, ty-0.7, tz,
 		mvMatrix,
-		primitiveType );
+		primitiveType,
+		webGLTexture_dots_face_0_2);
 
 	// Instance 8 --- middle board
-	drawModel(-angleXX, angleYY, angleZZ,
+	drawDominoModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx, ty, tz,
 		mvMatrix,
-		primitiveType );
+		primitiveType,
+		webGLTexture_dots_face_0_2);
+
 
 	/*
 	// Instance 2 --- LEFT TOP
