@@ -33,6 +33,14 @@ var cubeVertexTextureCoordBuffer0, cubeVertexTextureCoordBuffer1;
 
 // The translation vector
 
+var tpx = [-8.7,-7.0,-5.3,-3.6,-1.9,-0.2,1.5];
+var tpy = [-7,-7,-7,-7,-7,-7,-7];
+var tpz = [0,0,0,0,0,0,0];
+
+var tcx = [-18,-16.5,-15,-13.5,-12,-10.5,-9];
+var tcy = [15,15,15,15,15,15,15];
+var tcz = [0,0,0,0,0,0,0];
+
 var tx = 0.0;
 
 var ty = 0.0;
@@ -47,6 +55,25 @@ var angleYY = 0.0;
 
 var angleZZ = 0.0;
 
+
+var anglepXX = [0,0,0,0,0,0,0];
+
+var anglepYY = [0,0,0,0,0,0,0];
+
+var anglepZZ = [0,0,0,0,0,0,0];
+
+
+var pecaIndex = 0;
+
+//Texturas player
+var pTextures = [];
+
+//Texturas computador
+var cTextures = [];
+
+//Texturas "baralho"
+var bTextures = [];
+
 // The scaling factors
 
 var sx = 0.10;
@@ -54,6 +81,12 @@ var sx = 0.10;
 var sy = 0.10;
 
 var sz = 0.10;
+
+var scx = 0.05;
+
+var scy = 0.05;
+
+var scz = 0.05;
 
 // NEW - Animation controls
 
@@ -186,7 +219,14 @@ var cubeVertexIndices_others = [
 
             20, 21, 22,   20, 22, 23  // Left face
 ];
-         
+
+var pecas = ["peca0_0.png", "peca0_1.png", "peca0_2.png", "peca0_3.png", "peca0_4.png", "peca0_5.png", "peca0_6.png",
+	"peca1_1.png", "peca1_2.png", "peca1_3.png", "peca1_4.png", "peca1_5.png", "peca1_6.png",
+	"peca2_2.png", "peca2_3.png", "peca2_4.png", "peca2_5.png", "peca2_6.png",
+	"peca3_3.png", "peca3_4.png", "peca3_5.png", "peca3_6.png",
+	"peca4_4.png", "peca4_5.png", "peca4_6.png",
+	"peca5_5.png", "peca5_6.png",
+	"peca6_6.png"]
          
 //----------------------------------------------------------------------------
 //
@@ -217,11 +257,11 @@ var webGLTexture_dots_face_0_2, webGLTexture_back_face;
 var textures_imgs = {};
 
 function initTextures() {
-	
-	webGLTexture_dots_face_0_2 = gl.createTexture();
-	webGLTexture_dots_face_0_2.image = new Image();
-	webGLTexture_dots_face_0_2.image.onload = function () {
-		handleLoadedTexture(webGLTexture_dots_face_0_2)
+
+	webGLTexture_dots_face = gl.createTexture();
+	webGLTexture_dots_face.image = new Image();
+	webGLTexture_dots_face.image.onload = function () {
+		handleLoadedTexture(webGLTexture_dots_face)
 	};
 
 	var i, j, key;
@@ -232,6 +272,30 @@ function initTextures() {
 		}
 	}
 	webGLTexture_dots_face_0_2.image.src = "0_2.png";
+	var peca = Math.floor(Math.random() * pecas.length);
+	webGLTexture_dots_face.image.src = pecas[peca];
+
+	var i=0;
+	while(pecas.length>21) {
+		var peca = Math.floor(Math.random() * pecas.length);
+		pTextures[i]=pecas[peca];
+		i++;
+		pecas.splice(peca, 1);
+	}
+	i=0;
+	while(pecas.length>14 && pecas.length <=21) {
+		var peca = Math.floor(Math.random() * pecas.length);
+		cTextures[i]=pecas[peca];
+		i++;
+		pecas.splice(peca, 1);
+	}
+	i=0;
+	while(pecas.length>0 && pecas.length<=14) {
+		var peca = Math.floor(Math.random() * pecas.length);
+		bTextures[i]=pecas[peca];
+		i++;
+		pecas.splice(peca, 1);
+	}
 
 
 	webGLTexture_back_face = gl.createTexture();
@@ -242,6 +306,12 @@ function initTextures() {
 
 	webGLTexture_back_face.image.src = "77135314_608402826575523_7353092974072299520_n.png";
 
+}
+
+function changeTexture(){
+	var peca = Math.floor(Math.random() * pecas.length);
+	webGLTexture_dots_face.image.src = pecas[peca];
+	pecas.splice(peca, 1);
 }
 
 //----------------------------------------------------------------------------
@@ -332,6 +402,7 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer0);
     gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer0.itemSize, gl.FLOAT, false, 0, 0);
 
+
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, front_face_texture);
         
@@ -417,71 +488,114 @@ function drawScene() {
 	// And with diferent transformation parameters !!
 	
 	// Call the drawModel function !!
-	
 	// Instance 1 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+
+	drawDominoModel( anglepXX[0],anglepYY[0],anglepZZ[0],//-angleXX, angleYY, angleZZ,
 	           sx, sy, sz,
-	           tx-0.87, ty-0.7, tz,
+	           tpx[0]*sx, tpy[0]*sy, tpz[0]*sz,
 	           mvMatrix,
 	           primitiveType,
-			   webGLTexture_dots_face_0_2);
+	 			pTextures[0]);
 
 	// Instance 2 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel(anglepXX[1],anglepYY[1],anglepZZ[1],//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.70, ty-0.7, tz,
+		tpx[1]*sx, tpy[1]*sy, tpz[1]*sz,
 		mvMatrix,
-		primitiveType,
-		webGLTexture_dots_face_0_2);
+		primitiveType, pTextures[1] );
 
 	// Instance 3 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel(anglepXX[2],anglepYY[2],anglepZZ[2],//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.53, ty-0.7, tz,
+		tpx[2]*sx, tpy[2]*sy, tpz[2]*sz,
 		mvMatrix,
-		primitiveType,
-		webGLTexture_dots_face_0_2);
+		primitiveType, pTextures[2] );
 
 	// Instance 4 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( anglepXX[3],anglepYY[3],anglepZZ[3],//-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx-0.36, ty-0.7, tz,
+		tpx[3]*sx, tpy[3]*sy, tpz[3]*sz,
 		mvMatrix,
-		primitiveType,
-		webGLTexture_dots_face_0_2);
+		primitiveType, pTextures[3] );
 
 	// Instance 5 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel( anglepXX[4],anglepYY[4],anglepZZ[4],
 		sx, sy, sz,
-		tx-0.19, ty-0.7, tz,
+		tpx[4]*sx, tpy[4]*sy, tpz[4]*sz,
 		mvMatrix,
-		primitiveType,
-		webGLTexture_dots_face_0_2);
+		primitiveType, pTextures[4] );
 
 	// Instance 6 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel(anglepXX[5],anglepYY[5],anglepZZ[5],
 		sx, sy, sz,
-		tx-0.02, ty-0.7, tz,
+		tpx[5]*sx, tpy[5]*sy, tpz[5]*sz,
 		mvMatrix,
-		primitiveType,
-		webGLTexture_dots_face_0_2);
+		primitiveType, pTextures[5] );
 
 	// Instance 7 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+	drawDominoModel(anglepXX[6],anglepYY[6],anglepZZ[6],
 		sx, sy, sz,
-		tx+0.15, ty-0.7, tz,
+		tpx[6]*sx, tpy[6]*sy, tpz[6]*sz,
 		mvMatrix,
-		primitiveType,
-		webGLTexture_dots_face_0_2);
+		primitiveType, pTextures[6] );
 
 	// Instance 8 --- middle board
 	drawDominoModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
-		tx, ty, tz,
+		tx*sx, ty*sy, tz*sz,
 		mvMatrix,
-		primitiveType,
-		webGLTexture_dots_face_0_2);
+		primitiveType, bTextures[0] );
 
+	//Computer pieces
+
+	// Instance 1 --- left bottom
+	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tcx[0]*scx, tcy[0]*scy, tcz[0]*scz,
+		mvMatrix,
+		primitiveType, cTextures[0] );
+
+	// Instance 2 --- left bottom
+	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tcx[1]*scx, tcy[1]*scy, tcz[1]*scz,
+		mvMatrix,
+		primitiveType, cTextures[1] );
+
+	// Instance 3 --- left bottom
+	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tcx[2]*scx, tcy[2]*scy, tcz[2]*scz,
+		mvMatrix,
+		primitiveType, cTextures[2] );
+
+	// Instance 4 --- left bottom
+	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tcx[3]*scx, tcy[3]*scy, tcz[3]*scz,
+		mvMatrix,
+		primitiveType, cTextures[3] );
+
+	// Instance 5 --- left bottom
+	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tcx[4]*scx, tcy[4]*scy, tcz[4]*scz,
+		mvMatrix,
+		primitiveType, cTextures[4] );
+
+	// Instance 6 --- left bottom
+	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tcx[5]*scx, tcy[5]*scy, tcz[5]*scz,
+		mvMatrix,
+		primitiveType, cTextures[5] );
+
+	// Instance 7 --- left bottom
+	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
+		scx, scy, scz,
+		tcx[6]*scx, tcy[6]*scy, tcz[6]*scz,
+		mvMatrix,
+		primitiveType, cTextures[6] );
 
 	/*
 	// Instance 2 --- LEFT TOP
@@ -560,62 +674,67 @@ function handleKeys() {
 		
 		// Page Up
 		
-		sx *= 0.9;
+		sx *= 0.99;
 		
 		sz = sy = sx;
+
+		scx *= 0.99;
+
+		scz = scy = scx;
+
 	}
 	if (currentlyPressedKeys[34]) {
 		
 		// Page Down
 		
-		sx *= 1.1;
+		sx *= 1.01;
 		
 		sz = sy = sx;
+
+		scx *= 1.01;
+
+		scz = scy = scx;
 	}
 	if (currentlyPressedKeys[37]) {
 		
 		// Left cursor key
-		
-		if( rotationYY_ON === 0 ) {
-			
-			rotationYY_ON = 1;
-		}  
-		
-		rotationYY_SPEED -= 0.25;
+
+		tpx[pecaIndex]-=0.05;
 	}
 	if (currentlyPressedKeys[39]) {
 		
 		// Right cursor key
-		
-		if( rotationYY_ON === 0 ) {
-			
-			rotationYY_ON = 1;
-		}  
-		
-		rotationYY_SPEED += 0.25;
+
+		tpx[pecaIndex]+=0.05;
 	}
 	if (currentlyPressedKeys[38]) {
 		
 		// Up cursor key
 		
-		if( rotationXX_ON === 0 ) {
-			
-			rotationXX_ON = 1;
-		}  
-		
-		rotationXX_SPEED -= 0.25;
+		tpy[pecaIndex]+=0.05;
 	}
 	if (currentlyPressedKeys[40]) {
 		
 		// Down cursor key
-		
-		if( rotationXX_ON === 0 ) {
-			
-			rotationXX_ON = 1;
-		}  
-		
-		rotationXX_SPEED += 0.25;
+
+		tpy[pecaIndex]-=0.05;
 	}
+	document.addEventListener("keypress", function(event){
+
+		var bgColor = document.getElementById("bg-color");
+
+		// Getting the pressed key and setting the bg color
+
+		var key = event.keyCode; // ASCII
+
+		switch(key){
+			case 114:
+				anglepZZ[pecaIndex]+=90;
+		}
+
+		// Render the viewport
+		render();
+	});
 }
 
 //----------------------------------------------------------------------------
@@ -773,7 +892,7 @@ function setEventListeners( canvas ){
 		// Switching the direction
 		
 		if( rotationXX_DIR === 1 ) {
-			
+
 			rotationXX_DIR = -1;
 		}
 		else {
@@ -884,11 +1003,17 @@ function setEventListeners( canvas ){
 
 		angleZZ = 0.0;
 
-		sx = 0.25;
+		sx = 0.1;
 
-		sy = 0.25;
+		sy = 0.1;
 
-		sz = 0.25;
+		sz = 0.1;
+
+		scx = 0.05;
+
+		scy = 0.05;
+
+		scz = 0.05;
 		
 		rotationXX_ON = 0;
 		
@@ -907,7 +1032,29 @@ function setEventListeners( canvas ){
 		rotationZZ_DIR = 1;
 		
 		rotationZZ_SPEED = 1;
-	};      
+	};
+
+	document.getElementById("peca1").onclick = function(){
+		pecaIndex=0;
+	}
+	document.getElementById("peca2").onclick = function(){
+		pecaIndex=1;
+	}
+	document.getElementById("peca3").onclick = function(){
+		pecaIndex=2;
+	}
+	document.getElementById("peca4").onclick = function(){
+		pecaIndex=3;
+	}
+	document.getElementById("peca5").onclick = function(){
+		pecaIndex=4;
+	}
+	document.getElementById("peca6").onclick = function(){
+		pecaIndex=5;
+	}
+	document.getElementById("peca7").onclick = function(){
+		pecaIndex=6;
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -946,6 +1093,7 @@ function initWebGL( canvas ) {
 }
 
 //----------------------------------------------------------------------------
+
 
 function runWebGL() {
 	
