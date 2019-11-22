@@ -37,8 +37,8 @@ var tpx = [-8.7,-7.0,-5.3,-3.6,-1.9,-0.2,1.5];
 var tpy = [-7,-7,-7,-7,-7,-7,-7];
 var tpz = [0,0,0,0,0,0,0];
 
-var tcx = [-18,-16.5,-15,-13.5,-12,-10.5,-9];
-var tcy = [15,15,15,15,15,15,15];
+var tcx = [8,-16.5,-15,-13.5,-12,-10.5,-9];
+var tcy = [0,15,15,15,15,15,15];
 var tcz = [0,0,0,0,0,0,0];
 
 var tx = 0.0;
@@ -206,27 +206,27 @@ var textureCoords_other_faces = [
         
 var cubeVertexIndices_front = [
 
-            0, 1, 2,      0, 2, 3    // Front face
+            0, 1, 2,      0, 3, 2    // Front face
 	];
 var cubeVertexIndices_others = [
             4, 5, 6,      4, 6, 7,    // Back face
 
             8, 9, 10,     8, 10, 11,  // Top face
 
-            12, 13, 14,   12, 14, 15, // Bottom face
+            12, 13, 14,   13, 15, 14, // Bottom face
 
-            16, 17, 18,   16, 18, 19, // Right face
+            16, 17, 18,   17, 19, 18, // Right face
 
             20, 21, 22,   20, 22, 23  // Left face
 ];
 
-var pecas = ["peca0_0.png", "peca0_1.png", "peca0_2.png", "peca0_3.png", "peca0_4.png", "peca0_5.png", "peca0_6.png",
-	"peca1_1.png", "peca1_2.png", "peca1_3.png", "peca1_4.png", "peca1_5.png", "peca1_6.png",
-	"peca2_2.png", "peca2_3.png", "peca2_4.png", "peca2_5.png", "peca2_6.png",
-	"peca3_3.png", "peca3_4.png", "peca3_5.png", "peca3_6.png",
-	"peca4_4.png", "peca4_5.png", "peca4_6.png",
-	"peca5_5.png", "peca5_6.png",
-	"peca6_6.png"]
+var pecas = ["0_0.png", "0_1.png", "0_2.png", "0_3.png", "0_4.png", "0_5.png", "0_6.png",
+	"1_1.png", "1_2.png", "1_3.png", "1_4.png", "1_5.png", "1_6.png",
+	"2_2.png", "2_3.png", "2_4.png", "2_5.png", "2_6.png",
+	"3_3.png", "3_4.png", "3_5.png", "3_6.png",
+	"4_4.png", "4_5.png", "4_6.png",
+	"5_5.png", "5_6.png",
+	"6_6.png"]
          
 //----------------------------------------------------------------------------
 //
@@ -243,13 +243,12 @@ var pecas = ["peca0_0.png", "peca0_1.png", "peca0_2.png", "peca0_3.png", "peca0_
 // From www.learningwebgl.com
 
 function handleLoadedTexture(texture) {
-	
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	gl.bindTexture(gl.TEXTURE_2D, null);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
 
@@ -258,45 +257,126 @@ var textures_imgs = {};
 
 function initTextures() {
 
-	webGLTexture_dots_face = gl.createTexture();
-	webGLTexture_dots_face.image = new Image();
-	webGLTexture_dots_face.image.onload = function () {
-		handleLoadedTexture(webGLTexture_dots_face)
-	};
 
+	cTextures[0] = gl.createTexture();
+	cTextures[0].image = new Image();
+	cTextures[0].image.onload = function () {
+		handleLoadedTexture(cTextures[0])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	cTextures[0].image.src = pecas[27];
+	pecas.splice(27, 1);
+	/*
 	var i, j, key;
 	for(i=0; i<7; i++){
 		for(j=1; i<7; i++) {
 			key = i+"-"+j;
 			textures_imgs[key] = key+"png";
 		}
-	}
-	webGLTexture_dots_face_0_2.image.src = "0_2.png";
-	var peca = Math.floor(Math.random() * pecas.length);
-	webGLTexture_dots_face.image.src = pecas[peca];
-
+	}*/
+/*
 	var i=0;
-	while(pecas.length>21) {
+	for(i;i<8;i++) {
 		var peca = Math.floor(Math.random() * pecas.length);
-		pTextures[i]=pecas[peca];
-		i++;
+		pTextures[i] = gl.createTexture();
+		pTextures[i].image = new Image();
+		pTextures[i].image.onload = function () {
+			handleLoadedTexture(pTextures[i])
+		};
+		pTextures[i].image.src=pecas[peca];
 		pecas.splice(peca, 1);
 	}
 	i=0;
 	while(pecas.length>14 && pecas.length <=21) {
+		cTextures[i] = gl.createTexture();
+		cTextures[i] = new Image();
+		cTextures[i].image.onload = function () {
+			handleLoadedTexture(cTextures[i])
+		};
 		var peca = Math.floor(Math.random() * pecas.length);
-		cTextures[i]=pecas[peca];
+		cTextures[i].image.src=pecas[peca];
 		i++;
 		pecas.splice(peca, 1);
 	}
 	i=0;
 	while(pecas.length>0 && pecas.length<=14) {
+		bTextures[i] = gl.createTexture();
+		bTextures[i].image = new Image();
+		bTextures[i].image.onload = function () {
+			handleLoadedTexture(bTextures[i])
+		};
 		var peca = Math.floor(Math.random() * pecas.length);
-		bTextures[i]=pecas[peca];
+		bTextures[i].image.src=pecas[peca];
 		i++;
 		pecas.splice(peca, 1);
 	}
+*/
 
+//O CODIGO COMENTADO A BAIXO FUNCIONA MAS O ACIMA NÃO WTF
+
+
+	pTextures[0] = gl.createTexture();
+	pTextures[0].image = new Image();
+	pTextures[0].image.onload = function () {
+		handleLoadedTexture(pTextures[0])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	pTextures[0].image.src = pecas[peca];
+	pecas.splice(peca, 1);
+
+	pTextures[1] = gl.createTexture();
+	pTextures[1].image = new Image();
+	pTextures[1].image.onload = function () {
+		handleLoadedTexture(pTextures[1])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	pTextures[1].image.src = pecas[peca];
+	pecas.splice(peca, 1);
+
+	pTextures[2] = gl.createTexture();
+	pTextures[2].image = new Image();
+	pTextures[2].image.onload = function () {
+		handleLoadedTexture(pTextures[2])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	pTextures[2].image.src = pecas[peca];
+	pecas.splice(peca, 1);
+
+	pTextures[3] = gl.createTexture();
+	pTextures[3].image = new Image();
+	pTextures[3].image.onload = function () {
+		handleLoadedTexture(pTextures[3])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	pTextures[3].image.src = pecas[peca];
+	pecas.splice(peca, 1);
+
+	pTextures[4] = gl.createTexture();
+	pTextures[4].image = new Image();
+	pTextures[4].image.onload = function () {
+		handleLoadedTexture(pTextures[4])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	pTextures[4].image.src = pecas[peca];
+	pecas.splice(peca, 1);
+
+	pTextures[5] = gl.createTexture();
+	pTextures[5].image = new Image();
+	pTextures[5].image.onload = function () {
+		handleLoadedTexture(pTextures[5])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	pTextures[5].image.src = pecas[peca];
+	pecas.splice(peca, 1);
+
+	pTextures[6] = gl.createTexture();
+	pTextures[6].image = new Image();
+	pTextures[6].image.onload = function () {
+		handleLoadedTexture(pTextures[6])
+	};
+	var peca = Math.floor(Math.random() * pecas.length);
+	pTextures[6].image.src = pecas[peca];
+	pecas.splice(peca, 1);
 
 	webGLTexture_back_face = gl.createTexture();
 	webGLTexture_back_face.image = new Image();
@@ -304,7 +384,7 @@ function initTextures() {
 		handleLoadedTexture(webGLTexture_back_face)
 	};
 
-	webGLTexture_back_face.image.src = "77135314_608402826575523_7353092974072299520_n.png";
+	webGLTexture_back_face.image.src = "blacksquare.png";
 
 }
 
@@ -372,19 +452,18 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 						 mvMatrix,
 						 primitiveType,
 						 front_face_texture) {
-
     // Pay attention to transformation order !!
-    
+
 	mvMatrix = mult( mvMatrix, translationMatrix( tx, ty, tz ) );
-						 
+
 	mvMatrix = mult( mvMatrix, rotationZZMatrix( angleZZ ) );
-	
+
 	mvMatrix = mult( mvMatrix, rotationYYMatrix( angleYY ) );
-	
+
 	mvMatrix = mult( mvMatrix, rotationXXMatrix( angleXX ) );
-	
+
 	mvMatrix = mult( mvMatrix, scalingMatrix( sx, sy, sz ) );
-						 
+
 	// Passing the Model View Matrix to apply the current transformation
 	
 	var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
@@ -425,7 +504,7 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 	gl.bindTexture(gl.TEXTURE_2D, webGLTexture_back_face);
 
 	gl.uniform1i(shaderProgram.samplerUniform, 0);
-    
+
     // The vertex indices
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_others);
@@ -489,7 +568,7 @@ function drawScene() {
 	
 	// Call the drawModel function !!
 	// Instance 1 --- left bottom
-
+/*
 	drawDominoModel( anglepXX[0],anglepYY[0],anglepZZ[0],//-angleXX, angleYY, angleZZ,
 	           sx, sy, sz,
 	           tpx[0]*sx, tpy[0]*sy, tpz[0]*sz,
@@ -538,7 +617,7 @@ function drawScene() {
 		tpx[6]*sx, tpy[6]*sy, tpz[6]*sz,
 		mvMatrix,
 		primitiveType, pTextures[6] );
-
+*/
 	// Instance 8 --- middle board
 	drawDominoModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
@@ -546,12 +625,21 @@ function drawScene() {
 		mvMatrix,
 		primitiveType, bTextures[0] );
 
+
+	var i=0;
+	for(i;i<tpx.length;i++){
+		drawDominoModel(anglepXX[i],anglepYY[i],anglepZZ[i],
+			sx, sy, sz,
+			tpx[i]*sx, tpy[i]*sz, tpz[i]*sz,
+			mvMatrix,
+			primitiveType, pTextures[i] );
+	}
 	//Computer pieces
 
 	// Instance 1 --- left bottom
-	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
-		scx, scy, scz,
-		tcx[0]*scx, tcy[0]*scy, tcz[0]*scz,
+	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
+		sx, sy, sz,
+		tcx[0]*sx, tcy[0]*sy, tcz[0]*sz,
 		mvMatrix,
 		primitiveType, cTextures[0] );
 
@@ -597,32 +685,43 @@ function drawScene() {
 		mvMatrix,
 		primitiveType, cTextures[6] );
 
-	/*
-	// Instance 2 --- LEFT TOP
-	
-	drawModel( -angleXX, -angleYY, -angleZZ,  // CW rotations
-	           sx, sy, sz,
-	           tx - 0.5, ty + 0.5, tz,
-	           mvMatrix,
-	           primitiveType );
-	           
-	// Instance 3 --- LEFT BOTTOM
-	
-	drawModel( angleXX, angleYY, -angleZZ, 
-	           sx, sy, sz,
-	           tx + 0.5, ty - 0.5, tz,
-	           mvMatrix,
-	           primitiveType );
-	           	       
-	// Instance 4 --- RIGHT BOTTOM
-	
-	drawModel( angleXX, -angleYY, angleZZ,  // CW rotations
-	           sx, sy, sz,
-	           tx - 0.5, ty - 0.5, tz,
-	           mvMatrix,
-	           primitiveType );
-	*/
+	var j=1;
+	for(j;j<=tpx.length;j++){
+		document.getElementById("peca"+j.toString()).disabled = false;
+	}
+	j=tpx.length+1;
+	for(j;j>tpx.length && j<=9;j++){
+		document.getElementById("peca"+j.toString()).disabled = true;
+	}
+
+/*
+	if(tpx.length<8){
+		document.getElementById("peca8").disabled = true;
+	}
+	else{
+		document.getElementById("peca8").disabled = false;
+	}
+	if(tpx.length<7){
+		document.getElementById("peca").disabled = true;
+	}
+	else{
+		document.getElementById("peca8").disabled = false;
+	}
+	if(tpx.length<7){
+		document.getElementById("peca8").disabled = true;
+	}
+	else{
+		document.getElementById("peca8").disabled = false;
+	}
+	if(tpx.length<6){
+		document.getElementById("peca8").disabled = true;
+	}
+	else{
+		document.getElementById("peca8").disabled = false;
+	}
+*/
 }
+
 
 //----------------------------------------------------------------------------
 //
@@ -733,7 +832,6 @@ function handleKeys() {
 		}
 
 		// Render the viewport
-		render();
 	});
 }
 
@@ -1052,9 +1150,26 @@ function setEventListeners( canvas ){
 	document.getElementById("peca6").onclick = function(){
 		pecaIndex=5;
 	}
+	if(tpx.length<7){
+		document.getElementById("peca7").disabled = true;
+	}
 	document.getElementById("peca7").onclick = function(){
 		pecaIndex=6;
 	}
+	document.getElementById("peca8").onclick = function(){
+		pecaIndex=7;
+	}
+
+	document.getElementById("buscar").onclick = function(){
+
+		tpx[tpx.length]=tpx[tpx.length-1]+1.7;
+		tpy[tpy.length]=-7;
+		tpz[tpz.length]=0;
+		anglepXX[anglepXX.length]=0;
+		anglepYY[anglepYY.length]=0;
+		anglepZZ[anglepZZ.length]=0;
+	};
+
 }
 
 //----------------------------------------------------------------------------
