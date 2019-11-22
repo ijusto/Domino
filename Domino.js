@@ -63,16 +63,16 @@ var anglepYY = [0,0,0,0,0,0,0];
 var anglepZZ = [0,0,0,0,0,0,0];
 
 
-var pecaIndex = 0;
+var tileIndex = 0;
 
 //Texturas player
-var pTextures = [];
+var playerTextures = [];
 
-//Texturas computador
-var cTextures = [];
+//Texturas computer
+var pcTextures = [];
 
-//Texturas "baralho"
-var bTextures = [];
+//Texturas "deck"
+var deckTextures = [];
 
 // The scaling factors
 
@@ -170,6 +170,7 @@ var textureCoords_dots_face = [
           0.5, 1,
           0.0, 1
 ];
+
 var textureCoords_other_faces = [
           // Back face
           1.0, 0.0,
@@ -205,9 +206,9 @@ var textureCoords_other_faces = [
 // Vertex indices defining the triangles
         
 var cubeVertexIndices_front = [
-
             0, 1, 2,      0, 3, 2    // Front face
 	];
+
 var cubeVertexIndices_others = [
             4, 5, 6,      4, 6, 7,    // Back face
 
@@ -220,14 +221,16 @@ var cubeVertexIndices_others = [
             20, 21, 22,   20, 22, 23  // Left face
 ];
 
-var pecas = ["0_0.png", "0_1.png", "0_2.png", "0_3.png", "0_4.png", "0_5.png", "0_6.png",
-	"1_1.png", "1_2.png", "1_3.png", "1_4.png", "1_5.png", "1_6.png",
-	"2_2.png", "2_3.png", "2_4.png", "2_5.png", "2_6.png",
-	"3_3.png", "3_4.png", "3_5.png", "3_6.png",
-	"4_4.png", "4_5.png", "4_6.png",
-	"5_5.png", "5_6.png",
-	"6_6.png"]
-         
+var main, sec, count=0, tiles=[];
+for(main = 0; main < 7; main++) {
+	for (sec = main; sec < 7; sec++) {
+		tiles[count] = main + "_" + sec + ".png";
+		console.log(tiles[count]);
+		count++;
+	}
+}
+console.log(tiles.slice(0, tiles.length));
+
 //----------------------------------------------------------------------------
 //
 // The WebGL code
@@ -251,148 +254,63 @@ function handleLoadedTexture(texture) {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
-
-var webGLTexture_dots_face_0_2, webGLTexture_back_face;
-var textures_imgs = {};
+var webGLTexture_dots_face = null, webGLTexture_black_faces = null;
 
 function initTextures() {
+	bindImgToTexture(pcTextures, 0, null);
+	pcTextures[0].image.src = tiles[27]; // 6_6.png
+	tiles.splice(27, 1);
 
+	var i = 1;
+	while(i < 7) {
+		addTextureToList(pcTextures, i);
+		i++;
+	}
+	i=0;
+	while(tiles.length>14 && tiles.length <=21) {
+		addTextureToList(playerTextures, i);
+		i++;
+	}
+	i=0;
+	while(tiles.length>0 && tiles.length<=14) {
+		addTextureToList(deckTextures, i);
+		i++;
+	}
 
-	cTextures[0] = gl.createTexture();
-	cTextures[0].image = new Image();
-	cTextures[0].image.onload = function () {
-		handleLoadedTexture(cTextures[0])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	cTextures[0].image.src = pecas[27];
-	pecas.splice(27, 1);
-	/*
-	var i, j, key;
-	for(i=0; i<7; i++){
-		for(j=1; i<7; i++) {
-			key = i+"-"+j;
-			textures_imgs[key] = key+"png";
-		}
-	}*/
+	bindImgToTexture(webGLTexture_black_faces, null, "blacksquare.png");
+}
+
+function addTextureToList(textureList, index) {
+	bindImgToTexture(textureList, index, null);
+	let random_tile = Math.floor(Math.random() * tiles.length);
+	textureList[index].image.src=tiles[random_tile];
+	tiles.splice(random_tile, 1);
+}
+
+function bindImgToTexture(textureList, index, img){
+	if(textureList === null && index == null){
+		textureList = gl.createTexture();
+		textureList.image = new Image();
+		textureList.image.onload = function () {
+			handleLoadedTexture(textureList)
+		};
+		textureList.image.src = img;
+	} else {
+		textureList[index] = gl.createTexture();
+		textureList[index].image = new Image();
+		let texture = textureList[index];
+		textureList[index].image.onload = function () {
+			handleLoadedTexture(texture)
+		};
+	}
+}
 /*
-	var i=0;
-	for(i;i<8;i++) {
-		var peca = Math.floor(Math.random() * pecas.length);
-		pTextures[i] = gl.createTexture();
-		pTextures[i].image = new Image();
-		pTextures[i].image.onload = function () {
-			handleLoadedTexture(pTextures[i])
-		};
-		pTextures[i].image.src=pecas[peca];
-		pecas.splice(peca, 1);
-	}
-	i=0;
-	while(pecas.length>14 && pecas.length <=21) {
-		cTextures[i] = gl.createTexture();
-		cTextures[i] = new Image();
-		cTextures[i].image.onload = function () {
-			handleLoadedTexture(cTextures[i])
-		};
-		var peca = Math.floor(Math.random() * pecas.length);
-		cTextures[i].image.src=pecas[peca];
-		i++;
-		pecas.splice(peca, 1);
-	}
-	i=0;
-	while(pecas.length>0 && pecas.length<=14) {
-		bTextures[i] = gl.createTexture();
-		bTextures[i].image = new Image();
-		bTextures[i].image.onload = function () {
-			handleLoadedTexture(bTextures[i])
-		};
-		var peca = Math.floor(Math.random() * pecas.length);
-		bTextures[i].image.src=pecas[peca];
-		i++;
-		pecas.splice(peca, 1);
-	}
-*/
-
-//O CODIGO COMENTADO A BAIXO FUNCIONA MAS O ACIMA NÃO WTF
-
-
-	pTextures[0] = gl.createTexture();
-	pTextures[0].image = new Image();
-	pTextures[0].image.onload = function () {
-		handleLoadedTexture(pTextures[0])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	pTextures[0].image.src = pecas[peca];
-	pecas.splice(peca, 1);
-
-	pTextures[1] = gl.createTexture();
-	pTextures[1].image = new Image();
-	pTextures[1].image.onload = function () {
-		handleLoadedTexture(pTextures[1])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	pTextures[1].image.src = pecas[peca];
-	pecas.splice(peca, 1);
-
-	pTextures[2] = gl.createTexture();
-	pTextures[2].image = new Image();
-	pTextures[2].image.onload = function () {
-		handleLoadedTexture(pTextures[2])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	pTextures[2].image.src = pecas[peca];
-	pecas.splice(peca, 1);
-
-	pTextures[3] = gl.createTexture();
-	pTextures[3].image = new Image();
-	pTextures[3].image.onload = function () {
-		handleLoadedTexture(pTextures[3])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	pTextures[3].image.src = pecas[peca];
-	pecas.splice(peca, 1);
-
-	pTextures[4] = gl.createTexture();
-	pTextures[4].image = new Image();
-	pTextures[4].image.onload = function () {
-		handleLoadedTexture(pTextures[4])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	pTextures[4].image.src = pecas[peca];
-	pecas.splice(peca, 1);
-
-	pTextures[5] = gl.createTexture();
-	pTextures[5].image = new Image();
-	pTextures[5].image.onload = function () {
-		handleLoadedTexture(pTextures[5])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	pTextures[5].image.src = pecas[peca];
-	pecas.splice(peca, 1);
-
-	pTextures[6] = gl.createTexture();
-	pTextures[6].image = new Image();
-	pTextures[6].image.onload = function () {
-		handleLoadedTexture(pTextures[6])
-	};
-	var peca = Math.floor(Math.random() * pecas.length);
-	pTextures[6].image.src = pecas[peca];
-	pecas.splice(peca, 1);
-
-	webGLTexture_back_face = gl.createTexture();
-	webGLTexture_back_face.image = new Image();
-	webGLTexture_back_face.image.onload = function () {
-		handleLoadedTexture(webGLTexture_back_face)
-	};
-
-	webGLTexture_back_face.image.src = "blacksquare.png";
-
-}
-
 function changeTexture(){
-	var peca = Math.floor(Math.random() * pecas.length);
-	webGLTexture_dots_face.image.src = pecas[peca];
-	pecas.splice(peca, 1);
+	var random_tile = Math.floor(Math.random() * tiles.length);
+	webGLTexture_dots_face.image.src = tiles[random_tile];
+	tiles.splice(random_tile, 1);
 }
+ */
 
 //----------------------------------------------------------------------------
 
@@ -501,7 +419,7 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer1.itemSize, gl.FLOAT, false, 0, 0);
 
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, webGLTexture_back_face);
+	gl.bindTexture(gl.TEXTURE_2D, webGLTexture_black_faces);
 
 	gl.uniform1i(shaderProgram.samplerUniform, 0);
 
@@ -623,7 +541,7 @@ function drawScene() {
 		sx, sy, sz,
 		tx*sx, ty*sy, tz*sz,
 		mvMatrix,
-		primitiveType, bTextures[0] );
+		primitiveType, deckTextures[0] );
 
 
 	var i=0;
@@ -632,7 +550,7 @@ function drawScene() {
 			sx, sy, sz,
 			tpx[i]*sx, tpy[i]*sz, tpz[i]*sz,
 			mvMatrix,
-			primitiveType, pTextures[i] );
+			primitiveType, playerTextures[i] );
 	}
 	//Computer pieces
 
@@ -641,83 +559,83 @@ function drawScene() {
 		sx, sy, sz,
 		tcx[0]*sx, tcy[0]*sy, tcz[0]*sz,
 		mvMatrix,
-		primitiveType, cTextures[0] );
+		primitiveType, pcTextures[0] );
 
 	// Instance 2 --- left bottom
 	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
 		scx, scy, scz,
 		tcx[1]*scx, tcy[1]*scy, tcz[1]*scz,
 		mvMatrix,
-		primitiveType, cTextures[1] );
+		primitiveType, pcTextures[1] );
 
 	// Instance 3 --- left bottom
 	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
 		scx, scy, scz,
 		tcx[2]*scx, tcy[2]*scy, tcz[2]*scz,
 		mvMatrix,
-		primitiveType, cTextures[2] );
+		primitiveType, pcTextures[2] );
 
 	// Instance 4 --- left bottom
 	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
 		scx, scy, scz,
 		tcx[3]*scx, tcy[3]*scy, tcz[3]*scz,
 		mvMatrix,
-		primitiveType, cTextures[3] );
+		primitiveType, pcTextures[3] );
 
 	// Instance 5 --- left bottom
 	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
 		scx, scy, scz,
 		tcx[4]*scx, tcy[4]*scy, tcz[4]*scz,
 		mvMatrix,
-		primitiveType, cTextures[4] );
+		primitiveType, pcTextures[4] );
 
 	// Instance 6 --- left bottom
 	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
 		scx, scy, scz,
 		tcx[5]*scx, tcy[5]*scy, tcz[5]*scz,
 		mvMatrix,
-		primitiveType, cTextures[5] );
+		primitiveType, pcTextures[5] );
 
 	// Instance 7 --- left bottom
 	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
 		scx, scy, scz,
 		tcx[6]*scx, tcy[6]*scy, tcz[6]*scz,
 		mvMatrix,
-		primitiveType, cTextures[6] );
+		primitiveType, pcTextures[6] );
 
 	var j=1;
 	for(j;j<=tpx.length;j++){
-		document.getElementById("peca"+j.toString()).disabled = false;
+		document.getElementById("tile"+j.toString()).disabled = false;
 	}
 	j=tpx.length+1;
 	for(j;j>tpx.length && j<=9;j++){
-		document.getElementById("peca"+j.toString()).disabled = true;
+		document.getElementById("tile"+j.toString()).disabled = true;
 	}
 
 /*
 	if(tpx.length<8){
-		document.getElementById("peca8").disabled = true;
+		document.getElementById("tile8").disabled = true;
 	}
 	else{
-		document.getElementById("peca8").disabled = false;
+		document.getElementById("tile8").disabled = false;
 	}
 	if(tpx.length<7){
-		document.getElementById("peca").disabled = true;
+		document.getElementById("tile").disabled = true;
 	}
 	else{
-		document.getElementById("peca8").disabled = false;
+		document.getElementById("tile8").disabled = false;
 	}
 	if(tpx.length<7){
-		document.getElementById("peca8").disabled = true;
+		document.getElementById("tile8").disabled = true;
 	}
 	else{
-		document.getElementById("peca8").disabled = false;
+		document.getElementById("tile8").disabled = false;
 	}
 	if(tpx.length<6){
-		document.getElementById("peca8").disabled = true;
+		document.getElementById("tile8").disabled = true;
 	}
 	else{
-		document.getElementById("peca8").disabled = false;
+		document.getElementById("tile8").disabled = false;
 	}
 */
 }
@@ -798,25 +716,25 @@ function handleKeys() {
 		
 		// Left cursor key
 
-		tpx[pecaIndex]-=0.05;
+		tpx[tileIndex]-=0.05;
 	}
 	if (currentlyPressedKeys[39]) {
 		
 		// Right cursor key
 
-		tpx[pecaIndex]+=0.05;
+		tpx[tileIndex]+=0.05;
 	}
 	if (currentlyPressedKeys[38]) {
 		
 		// Up cursor key
 		
-		tpy[pecaIndex]+=0.05;
+		tpy[tileIndex]+=0.05;
 	}
 	if (currentlyPressedKeys[40]) {
 		
 		// Down cursor key
 
-		tpy[pecaIndex]-=0.05;
+		tpy[tileIndex]-=0.05;
 	}
 	document.addEventListener("keypress", function(event){
 
@@ -828,7 +746,7 @@ function handleKeys() {
 
 		switch(key){
 			case 114:
-				anglepZZ[pecaIndex]+=90;
+				anglepZZ[tileIndex]+=90;
 		}
 
 		// Render the viewport
@@ -858,7 +776,6 @@ function handleMouseDown(event) {
 }
 
 function handleMouseUp(event) {
-
     mouseDown = false;
 }
 
@@ -1132,36 +1049,43 @@ function setEventListeners( canvas ){
 		rotationZZ_SPEED = 1;
 	};
 
-	document.getElementById("peca1").onclick = function(){
-		pecaIndex=0;
-	}
-	document.getElementById("peca2").onclick = function(){
-		pecaIndex=1;
-	}
-	document.getElementById("peca3").onclick = function(){
-		pecaIndex=2;
-	}
-	document.getElementById("peca4").onclick = function(){
-		pecaIndex=3;
-	}
-	document.getElementById("peca5").onclick = function(){
-		pecaIndex=4;
-	}
-	document.getElementById("peca6").onclick = function(){
-		pecaIndex=5;
-	}
+	document.getElementById("tile1").onclick = function(){
+		tileIndex=0;
+	};
+
+	document.getElementById("tile2").onclick = function(){
+		tileIndex=1;
+	};
+
+	document.getElementById("tile3").onclick = function(){
+		tileIndex=2;
+	};
+
+	document.getElementById("tile4").onclick = function(){
+		tileIndex=3;
+	};
+
+	document.getElementById("tile5").onclick = function(){
+		tileIndex=4;
+	};
+
+	document.getElementById("tile6").onclick = function(){
+		tileIndex=5;
+	};
+
 	if(tpx.length<7){
-		document.getElementById("peca7").disabled = true;
-	}
-	document.getElementById("peca7").onclick = function(){
-		pecaIndex=6;
-	}
-	document.getElementById("peca8").onclick = function(){
-		pecaIndex=7;
+		document.getElementById("tile7").disabled = true;
 	}
 
-	document.getElementById("buscar").onclick = function(){
+	document.getElementById("tile7").onclick = function(){
+		tileIndex=6;
+	};
 
+	document.getElementById("tile8").onclick = function(){
+		tileIndex=7;
+	};
+
+	document.getElementById("getTile").onclick = function(){
 		tpx[tpx.length]=tpx[tpx.length-1]+1.7;
 		tpy[tpy.length]=-7;
 		tpz[tpz.length]=0;
