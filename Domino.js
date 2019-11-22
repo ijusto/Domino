@@ -475,67 +475,17 @@ function drawScene() {
 	}
 	
 	// Passing the Projection Matrix to apply the current projection
-	
-	var pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-	
+
+	let pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+
 	gl.uniformMatrix4fv(pUniform, false, new Float32Array(flatten(pMatrix)));
 	
 	// NEW --- Instantianting the same model more than once !!
 	
 	// And with diferent transformation parameters !!
 	
-	// Call the drawModel function !!
-	// Instance 1 --- left bottom
-/*
-	drawDominoModel( anglepXX[0],anglepYY[0],anglepZZ[0],//-angleXX, angleYY, angleZZ,
-	           sx, sy, sz,
-	           tpx[0]*sx, tpy[0]*sy, tpz[0]*sz,
-	           mvMatrix,
-	           primitiveType,
-	 			pTextures[0]);
+	// Call the drawModel function
 
-	// Instance 2 --- left bottom
-	drawDominoModel(anglepXX[1],anglepYY[1],anglepZZ[1],//-angleXX, angleYY, angleZZ,
-		sx, sy, sz,
-		tpx[1]*sx, tpy[1]*sy, tpz[1]*sz,
-		mvMatrix,
-		primitiveType, pTextures[1] );
-
-	// Instance 3 --- left bottom
-	drawDominoModel(anglepXX[2],anglepYY[2],anglepZZ[2],//-angleXX, angleYY, angleZZ,
-		sx, sy, sz,
-		tpx[2]*sx, tpy[2]*sy, tpz[2]*sz,
-		mvMatrix,
-		primitiveType, pTextures[2] );
-
-	// Instance 4 --- left bottom
-	drawDominoModel( anglepXX[3],anglepYY[3],anglepZZ[3],//-angleXX, angleYY, angleZZ,
-		sx, sy, sz,
-		tpx[3]*sx, tpy[3]*sy, tpz[3]*sz,
-		mvMatrix,
-		primitiveType, pTextures[3] );
-
-	// Instance 5 --- left bottom
-	drawDominoModel( anglepXX[4],anglepYY[4],anglepZZ[4],
-		sx, sy, sz,
-		tpx[4]*sx, tpy[4]*sy, tpz[4]*sz,
-		mvMatrix,
-		primitiveType, pTextures[4] );
-
-	// Instance 6 --- left bottom
-	drawDominoModel(anglepXX[5],anglepYY[5],anglepZZ[5],
-		sx, sy, sz,
-		tpx[5]*sx, tpy[5]*sy, tpz[5]*sz,
-		mvMatrix,
-		primitiveType, pTextures[5] );
-
-	// Instance 7 --- left bottom
-	drawDominoModel(anglepXX[6],anglepYY[6],anglepZZ[6],
-		sx, sy, sz,
-		tpx[6]*sx, tpy[6]*sy, tpz[6]*sz,
-		mvMatrix,
-		primitiveType, pTextures[6] );
-*/
 	// Instance 8 --- middle board
 	drawDominoModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
@@ -544,100 +494,44 @@ function drawScene() {
 		primitiveType, deckTextures[0] );
 
 
-	var i=0;
-	for(i;i<tpx.length;i++){
+	let i = 0;
+	for(i; i < tpx.length; i++){
 		drawDominoModel(anglepXX[i],anglepYY[i],anglepZZ[i],
 			sx, sy, sz,
 			tpx[i]*sx, tpy[i]*sz, tpz[i]*sz,
 			mvMatrix,
-			primitiveType, playerTextures[i] );
+			primitiveType, playerTextures[i]
+		);
 	}
+
 	//Computer pieces
-
-	// Instance 1 --- left bottom
-	drawDominoModel( 0,0,0,//-angleXX, angleYY, angleZZ,
-		sx, sy, sz,
-		tcx[0]*sx, tcy[0]*sy, tcz[0]*sz,
-		mvMatrix,
-		primitiveType, pcTextures[0] );
-
-	// Instance 2 --- left bottom
-	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
-		scx, scy, scz,
-		tcx[1]*scx, tcy[1]*scy, tcz[1]*scz,
-		mvMatrix,
-		primitiveType, pcTextures[1] );
-
-	// Instance 3 --- left bottom
-	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
-		scx, scy, scz,
-		tcx[2]*scx, tcy[2]*scy, tcz[2]*scz,
-		mvMatrix,
-		primitiveType, pcTextures[2] );
-
-	// Instance 4 --- left bottom
-	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
-		scx, scy, scz,
-		tcx[3]*scx, tcy[3]*scy, tcz[3]*scz,
-		mvMatrix,
-		primitiveType, pcTextures[3] );
-
-	// Instance 5 --- left bottom
-	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
-		scx, scy, scz,
-		tcx[4]*scx, tcy[4]*scy, tcz[4]*scz,
-		mvMatrix,
-		primitiveType, pcTextures[4] );
-
-	// Instance 6 --- left bottom
-	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
-		scx, scy, scz,
-		tcx[5]*scx, tcy[5]*scy, tcz[5]*scz,
-		mvMatrix,
-		primitiveType, pcTextures[5] );
-
-	// Instance 7 --- left bottom
-	drawDominoModel( 0,180,0,//-angleXX, angleYY, angleZZ,
-		scx, scy, scz,
-		tcx[6]*scx, tcy[6]*scy, tcz[6]*scz,
-		mvMatrix,
-		primitiveType, pcTextures[6] );
-
-	var j=1;
-	for(j;j<=tpx.length;j++){
-		document.getElementById("tile"+j.toString()).disabled = false;
-	}
-	j=tpx.length+1;
-	for(j;j>tpx.length && j<=9;j++){
-		document.getElementById("tile"+j.toString()).disabled = true;
+	i = 0;
+	let angleY = 0, sxtmp = sx, sytmp = sy, sztmp = sz;
+	for(i; i < pcTextures.length; i++){
+		if(i === 1){
+			angleY = 180;
+			sxtmp = scx;
+			sytmp = scy;
+			sztmp = scz;
+		}
+		drawDominoModel( 0, angleY,0, //-angleXX, angleYY, angleZZ,
+			sxtmp, sytmp, sztmp,
+			tcx[i]*sxtmp, tcy[i]*sytmp, tcz[i]*sztmp,
+			mvMatrix,
+			primitiveType, pcTextures[i]
+		);
 	}
 
-/*
-	if(tpx.length<8){
-		document.getElementById("tile8").disabled = true;
+	let j = 1;
+	for(j; j <= tpx.length; j++){
+		document.getElementById("tile" + j.toString()).disabled = false;
 	}
-	else{
-		document.getElementById("tile8").disabled = false;
+
+	j = tpx.length + 1;
+	for(j; j > tpx.length && j <= 9; j++){
+		document.getElementById("tile" + j.toString()).disabled = true;
 	}
-	if(tpx.length<7){
-		document.getElementById("tile").disabled = true;
-	}
-	else{
-		document.getElementById("tile8").disabled = false;
-	}
-	if(tpx.length<7){
-		document.getElementById("tile8").disabled = true;
-	}
-	else{
-		document.getElementById("tile8").disabled = false;
-	}
-	if(tpx.length<6){
-		document.getElementById("tile8").disabled = true;
-	}
-	else{
-		document.getElementById("tile8").disabled = false;
-	}
-*/
+
 }
 
 
@@ -659,17 +553,14 @@ function animate() {
 		var elapsed = timeNow - lastTime;
 		
 		if( rotationXX_ON ) {
-
 			angleXX += rotationXX_DIR * rotationXX_SPEED * (90 * elapsed) / 1000.0;
 	    }
 
 		if( rotationYY_ON ) {
-
 			angleYY += rotationYY_DIR * rotationYY_SPEED * (90 * elapsed) / 1000.0;
 	    }
 
 		if( rotationZZ_ON ) {
-
 			angleZZ += rotationZZ_DIR * rotationZZ_SPEED * (90 * elapsed) / 1000.0;
 	    }
 	}
@@ -686,56 +577,42 @@ function animate() {
 var currentlyPressedKeys = {};
 
 function handleKeys() {
-	
+	let valuePageUpOrDown;
+
 	if (currentlyPressedKeys[33]) {
-		
-		// Page Up
-		
-		sx *= 0.99;
-		
-		sz = sy = sx;
-
-		scx *= 0.99;
-
-		scz = scy = scx;
-
+		valuePageUpOrDown = 0.99;  // Page Up
+	} else if (currentlyPressedKeys[34]) {
+		valuePageUpOrDown = 1.01;  // Page Down
 	}
-	if (currentlyPressedKeys[34]) {
-		
-		// Page Down
-		
-		sx *= 1.01;
-		
+
+	if (currentlyPressedKeys[33] || currentlyPressedKeys[34]) {
+		sx *= valuePageUpOrDown;
 		sz = sy = sx;
-
-		scx *= 1.01;
-
+		scx *= valuePageUpOrDown;
 		scz = scy = scx;
 	}
+
+
 	if (currentlyPressedKeys[37]) {
-		
 		// Left cursor key
-
 		tpx[tileIndex]-=0.05;
 	}
-	if (currentlyPressedKeys[39]) {
-		
-		// Right cursor key
 
+	if (currentlyPressedKeys[39]) {
+		// Right cursor key
 		tpx[tileIndex]+=0.05;
 	}
+
 	if (currentlyPressedKeys[38]) {
-		
 		// Up cursor key
-		
 		tpy[tileIndex]+=0.05;
 	}
-	if (currentlyPressedKeys[40]) {
-		
-		// Down cursor key
 
+	if (currentlyPressedKeys[40]) {
+		// Down cursor key
 		tpy[tileIndex]-=0.05;
 	}
+
 	document.addEventListener("keypress", function(event){
 
 		var bgColor = document.getElementById("bg-color");
@@ -767,7 +644,6 @@ var lastMouseX = null;
 var lastMouseY = null;
 
 function handleMouseDown(event) {
-	
     mouseDown = true;
   
     lastMouseX = event.clientX;
@@ -852,12 +728,10 @@ function setEventListeners( canvas ){
 	// From learningwebgl.com
 
     function handleKeyDown(event) {
-		
         currentlyPressedKeys[event.keyCode] = true;
     }
 
     function handleKeyUp(event) {
-		
         currentlyPressedKeys[event.keyCode] = false;
     }
 
@@ -870,16 +744,12 @@ function setEventListeners( canvas ){
 	var projection = document.getElementById("projection-selection");
 	
 	projection.addEventListener("click", function(){
-				
 		// Getting the selection
-		
 		var p = projection.selectedIndex;
 				
 		switch(p){
-			
 			case 0 : projectionType = 0;
 				break;
-			
 			case 1 : projectionType = 1;
 				break;
 		}  	
@@ -889,188 +759,142 @@ function setEventListeners( canvas ){
 	// Button events
 	
 	document.getElementById("XX-on-off-button").onclick = function(){
-		
 		// Switching on / off
-		
 		if( rotationXX_ON ) {
-			
 			rotationXX_ON = 0;
 		}
 		else {
-			
 			rotationXX_ON = 1;
 		}  
 	};
 
 	document.getElementById("XX-direction-button").onclick = function(){
-		
 		// Switching the direction
-		
 		if( rotationXX_DIR === 1 ) {
-
 			rotationXX_DIR = -1;
 		}
 		else {
-			
 			rotationXX_DIR = 1;
 		}  
 	};      
 
 	document.getElementById("XX-slower-button").onclick = function(){
-		
 		rotationXX_SPEED *= 0.75;  
 	};      
 
 	document.getElementById("XX-faster-button").onclick = function(){
-		
 		rotationXX_SPEED *= 1.25;  
 	};      
 
 	document.getElementById("YY-on-off-button").onclick = function(){
-		
 		// Switching on / off
-		
 		if( rotationYY_ON ) {
-			
 			rotationYY_ON = 0;
 		}
 		else {
-			
 			rotationYY_ON = 1;
 		}  
 	};
 
 	document.getElementById("YY-direction-button").onclick = function(){
-		
 		// Switching the direction
-		
 		if( rotationYY_DIR === 1 ) {
-			
 			rotationYY_DIR = -1;
 		}
 		else {
-			
 			rotationYY_DIR = 1;
 		}  
 	};      
 
 	document.getElementById("YY-slower-button").onclick = function(){
-		
 		rotationYY_SPEED *= 0.75;  
 	};      
 
 	document.getElementById("YY-faster-button").onclick = function(){
-		
 		rotationYY_SPEED *= 1.25;  
 	};      
 
 	document.getElementById("ZZ-on-off-button").onclick = function(){
-		
 		// Switching on / off
-		
 		if( rotationZZ_ON ) {
-			
 			rotationZZ_ON = 0;
 		}
 		else {
-			
 			rotationZZ_ON = 1;
 		}  
 	};
 
 	document.getElementById("ZZ-direction-button").onclick = function(){
-		
 		// Switching the direction
-		
 		if( rotationZZ_DIR === 1 ) {
-			
 			rotationZZ_DIR = -1;
 		}
 		else {
-			
 			rotationZZ_DIR = 1;
 		}  
 	};      
 
 	document.getElementById("ZZ-slower-button").onclick = function(){
-		
 		rotationZZ_SPEED *= 0.75;  
 	};      
 
 	document.getElementById("ZZ-faster-button").onclick = function(){
-		
 		rotationZZ_SPEED *= 1.25;  
 	};      
 
 	document.getElementById("reset-button").onclick = function(){
-		
 		// The initial values
-
 		tx = 0.0;
-
 		ty = 0.0;
-
 		tz = 0.0;
 
 		angleXX = 0.0;
-
 		angleYY = 0.0;
-
 		angleZZ = 0.0;
 
 		sx = 0.1;
-
 		sy = 0.1;
-
 		sz = 0.1;
 
 		scx = 0.05;
-
 		scy = 0.05;
-
 		scz = 0.05;
 		
 		rotationXX_ON = 0;
-		
 		rotationXX_DIR = 1;
-		
 		rotationXX_SPEED = 1;
 
 		rotationYY_ON = 0;
-		
 		rotationYY_DIR = 1;
-		
 		rotationYY_SPEED = 1;
 
 		rotationZZ_ON = 0;
-		
 		rotationZZ_DIR = 1;
-		
 		rotationZZ_SPEED = 1;
 	};
 
 	document.getElementById("tile1").onclick = function(){
-		tileIndex=0;
+		tileIndex = 0;
 	};
 
 	document.getElementById("tile2").onclick = function(){
-		tileIndex=1;
+		tileIndex = 1;
 	};
 
 	document.getElementById("tile3").onclick = function(){
-		tileIndex=2;
+		tileIndex = 2;
 	};
 
 	document.getElementById("tile4").onclick = function(){
-		tileIndex=3;
+		tileIndex = 3;
 	};
 
 	document.getElementById("tile5").onclick = function(){
-		tileIndex=4;
+		tileIndex = 4;
 	};
 
 	document.getElementById("tile6").onclick = function(){
-		tileIndex=5;
+		tileIndex = 5;
 	};
 
 	if(tpx.length<7){
@@ -1078,20 +902,20 @@ function setEventListeners( canvas ){
 	}
 
 	document.getElementById("tile7").onclick = function(){
-		tileIndex=6;
+		tileIndex = 6;
 	};
 
 	document.getElementById("tile8").onclick = function(){
-		tileIndex=7;
+		tileIndex = 7;
 	};
 
 	document.getElementById("getTile").onclick = function(){
-		tpx[tpx.length]=tpx[tpx.length-1]+1.7;
-		tpy[tpy.length]=-7;
-		tpz[tpz.length]=0;
-		anglepXX[anglepXX.length]=0;
-		anglepYY[anglepYY.length]=0;
-		anglepZZ[anglepZZ.length]=0;
+		tpx[tpx.length] = tpx[tpx.length-1] + 1.7;
+		tpy[tpy.length] = -7;
+		tpz[tpz.length] = 0;
+		anglepXX[anglepXX.length] = 0;
+		anglepYY[anglepYY.length] = 0;
+		anglepZZ[anglepZZ.length] = 0;
 	};
 
 }
