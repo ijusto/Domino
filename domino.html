@@ -46,8 +46,14 @@
     <body onload="runWebGL();">
 
         <div style="text-align:center;">
+            <div class="container" style="position: relative;">
 
-            <canvas id="my-canvas" style="border:1px solid #000000;" width="900" height="500"></canvas>
+                <canvas id="my-canvas" style="border:1px solid #000000;" width="900" height="500"></canvas>
+                <div id="overlay" style="position: absolute; left: 870px; top: 10px;">
+                    <div>Number of tiles in deck: <span id="deck_tile_number"></span></div>
+                    <!--<div>Winner: <span id="winner"></span></div>-->
+                </div>
+            </div>
 
             <p><button id="getTile">Get tile</button></p>
 
@@ -68,6 +74,18 @@
                 <button id="tile8">Tile 8</button>
 
                 <button id="tile9">Tile 9</button>
+                <button id="tile10">Tile 10</button>
+                <button id="tile11">Tile 11</button>
+                <button id="tile12">Tile 12</button>
+                <button id="tile13">Tile 13</button>
+                <button id="tile14">Tile 14</button>
+                <button id="tile15">Tile 15</button>
+                <button id="tile16">Tile 16</button>
+                <button id="tile17">Tile 17</button>
+                <button id="tile18">Tile 18</button>
+                <button id="tile19">Tile 19</button>
+                <button id="tile20">Tile 20</button>
+                <button id="tile21">Tile 21</button>
             </p>
             <p>Use cursor keys to spin and <code>Page Up</code>/<code>Page Down</code> to zoom out/in.</p>
 

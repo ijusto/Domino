@@ -50,7 +50,6 @@ var angleXX = 0.0;
 var angleYY = 0.0;
 var angleZZ = 0.0;
 
-
 var anglepXX = [0, 0, 0, 0, 0, 0, 0];
 var anglepYY = [0, 0, 0, 0, 0, 0, 0];
 var anglepZZ = [0, 0, 0, 0, 0, 0, 0];
@@ -65,6 +64,7 @@ var pcTextures = [];
 
 //Textures "deck"
 var deckTextures = [];
+var deckTileNumber = 0;
 
 // The scaling factors
 var sx = 0.10;
@@ -199,15 +199,15 @@ var cubeVertexIndicesNotFrontFace = [
 	20, 21, 22,   20, 22, 23  // Left face
 ];
 
-var main, sec, count=0, tiles=[];
-for(main = 0; main < 7; main++) {
-	for (sec = main; sec < 7; sec++) {
-		tiles[count] = main + "_" + sec + ".png";
-		console.log(tiles[count]);
+var main_number, sec_number, count = 0, tiles = [];
+for(main_number = 0; main_number < 7; main_number++) {
+	for (sec_number = main_number; sec_number < 7; sec_number++) {
+		tiles[count] = main_number + "_" + sec_number + ".png";
+		console.log(main_number + "_" + sec_number + ".png");
 		count++;
 	}
 }
-console.log(tiles.slice(0, tiles.length));
+//console.log(tiles.slice(0, tiles.length));
 
 //----------------------------------------------------------------------------
 //
@@ -242,28 +242,30 @@ function initTextures() {
 
 	var i = 1;
 	while(i < 7) {
-		addTextureToList(pcTextures, i);
+		addTextureToList(pcTextures, i, tiles);
 		i++;
 	}
 	i=0;
 	while(tiles.length>14 && tiles.length <=21) {
-		addTextureToList(playerTextures, i);
+		addTextureToList(playerTextures, i, tiles);
 		i++;
 	}
 	i=0;
 	while(tiles.length>0 && tiles.length<=14) {
-		addTextureToList(deckTextures, i);
+		addTextureToList(deckTextures, i, tiles);
 		i++;
 	}
+
+	deckTileNumber = deckTextures.length;
 
 	bindImgToTexture(webGLTexture_black_faces, null, "blacksquare.png");
 }
 
-function addTextureToList(textureList, index) {
+function addTextureToList(textureList, index, fromList) {
 	bindImgToTexture(textureList, index, null);
-	let random_tile = Math.floor(Math.random() * tiles.length);
-	textureList[index].image.src = tiles[random_tile];
-	tiles.splice(random_tile, 1);
+	let random_tile = Math.floor(Math.random() * fromList.length);
+	textureList[index].image.src = fromList[random_tile];
+	fromList.splice(random_tile, 1);
 }
 
 function bindImgToTexture(textureList, index, img){
@@ -508,11 +510,13 @@ function drawScene() {
 	// Call the drawModel function
 
 	// Instance 8 --- middle board
+	/*
 	drawDominoModel(-angleXX, angleYY, angleZZ,
 		sx, sy, sz,
 		tx*sx, ty*sy, tz*sz,
 		mvMatrix,
 		primitiveType, deckTextures[0] );
+	*/
 
 	let i = 0;
 	for(i; i < tpx.length; i++){
@@ -529,14 +533,10 @@ function drawScene() {
 	let angleX = 0, angleY = 25, angleZ = 90, sxtmp = sx, sytmp = sy, sztmp = sz;
 	for(i; i < pcTextures.length; i++){
 		if(i === 1){
-			angleX = 0;
-			angleY = 180;
-			angleZ = 0;
-			sxtmp = scx;
-			sytmp = scy;
-			sztmp = scz;
+			angleX = 0; angleY = 180; angleZ = 0;
+			sxtmp = scx; sytmp = scy; sztmp = scz;
 		}
-		drawDominoModel( angleX, angleY,angleZ, //-angleXX, angleYY, angleZZ,
+		drawDominoModel( angleX, 0/*angleY*/, angleZ,
 			sxtmp, sytmp, sztmp,
 			tcx[i]*sxtmp, tcy[i]*sytmp, tcz[i]*sztmp,
 			mvMatrix,
@@ -722,7 +722,7 @@ function tick() {
 //
 
 function outputInfos(){
-		
+	document.getElementById("deck_tile_number").innerHTML = deckTileNumber;
 }
 
 //----------------------------------------------------------------------------
@@ -926,6 +926,13 @@ function setEventListeners( canvas ){
 	};
 
 	document.getElementById("getTile").onclick = function(){
+		let index = playerTextures.length;
+		let random_tile = Math.floor(Math.random() * deckTextures.length);
+		playerTextures[index] = deckTextures[random_tile];
+		deckTextures.splice(random_tile, 1);
+		deckTileNumber = deckTextures.length;
+		document.getElementById("deck_tile_number").innerHTML = deckTileNumber;
+
 		tpx[tpx.length] = tpx[tpx.length-1] + 1.7;
 		tpy[tpy.length] = -7;
 		tpz[tpz.length] = 0;
@@ -943,7 +950,6 @@ function setEventListeners( canvas ){
 
 function initWebGL( canvas ) {
 	try {
-		
 		// Create the WebGL context
 		
 		// Some browsers still need "experimental-webgl"
