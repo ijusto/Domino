@@ -24,96 +24,75 @@ var shaderProgram = null;
 
 var cubeVertexPositionBuffer = null;
 
-var cubeVertexIndexBuffer_front = null;
-var cubeVertexIndexBuffer_others = null;
+var cubeVertexIndexBufferFrontFace = null;
+var cubeVertexIndexBufferNotFrontFace = null;
 
-var cubeVertexTextureCoordBuffer0, cubeVertexTextureCoordBuffer1;
+var cubeVertexTextureCoordBufferFrontFace = null, cubeVertexTextureCoordBufferNotFrontFace = null;
 
 // The global transformation parameters
 
 // The translation vector
+var tpx = [-8.7, -7.0, -5.3, -3.6, -1.9, -0.2, 1.5];
+var tpy = [-7, -7, -7, -7, -7, -7, -7];
+var tpz = [0, 0, 0, 0, 0, 0, 0];
 
-var tpx = [-8.7,-7.0,-5.3,-3.6,-1.9,-0.2,1.5];
-var tpy = [-7,-7,-7,-7,-7,-7,-7];
-var tpz = [0,0,0,0,0,0,0];
-
-var tcx = [8,-16.5,-15,-13.5,-12,-10.5,-9];
-var tcy = [0,15,15,15,15,15,15];
-var tcz = [0,0,0,0,0,0,0];
+var tcx = [8, -16.5, -15, -13.5, -12, -10.5, -9];
+var tcy = [0, 15, 15, 15, 15, 15, 15];
+var tcz = [0, 0, 0, 0, 0, 0, 0];
 
 var tx = 0.0;
-
 var ty = 0.0;
-
 var tz = 0.0;
 
 // The rotation angles in degrees
 
 var angleXX = 0.0;
-
 var angleYY = 0.0;
-
 var angleZZ = 0.0;
 
 
-var anglepXX = [0,0,0,0,0,0,0];
-
-var anglepYY = [0,0,0,0,0,0,0];
-
-var anglepZZ = [0,0,0,0,0,0,0];
-
+var anglepXX = [0, 0, 0, 0, 0, 0, 0];
+var anglepYY = [0, 0, 0, 0, 0, 0, 0];
+var anglepZZ = [0, 0, 0, 0, 0, 0, 0];
 
 var tileIndex = 0;
 
-//Texturas player
+//Textures player
 var playerTextures = [];
 
-//Texturas computer
+//Textures computer
 var pcTextures = [];
 
-//Texturas "deck"
+//Textures "deck"
 var deckTextures = [];
 
 // The scaling factors
-
 var sx = 0.10;
-
 var sy = 0.10;
-
 var sz = 0.10;
 
 var scx = 0.05;
-
 var scy = 0.05;
-
 var scz = 0.05;
 
 // NEW - Animation controls
 
 var rotationXX_ON = 1;
-
 var rotationXX_DIR = 1;
-
 var rotationXX_SPEED = 1;
  
 var rotationYY_ON = 1;
-
 var rotationYY_DIR = 1;
-
 var rotationYY_SPEED = 1;
  
 var rotationZZ_ON = 1;
-
 var rotationZZ_DIR = 1;
-
 var rotationZZ_SPEED = 1;
  
 // To allow choosing the way of drawing the model triangles
-
 var primitiveType = null;
  
 // To allow choosing the projection type
-
 var projectionType = 0;
  
 // From learningwebgl.com
@@ -121,104 +100,103 @@ var projectionType = 0;
 // NEW --- Storing the vertices defining the cube faces
 
 vertices = [
-            // Front face
-            -0.5, -2,  0.25,
-             0.5, -2,  0.25,
-             0.5,  2,  0.25,
-            -0.5,  2,  0.25,
+	// Front face
+	-0.5, -2,  0.25,
+	 0.5, -2,  0.25,
+	 0.5,  2,  0.25,
+	-0.5,  2,  0.25,
 
-            // Back face
-            -0.5, -2, -0.25,
-            -0.5,  2, -0.25,
-             0.5,  2, -0.25,
-             0.5, -2, -0.25,
+	// Back face
+	-0.5, -2, -0.25,
+	-0.5,  2, -0.25,
+	 0.5,  2, -0.25,
+	 0.5, -2, -0.25,
 
-            // Top face
-            -0.5,  2, -0.25,
-            -0.5,  2,  0.25,
-             0.5,  2,  0.25,
-             0.5,  2, -0.25,
+	// Top face
+	-0.5,  2, -0.25,
+	-0.5,  2,  0.25,
+	 0.5,  2,  0.25,
+	 0.5,  2, -0.25,
 
-            // Bottom face
-            -0.5, -2, -0.25,
-             0.5, -2, -0.25,
-             0.5, -2,  0.25,
-            -0.5, -2,  0.25,
+	// Bottom face
+	-0.5, -2, -0.25,
+	 0.5, -2, -0.25,
+	 0.5, -2,  0.25,
+	-0.5, -2,  0.25,
 
-            // Right face
-             0.5, -2, -0.25,
-             0.5,  2, -0.25,
-             0.5,  2,  0.25,
-             0.5, -2,  0.25,
+	// Right face
+	 0.5, -2, -0.25,
+	 0.5,  2, -0.25,
+	 0.5,  2,  0.25,
+	 0.5, -2,  0.25,
 
-            // Left face
-            -0.5, -2, -0.25,
-            -0.5, -2,  0.25,
-            -0.5,  2,  0.25,
-            -0.5,  2, -0.25
+	// Left face
+	-0.5, -2, -0.25,
+	-0.5, -2,  0.25,
+	-0.5,  2,  0.25,
+	-0.5,  2, -0.25
 ];
 
 // Texture coordinates for the quadrangular faces
 
 // Notice how they are assigne to the corresponding vertices
 
-var textureCoords_dots_face = [
-
-          // Front face
-          0.0, 0.0,
-          0.5, 0.0,
-          0.5, 1,
-          0.0, 1
+var textureCoordsFrontFace = [
+	// Front face
+	0.0, 0.0,
+	0.5, 0.0,
+	0.5, 1,
+	0.0, 1
 ];
 
-var textureCoords_other_faces = [
-          // Back face
-          1.0, 0.0,
-          1.0, 1.0,
-          0.0, 1.0,
-          0.0, 0.0,
+var textureCoordsNotFrontFace = [
+	// Back face
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0,
+	0.0, 0.0,
 
-          // Top face
-          0.0, 1.0,
-          0.0, 0.0,
-          1.0, 0.0,
-          1.0, 1.0,
+	// Top face
+	0.0, 1.0,
+	0.0, 0.0,
+	1.0, 0.0,
+	1.0, 1.0,
 
-          // Bottom face
-          1.0, 1.0,
-          0.0, 1.0,
-          0.0, 0.0,
-          1.0, 0.0,
+	// Bottom face
+	1.0, 1.0,
+	0.0, 1.0,
+	0.0, 0.0,
+	1.0, 0.0,
 
-          // Right face
-          1.0, 0.0,
-          1.0, 1.0,
-          0.0, 1.0,
-          0.0, 0.0,
+	// Right face
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0,
+	0.0, 0.0,
 
-          // Left face
-          0.0, 0.0,
-          1.0, 0.0,
-          1.0, 1.0,
-          0.0, 1.0
+	// Left face
+	0.0, 0.0,
+	1.0, 0.0,
+	1.0, 1.0,
+	0.0, 1.0
 ];
 
 // Vertex indices defining the triangles
         
-var cubeVertexIndices_front = [
-            0, 1, 2,      0, 3, 2    // Front face
-	];
+var cubeVertexIndicesFrontFace = [
+	0, 1, 2, 	0, 3, 2    // Front face
+];
 
-var cubeVertexIndices_others = [
-            4, 5, 6,      4, 6, 7,    // Back face
+var cubeVertexIndicesNotFrontFace = [
+	4, 5, 6,      4, 6, 7,    // Back face
 
-            8, 9, 10,     8, 10, 11,  // Top face
+	8, 9, 10,     8, 10, 11,  // Top face
 
-            12, 13, 14,   13, 15, 14, // Bottom face
+	12, 13, 14,   13, 15, 14, // Bottom face
 
-            16, 17, 18,   17, 19, 18, // Right face
+	16, 17, 18,   17, 19, 18, // Right face
 
-            20, 21, 22,   20, 22, 23  // Left face
+	20, 21, 22,   20, 22, 23  // Left face
 ];
 
 var main, sec, count=0, tiles=[];
@@ -254,11 +232,12 @@ function handleLoadedTexture(texture) {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
-var webGLTexture_dots_face = null, webGLTexture_black_faces = null;
+var webGLTexture_black_faces = null;
 
 function initTextures() {
+	// 6_6.png
 	bindImgToTexture(pcTextures, 0, null);
-	pcTextures[0].image.src = tiles[27]; // 6_6.png
+	pcTextures[0].image.src = tiles[27];
 	tiles.splice(27, 1);
 
 	var i = 1;
@@ -283,12 +262,12 @@ function initTextures() {
 function addTextureToList(textureList, index) {
 	bindImgToTexture(textureList, index, null);
 	let random_tile = Math.floor(Math.random() * tiles.length);
-	textureList[index].image.src=tiles[random_tile];
+	textureList[index].image.src = tiles[random_tile];
 	tiles.splice(random_tile, 1);
 }
 
 function bindImgToTexture(textureList, index, img){
-	if(textureList === null && index == null){
+	if(index === null){
 		textureList = gl.createTexture();
 		textureList.image = new Image();
 		textureList.image.onload = function () {
@@ -304,6 +283,7 @@ function bindImgToTexture(textureList, index, img){
 		};
 	}
 }
+
 /*
 function changeTexture(){
 	var random_tile = Math.floor(Math.random() * tiles.length);
@@ -316,48 +296,73 @@ function changeTexture(){
 
 // Handling the Buffers
 
-function initBuffers() {	
-	
+function initBuffers() {
 	// Coordinates
-		
 	cubeVertexPositionBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	cubeVertexPositionBuffer.itemSize = 3;
-	cubeVertexPositionBuffer.numItems = vertices.length / 3;			
+	cubeVertexPositionBuffer.numItems = vertices.length / 3;
 
 	// Textures
-
 	//other faces
-	cubeVertexTextureCoordBuffer1 = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer1);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords_other_faces), gl.STATIC_DRAW);
-	cubeVertexTextureCoordBuffer1.itemSize = 2;
-	cubeVertexTextureCoordBuffer1.numItems = 20;
-
+	cubeVertexTextureCoordBufferNotFrontFace = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBufferNotFrontFace);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordsNotFrontFace), gl.STATIC_DRAW);
+	cubeVertexTextureCoordBufferNotFrontFace.itemSize = 2;
+	cubeVertexTextureCoordBufferNotFrontFace.numItems = 20;
 	// front face
-    cubeVertexTextureCoordBuffer0 = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer0);
- 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords_dots_face), gl.STATIC_DRAW);
-    cubeVertexTextureCoordBuffer0.itemSize = 2;
-    cubeVertexTextureCoordBuffer0.numItems = 4;//24;
-
+	cubeVertexTextureCoordBufferFrontFace = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBufferFrontFace);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordsFrontFace), gl.STATIC_DRAW);
+	cubeVertexTextureCoordBufferFrontFace.itemSize = 2;
+	cubeVertexTextureCoordBufferFrontFace.numItems = 4;//24;
 
 	// Vertex indices
+	// front face
+	cubeVertexIndexBufferFrontFace = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBufferFrontFace);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndicesFrontFace), gl.STATIC_DRAW);
+	cubeVertexIndexBufferFrontFace.itemSize = 1;
+	cubeVertexIndexBufferFrontFace.numItems = 6;
+	//other faces
+	cubeVertexIndexBufferNotFrontFace = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBufferNotFrontFace);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndicesNotFrontFace), gl.STATIC_DRAW);
+	cubeVertexIndexBufferNotFrontFace.itemSize = 1;
+	cubeVertexIndexBufferNotFrontFace.numItems = 30;
 
-	cubeVertexIndexBuffer_front = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_front);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices_front), gl.STATIC_DRAW);
-	cubeVertexIndexBuffer_front.itemSize = 1;
-	cubeVertexIndexBuffer_front.numItems = 6;
+	/*
+	// Coordinates
+	initBuffer(false, cubeVertexPositionBuffer, vertices, 3, vertices.length / 3);
 
-	cubeVertexIndexBuffer_others = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_others);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices_others), gl.STATIC_DRAW);
-	cubeVertexIndexBuffer_others.itemSize = 1;
-	cubeVertexIndexBuffer_others.numItems = 30;
+	// Textures
+	//other faces
+	initBuffer(false, cubeVertexTextureCoordBufferNotFrontFace, textureCoordsNotFrontFace, 2, 20);
+	// front face
+	initBuffer(false, cubeVertexTextureCoordBufferFrontFace, textureCoordsFrontFace, 2, 4);
 
+	// Vertex indices
+	// front face
+	initBuffer(true, cubeVertexIndexBufferFrontFace, cubeVertexIndicesFrontFace, 1, 6);
+	//other faces
+	initBuffer(true, cubeVertexIndexBufferNotFrontFace, cubeVertexIndicesNotFrontFace, 1, 30);
 
+	 */
+
+}
+
+function initBuffer(isVertexIndices, buffer, coords, itemSize, numItems) {
+	buffer = gl.createBuffer();
+	if(isVertexIndices === true){
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(coords), gl.STATIC_DRAW);
+	} else {
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.STATIC_DRAW);
+	}
+	buffer.itemSize = itemSize;
+	buffer.numItems = numItems;
 }
 
 //----------------------------------------------------------------------------
@@ -375,9 +380,7 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 	mvMatrix = mult( mvMatrix, translationMatrix( tx, ty, tz ) );
 
 	mvMatrix = mult( mvMatrix, rotationZZMatrix( angleZZ ) );
-
 	mvMatrix = mult( mvMatrix, rotationYYMatrix( angleYY ) );
-
 	mvMatrix = mult( mvMatrix, rotationXXMatrix( angleXX ) );
 
 	mvMatrix = mult( mvMatrix, scalingMatrix( sx, sy, sz ) );
@@ -388,48 +391,66 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 	
 	gl.uniformMatrix4fv(mvUniform, false, new Float32Array(flatten(mvMatrix)));
 
-    // Passing the buffers
-    	
+	// Passing the buffers
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-    
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-	// NEW --- Textures
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer0);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer0.itemSize, gl.FLOAT, false, 0, 0);
-
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, front_face_texture);
-        
-    gl.uniform1i(shaderProgram.samplerUniform, 0);
-
-	// The vertex indices
-
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_front);
-
-	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
-
-	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer_front.numItems, gl.UNSIGNED_SHORT, 0);
-
-	// NEW --- Textures
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer1);
-	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer1.itemSize, gl.FLOAT, false, 0, 0);
-
+	// Textures
+	// Front Face
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBufferFrontFace);
+	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBufferFrontFace.itemSize, gl.FLOAT, false, 0, 0);
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, webGLTexture_black_faces);
-
+	gl.bindTexture(gl.TEXTURE_2D, front_face_texture);
 	gl.uniform1i(shaderProgram.samplerUniform, 0);
 
-    // The vertex indices
-    
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer_others);
+	// The vertex indices
+	// Front Face
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBufferFrontFace);
+	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
+	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBufferFrontFace.numItems, gl.UNSIGNED_SHORT, 0);
 
-	// Drawing the triangles --- NEW --- DRAWING ELEMENTS 
-	
-	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer_others.numItems, gl.UNSIGNED_SHORT, 0);
+	// Textures
+	// Other Faces
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBufferNotFrontFace);
+	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBufferNotFrontFace.itemSize, gl.FLOAT, false, 0, 0);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, webGLTexture_black_faces);
+	gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+	// The vertex indices
+	// Other Faces
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBufferNotFrontFace);
+	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
+	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBufferNotFrontFace.numItems, gl.UNSIGNED_SHORT, 0);
+
+	/*
+    // Passing the buffers
+
+	// Coordinates
+	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+	// Front Face
+	drawTextures(front_face_texture, cubeVertexTextureCoordBufferFrontFace, cubeVertexIndexBufferFrontFace);
+
+	// Other Faces
+	drawTextures(webGLTexture_black_faces, cubeVertexTextureCoordBufferNotFrontFace, cubeVertexIndexBufferNotFrontFace);
+	 */
+
+}
+
+function drawTextures(texture, textureBuffer, vertexBuffer) {
+	// Textures
+	gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+	// The vertex indices
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexBuffer);
+	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
+	gl.drawElements(gl.TRIANGLES, vertexBuffer.itemSize, gl.UNSIGNED_SHORT, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -493,7 +514,6 @@ function drawScene() {
 		mvMatrix,
 		primitiveType, deckTextures[0] );
 
-
 	let i = 0;
 	for(i; i < tpx.length; i++){
 		drawDominoModel(anglepXX[i],anglepYY[i],anglepZZ[i],
@@ -506,15 +526,17 @@ function drawScene() {
 
 	//Computer pieces
 	i = 0;
-	let angleY = 0, sxtmp = sx, sytmp = sy, sztmp = sz;
+	let angleX = 0, angleY = 25, angleZ = 90, sxtmp = sx, sytmp = sy, sztmp = sz;
 	for(i; i < pcTextures.length; i++){
 		if(i === 1){
+			angleX = 0;
 			angleY = 180;
+			angleZ = 0;
 			sxtmp = scx;
 			sytmp = scy;
 			sztmp = scz;
 		}
-		drawDominoModel( 0, angleY,0, //-angleXX, angleYY, angleZZ,
+		drawDominoModel( angleX, angleY,angleZ, //-angleXX, angleYY, angleZZ,
 			sxtmp, sytmp, sztmp,
 			tcx[i]*sxtmp, tcy[i]*sytmp, tcz[i]*sztmp,
 			mvMatrix,
@@ -590,27 +612,24 @@ function handleKeys() {
 		sz = sy = sx;
 		scx *= valuePageUpOrDown;
 		scz = scy = scx;
-	}
+	} else {
+		if (currentlyPressedKeys[37]) {
+			// Left cursor key
+			tpx[tileIndex] -= 0.05;
+		}
+		if (currentlyPressedKeys[39]) {
+			// Right cursor key
+			tpx[tileIndex] += 0.05;
+		}
+		if (currentlyPressedKeys[38]) {
+			// Up cursor key
+			tpy[tileIndex] += 0.05;
+		}
 
-
-	if (currentlyPressedKeys[37]) {
-		// Left cursor key
-		tpx[tileIndex]-=0.05;
-	}
-
-	if (currentlyPressedKeys[39]) {
-		// Right cursor key
-		tpx[tileIndex]+=0.05;
-	}
-
-	if (currentlyPressedKeys[38]) {
-		// Up cursor key
-		tpy[tileIndex]+=0.05;
-	}
-
-	if (currentlyPressedKeys[40]) {
-		// Down cursor key
-		tpy[tileIndex]-=0.05;
+		if (currentlyPressedKeys[40]) {
+			// Down cursor key
+			tpy[tileIndex] -= 0.05;
+		}
 	}
 
 	document.addEventListener("keypress", function(event){
@@ -623,7 +642,7 @@ function handleKeys() {
 
 		switch(key){
 			case 114:
-				anglepZZ[tileIndex]+=90;
+				anglepZZ[tileIndex] += 90;
 		}
 
 		// Render the viewport
@@ -696,9 +715,6 @@ function tick() {
 	
 	animate();
 }
-
-
-
 
 //----------------------------------------------------------------------------
 //
