@@ -32,7 +32,11 @@ var cubeVertexTextureCoordBufferFrontFace = null, cubeVertexTextureCoordBufferNo
 // The global transformation parameters
 
 // The translation vector
-var tpx = [-8.7, -7.0, -5.3, -3.6, -1.9, -0.2, 1.5];
+var tpx = [-9.4];
+var dist_btw_tiles = 1.1; // 1.7
+for(let i = 1; i < 7; i++) {
+	tpx[i] = tpx[i-1] + dist_btw_tiles;
+}
 var tpy = [-7, -7, -7, -7, -7, -7, -7];
 var tpz = [0, 0, 0, 0, 0, 0, 0];
 
@@ -94,47 +98,49 @@ var primitiveType = null;
  
 // To allow choosing the projection type
 var projectionType = 0;
- 
+var left_ortho = -1.0, right_ortho = 1.0, bottom_ortho = -1.0, top_ortho = 1.0, near_ortho = -1.0, far_ortho = 1.0;
+var fovy_persp = 45, aspect_persp = 1, near_persp = 0.05, far_persp = 10;
+
 // From learningwebgl.com
 
 // NEW --- Storing the vertices defining the cube faces
 
 vertices = [
 	// Front face
-	-0.5, -2,  0.25,
-	 0.5, -2,  0.25,
-	 0.5,  2,  0.25,
-	-0.5,  2,  0.25,
+	-0.5, -1,  0.25,
+	 0.5, -1,  0.25,
+	 0.5,  1,  0.25,
+	-0.5,  1,  0.25,
 
 	// Back face
-	-0.5, -2, -0.25,
-	-0.5,  2, -0.25,
-	 0.5,  2, -0.25,
-	 0.5, -2, -0.25,
+	-0.5, -1, -0.25,
+	-0.5,  1, -0.25,
+	 0.5,  1, -0.25,
+	 0.5, -1, -0.25,
 
 	// Top face
-	-0.5,  2, -0.25,
-	-0.5,  2,  0.25,
-	 0.5,  2,  0.25,
-	 0.5,  2, -0.25,
+	-0.5,  1, -0.25,
+	-0.5,  1,  0.25,
+	 0.5,  1,  0.25,
+	 0.5,  1, -0.25,
 
 	// Bottom face
-	-0.5, -2, -0.25,
-	 0.5, -2, -0.25,
-	 0.5, -2,  0.25,
-	-0.5, -2,  0.25,
+	-0.5, -1, -0.25,
+	 0.5, -1, -0.25,
+	 0.5, -1,  0.25,
+	-0.5, -1,  0.25,
 
 	// Right face
-	 0.5, -2, -0.25,
-	 0.5,  2, -0.25,
-	 0.5,  2,  0.25,
-	 0.5, -2,  0.25,
+	 0.5, -1, -0.25,
+	 0.5,  1, -0.25,
+	 0.5,  1,  0.25,
+	 0.5, -1,  0.25,
 
 	// Left face
-	-0.5, -2, -0.25,
-	-0.5, -2,  0.25,
-	-0.5,  2,  0.25,
-	-0.5,  2, -0.25
+	-0.5, -1, -0.25,
+	-0.5, -1,  0.25,
+	-0.5,  1,  0.25,
+	-0.5,  1, -0.25
 ];
 
 // Texture coordinates for the quadrangular faces
@@ -203,11 +209,12 @@ var main_number, sec_number, count = 0, tiles = [];
 for(main_number = 0; main_number < 7; main_number++) {
 	for (sec_number = main_number; sec_number < 7; sec_number++) {
 		tiles[count] = main_number + "_" + sec_number + ".png";
-		console.log(main_number + "_" + sec_number + ".png");
 		count++;
 	}
 }
 //console.log(tiles.slice(0, tiles.length));
+
+var selectedTile = null;
 
 //----------------------------------------------------------------------------
 //
@@ -468,14 +475,59 @@ function drawScene() {
 	// Clearing with the background color
 	
 	gl.clear(gl.COLOR_BUFFER_BIT);
-	
+
+
+
+
+	for(let id of [/*"left_ortho", "right_ortho", "bottom_ortho",*/ "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]){
+		let elemId = "myRange_" + id;
+		let slider = document.getElementById(elemId);
+		elemId = "demo_" + id;
+		let output = document.getElementById(elemId);
+		output.innerHTML = slider.value;
+		slider.oninput = function() {
+			output.innerHTML = this.value;
+			switch(id){
+				case "left_ortho":
+					left_ortho = this.value;
+					break;
+				case "right_ortho":
+					right_ortho = this.value;
+					break;
+				case "bottom_ortho":
+					bottom_ortho = this.value;
+					break;
+				case "near_ortho":
+					near_ortho = this.value;
+					break;
+				case "far_ortho":
+					far_ortho = this.value;
+					break;
+				case "fovy_persp":
+					fovy_persp = this.value;
+					break;
+				case "aspect_persp":
+					aspect_persp = this.value;
+					break;
+				case "near_persp":
+					near_persp = this.value;
+					break;
+				case "far_persp":
+					far_persp = this.value;
+					break;
+			}
+		};
+
+
+	}
+
 	// NEW --- Computing the Projection Matrix
 	
 	if( projectionType === 0 ) {
 		
 		// For now, the default orthogonal view volume
 		
-		pMatrix = ortho( -1.0, 1.0, -1.0, 1.0, -1.0, 1.0 );
+		pMatrix = ortho(left_ortho, right_ortho, bottom_ortho, top_ortho, near_ortho, far_ortho);
 		
 		tz = 0;
 		
@@ -491,7 +543,7 @@ function drawScene() {
 		
 		// Ensure that the model is "inside" the view volume
 		
-		pMatrix = perspective( 45, 1, 0.05, 10 );
+		pMatrix = perspective(fovy_persp, aspect_persp, near_persp, far_persp);
 		
 		tz = -2.25;
 
@@ -509,20 +561,20 @@ function drawScene() {
 	
 	// Call the drawModel function
 
-	// Instance 8 --- middle board
 	/*
-	drawDominoModel(-angleXX, angleYY, angleZZ,
+	// Instance middle board
+	drawDominoModel(0, 0, angleZZ,
 		sx, sy, sz,
 		tx*sx, ty*sy, tz*sz,
 		mvMatrix,
 		primitiveType, deckTextures[0] );
-	*/
+	 */
 
 	let i = 0;
 	for(i; i < tpx.length; i++){
 		drawDominoModel(anglepXX[i],anglepYY[i],anglepZZ[i],
 			sx, sy, sz,
-			tpx[i]*sx, tpy[i]*sz, tpz[i]*sz,
+			tpx[i]*sx, tpy[i]*sy, tpz[i]*sz,
 			mvMatrix,
 			primitiveType, playerTextures[i]
 		);
@@ -536,7 +588,7 @@ function drawScene() {
 			angleX = 0; angleY = 180; angleZ = 0;
 			sxtmp = scx; sytmp = scy; sztmp = scz;
 		}
-		drawDominoModel( angleX, 0/*angleY*/, angleZ,
+		drawDominoModel( angleX, angleY, angleZ,
 			sxtmp, sytmp, sztmp,
 			tcx[i]*sxtmp, tcy[i]*sytmp, tcz[i]*sztmp,
 			mvMatrix,
@@ -550,7 +602,7 @@ function drawScene() {
 	}
 
 	j = tpx.length + 1;
-	for(j; j > tpx.length && j <= 9; j++){
+	for(j; j > tpx.length && j <= 21; j++){
 		document.getElementById("tile" + j.toString()).disabled = true;
 	}
 
@@ -679,8 +731,8 @@ function handleMouseMove(event) {
     if (!mouseDown) {
 	  
       return;
-    } 
-  
+    }
+
     // Rotation angles proportional to cursor displacement
     
     var newX = event.clientX;
@@ -926,19 +978,25 @@ function setEventListeners( canvas ){
 	};
 
 	document.getElementById("getTile").onclick = function(){
-		let index = playerTextures.length;
-		let random_tile = Math.floor(Math.random() * deckTextures.length);
-		playerTextures[index] = deckTextures[random_tile];
-		deckTextures.splice(random_tile, 1);
-		deckTileNumber = deckTextures.length;
-		document.getElementById("deck_tile_number").innerHTML = deckTileNumber;
+		if(deckTileNumber !== 0) {
+			let index = playerTextures.length;
+			let random_tile = Math.floor(Math.random() * deckTextures.length);
+			playerTextures[index] = deckTextures[random_tile];
+			deckTextures.splice(random_tile, 1);
+			deckTileNumber = deckTextures.length;
+			document.getElementById("deck_tile_number").innerHTML = deckTileNumber;
 
-		tpx[tpx.length] = tpx[tpx.length-1] + 1.7;
-		tpy[tpy.length] = -7;
-		tpz[tpz.length] = 0;
-		anglepXX[anglepXX.length] = 0;
-		anglepYY[anglepYY.length] = 0;
-		anglepZZ[anglepZZ.length] = 0;
+			tpx[tpx.length] = tpx[tpx.length - 1] + dist_btw_tiles;
+			tpy[tpy.length] = -7;
+			tpz[tpz.length] = 0;
+			anglepXX[anglepXX.length] = 0;
+			anglepYY[anglepYY.length] = 0;
+			anglepZZ[anglepZZ.length] = 0;
+			if(deckTileNumber === 0){
+				document.getElementById("getTile").disabled = true;
+			}
+		}
+
 	};
 
 }

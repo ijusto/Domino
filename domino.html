@@ -4,6 +4,46 @@
         <title>Domino</title>
 
         <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .slidecontainer {
+                width: 100%;
+            }
+
+            .slider {
+                -webkit-appearance: none;
+                width: 30%;
+                height: 10px;
+                border-radius: 3px;
+                background: #d3d3d3;
+                outline: none;
+                opacity: 0.7;
+                -webkit-transition: .2s;
+                transition: opacity .2s;
+            }
+
+            .slider:hover {
+                opacity: 1;
+            }
+
+            .slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                background: #4CAF50;
+                cursor: pointer;
+            }
+
+            .slider::-moz-range-thumb {
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                background: #4CAF50;
+                cursor: pointer;
+            }
+        </style>
 
         <!-- The vertex and fragment shaders. -->
         <script id="shader-vs" type="x-shader/x-vertex">
@@ -48,10 +88,57 @@
         <div style="text-align:center;">
             <div class="container" style="position: relative;">
 
-                <canvas id="my-canvas" style="border:1px solid #000000;" width="900" height="500"></canvas>
-                <div id="overlay" style="position: absolute; left: 870px; top: 10px;">
-                    <div>Number of tiles in deck: <span id="deck_tile_number"></span></div>
-                    <!--<div>Winner: <span id="winner"></span></div>-->
+                <canvas id="my-canvas" style="border:1px solid #000000;" width="630" height="630"></canvas>
+                <div >
+                    <div style="position: absolute; left: 1000px; top: 20px;">Number of tiles in deck: <span id="deck_tile_number"></span></div>
+                    <br/>
+                    <div style="position: absolute; left: 1000px; top: 50px;">Choose the <b>projection type:</b></div>
+                    <div style="position: absolute; left: 1000px; top: 70px;">
+                        <select id="projection-selection">
+                            <option value="0">Orthogonal Projection</option>
+                            <option value="1">Perspective Projection</option>
+                        </select>
+                    </div>
+                    <br/>
+                    <div style="position: absolute; left: 1000px; top: 120px;">Values:</div>
+                    <!--
+                    <div class="slidecontainer">
+                        left_ortho: <input type="range" min="-1.0" max="0.9" value="-1.0" class="slider" id="myRange_left_ortho"> <span id="demo_left_ortho">  </span>
+                    </div>
+
+                    <div class="slidecontainer">
+                        right_ortho: <input type="range" min="1.0" max="2.0" value="1.0" class="slider" id="myRange_right_ortho"> <span id="demo_right_ortho">  </span>
+                    </div>
+
+                    <div class="slidecontainer">
+                        bottom_ortho: <input type="range" min="-1" max="1" value="1.0" class="slider" id="myRange_bottom_ortho"> <span id="demo_bottom_ortho">  </span>
+                    </div>
+                    -->
+                    <div style="position: absolute; left: 1000px; top:160px;">
+                        <div class="slidecontainer">
+                            near_ortho: <input type="range" min="-2" max="1" value="-1.0" class="slider" id="myRange_near_ortho"> <span id="demo_near_ortho">  </span>
+                        </div>
+
+                        <div class="slidecontainer">
+                            far_ortho: <input type="range" min="-1" max="2" value="1.0" class="slider" id="myRange_far_ortho"> <span id="demo_far_ortho">  </span>
+                        </div>
+
+                        <div class="slidecontainer">
+                            fovy_persp: <input type="range" min="0" max="200" value="45" class="slider" id="myRange_fovy_persp"> <span id="demo_fovy_persp">  </span>
+                        </div>
+
+                        <div class="slidecontainer">
+                            aspect_persp: <input type="range" min="-5" max="5" value="1" class="slider" id="myRange_aspect_persp"> <span id="demo_aspect_persp">  </span>
+                        </div>
+
+                        <div class="slidecontainer">
+                            near_persp: <input type="range" min="-10" max="5" value="0.05" class="slider" id="myRange_near_persp"> <span id="demo_near_persp">  </span>
+                        </div>
+
+                        <div class="slidecontainer">
+                            far_persp: <input type="range" min="-10.0" max="30" value="10" class="slider" id="myRange_far_persp"> <span id="demo_far_persp">  </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -126,16 +213,6 @@
                 <button id="ZZ-faster-button">Faster</button>
 
             </p>
-
-            <p>Choose the <b>projection type</b>:
-
-                <select id="projection-selection">
-                    <option value="0">Orthogonal Projection</option>
-                    <option value="1">Perspective Projection</option>
-                </select>
-
-            </p>
-
             <p>
 
                 <button id="reset-button">Reset</button>
