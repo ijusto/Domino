@@ -127,10 +127,10 @@
 
     </head>
 
-    <body onload="runWebGL();">
+    <body onload="runWebGL();" style="margin-top: 3px;">
 
-        <div style="text-align:center;">
-            <!--<div class="container" style="position: relative;">-->
+    <div style="text-align:center;">
+        <!--<div class="container" style="position: relative;">-->
             <div class="row">
                 <div class="column left"><p><button class="button" id="getTile">Get tile</button></p>
 
@@ -157,11 +157,12 @@
                         <button class="button" id="tile20" style="display: none;">Tile 20</button>
                         <button class="button" id="tile21" style="display: none;">Tile 21</button>
                     </p>
-                    <p>Use cursor keys to spin and <code>Page Up</code>/<code>Page Down</code> to zoom out/in.</p>
+                    <p style="text-align: left">Use cursor keys to spin and <code>Page Up</code>/<code>Page Down</code> to zoom out/in.</p>
+                    <p style="text-align: left">Move: <img src="imgs/arrows.png" style="float: inside;height: 50px; alignment-baseline: auto" alt="&#8592; &#8593; &#8595; &#8594; : arrow keys"/> &#8195; &#8195; &#8631; : <img src="imgs/r-butoon-md.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="R"/></p>
                     <!-- TODO -->
-                    <p>Press any mouse button and move the cursor to rotate the models.</p>
+                    <p style="text-align: left">Press any mouse button and move the cursor to rotate the models.</p>
                 </div>
-                <div class="column middle">
+                <div class="column middle" style="padding: 0">
                     <canvas id="my-canvas" style="border:1px solid #000000;" width="630" height="630"></canvas>
                 </div>
                 <div class="column right"><div style="position: absolute; top: 20px;">Number of tiles in deck: <span id="deck_tile_number"></span></div>
@@ -227,8 +228,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div >
 
             </div>
 
