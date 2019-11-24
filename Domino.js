@@ -40,9 +40,13 @@ for(let i = 1; i < 7; i++) {
 var tpy = [-7, -7, -7, -7, -7, -7, -7];
 var tpz = [0, 0, 0, 0, 0, 0, 0];
 
-var tcx = [8, -16.5, -15, -13.5, -12, -10.5, -9];
-var tcy = [0, 15, 15, 15, 15, 15, 15];
-var tcz = [0, 0, 0, 0, 0, 0, 0];
+var tcx = [-16.5, -15, -13.5, -12, -10.5, -9];
+var tcy = [15, 15, 15, 15, 15, 15];
+var tcz = [0, 0, 0, 0, 0, 0];
+
+var tbx = [8];
+var tby = [0];
+var tbz = [0];
 
 var tx = 0.0;
 var ty = 0.0;
@@ -69,6 +73,10 @@ var pcTextures = [];
 //Textures "deck"
 var deckTextures = [];
 var deckTileNumber = 0;
+
+// board pieces
+var boardTextures = [];
+var angleX_board = 0, angleY_board = 25, angleZ_board = 90;
 
 // The scaling factors
 var sx = 0.10;
@@ -243,12 +251,12 @@ var webGLTexture_black_faces = null;
 
 function initTextures() {
 	// 6_6.png
-	bindImgToTexture(pcTextures, 0, null);
-	pcTextures[0].image.src = tiles[27];
+	bindImgToTexture(boardTextures, 0, null);
+	boardTextures[0].image.src = tiles[27];
 	tiles.splice(27, 1);
 
-	var i = 1;
-	while(i < 7) {
+	var i = 0;
+	while(i < 6) {
 		addTextureToList(pcTextures, i, tiles);
 		i++;
 	}
@@ -479,7 +487,7 @@ function drawScene() {
 
 
 
-	for(let id of [/*"left_ortho", "right_ortho", "bottom_ortho",*/ "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]){
+	for(let id of [/*"left_ortho", "right_ortho", "bottom_ortho",*/ "rotx", "roty", "rotz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]){
 		let elemId = "myRange_" + id;
 		let slider = document.getElementById(elemId);
 		elemId = "demo_" + id;
@@ -488,6 +496,15 @@ function drawScene() {
 		slider.oninput = function() {
 			output.innerHTML = this.value;
 			switch(id){
+				case "rotx":
+					angleX_board = this.value;
+					break;
+				case "roty":
+					angleY_board = this.value;
+					break;
+				case "rotz":
+					angleZ_board = this.value;
+					break;
 				case "left_ortho":
 					left_ortho = this.value;
 					break;
@@ -570,8 +587,7 @@ function drawScene() {
 		primitiveType, deckTextures[0] );
 	 */
 
-	let i = 0;
-	for(i; i < tpx.length; i++){
+	for(let i = 0; i < tpx.length; i++){
 		drawDominoModel(anglepXX[i],anglepYY[i],anglepZZ[i],
 			sx, sy, sz,
 			tpx[i]*sx, tpy[i]*sy, tpz[i]*sz,
@@ -580,17 +596,21 @@ function drawScene() {
 		);
 	}
 
-	//Computer pieces
-	i = 0;
-	let angleX = 0, angleY = 25, angleZ = 90, sxtmp = sx, sytmp = sy, sztmp = sz;
-	for(i; i < pcTextures.length; i++){
-		if(i === 1){
-			angleX = 0; angleY = 180; angleZ = 0;
-			sxtmp = scx; sytmp = scy; sztmp = scz;
-		}
-		drawDominoModel( angleX, angleY, angleZ,
-			sxtmp, sytmp, sztmp,
-			tcx[i]*sxtmp, tcy[i]*sytmp, tcz[i]*sztmp,
+	// Board pieces
+	for(let i = 0; i < boardTextures.length; i++){
+		drawDominoModel( angleX_board, angleY_board, angleZ_board,
+			sx, sy, sz,
+			tbx[i]*sx, tby[i]*sy, tbz[i]*sz,
+			mvMatrix,
+			primitiveType, boardTextures[i]
+		);
+	}
+
+	// Computer pieces
+	for(let i = 0; i < pcTextures.length; i++){
+		drawDominoModel( 0, 180, 0,
+			scx, scy, scz,
+			tcx[i]*scx, tcy[i]*scy, tcz[i]*scz,
 			mvMatrix,
 			primitiveType, pcTextures[i]
 		);
@@ -986,8 +1006,15 @@ function setEventListeners( canvas ){
 			deckTileNumber = deckTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckTileNumber;
 
-			tpx[tpx.length] = tpx[tpx.length - 1] + dist_btw_tiles;
-			tpy[tpy.length] = -7;
+
+			if(deckTileNumber <= 2) {
+				console.log(21-deckTileNumber-(18 + 1));
+				tpx[tpx.length] = tpx[2 - deckTileNumber];
+				tpy[tpy.length] = -9;
+			} else {
+				tpx[tpx.length] = tpx[tpx.length - 1] + dist_btw_tiles;
+				tpy[tpy.length] = -7;
+			}
 			tpz[tpz.length] = 0;
 			anglepXX[anglepXX.length] = 0;
 			anglepYY[anglepYY.length] = 0;
