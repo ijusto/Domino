@@ -33,7 +33,17 @@ var cubeVertexTextureCoordBufferFrontFace = null, cubeVertexTextureCoordBufferNo
 
 // The translation vector
 var tpx = [-9.4];
+var temppx = [-9.4];
+var temppy = [-7];
 var dist_btw_tiles = 1.1; // 1.7
+for(let i = 1; i < 18; i++) {
+	temppx[i] = temppx[i-1] + dist_btw_tiles;
+	temppy[i] = -7;
+}
+for(let i = 18; i < 21; i++){
+	temppx[i] = temppx[i-18];
+	temppy[i] = -9;
+}
 for(let i = 1; i < 7; i++) {
 	tpx[i] = tpx[i-1] + dist_btw_tiles;
 }
@@ -1188,14 +1198,8 @@ function setEventListeners( canvas ){
 			document.getElementById("deck_tile_number").innerHTML = deckTileNumber;
 
 
-			if(deckTileNumber <= 2) {
-				console.log(21-deckTileNumber-(18 + 1));
-				tpx[tpx.length] = tpx[2 - deckTileNumber];
-				tpy[tpy.length] = -9;
-			} else {
-				tpx[tpx.length] = tpx[tpx.length - 1] + dist_btw_tiles;
-				tpy[tpy.length] = -7;
-			}
+			tpx[tpx.length] = temppx[playerTiles.length - 1];
+			tpy[tpy.length] = temppy[playerTiles.length - 1];
 			tpz[tpz.length] = 0;
 			anglepXX[anglepXX.length] = 0;
 			anglepYY[anglepYY.length] = 0;
