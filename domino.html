@@ -6,6 +6,25 @@
         <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
+
+            .button {
+                background-color: #87877f;
+                border: none;
+                color: black;
+                padding: 10px 10px;
+                text-align: center;
+                font-size: 15px;
+                margin: 4px 2px;
+                opacity: 0.6;
+                transition: 0.3s;
+                display: inline-block;
+                text-decoration: none;
+                cursor: pointer;
+                border-radius: 8px;
+            }
+
+            .button:hover {opacity: 1}
+
             .slidecontainer {
                 width: 100%;
             }
@@ -14,7 +33,7 @@
                 -webkit-appearance: none;
                 width: 30%;
                 height: 10px;
-                border-radius: 3px;
+                border-radius: 2px;
                 background: #d3d3d3;
                 outline: none;
                 opacity: 0.7;
@@ -116,76 +135,71 @@
                     -->
                     <div style="position: absolute; left: 1000px; top:160px;">
                         Board:
-                        <div class="slidecontainer">
-                            rotx: <input type="range" min="0" max="360" value="0" class="slider" id="myRange_rotx"> <span id="demo_rotx">  </span>
+                        <div class="slidecontainer" id="rotx">
+                            rotx: <input type="range" min="0" max="360" value="12" class="slider" id="myRange_rotx"> <span id="demo_rotx">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            roty: <input type="range" min="0" max="360" value="25" class="slider" id="myRange_roty"> <span id="demo_roty">  </span>
+                        <div class="slidecontainer" id="roty">
+                            roty: <input type="range" min="0" max="360" value="339" class="slider" id="myRange_roty"> <span id="demo_roty">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            rotz: <input type="range" min="0" max="360" value="90" class="slider" id="myRange_rotz"> <span id="demo_rotz">  </span>
+                        <div class="slidecontainer" id="rotz">
+                            rotz: <input type="range" min="0" max="360" value="266" class="slider" id="myRange_rotz"> <span id="demo_rotz">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            near_ortho: <input type="range" min="-2" max="1" value="-1.0" class="slider" id="myRange_near_ortho"> <span id="demo_near_ortho">  </span>
+                        <div class="slidecontainer" id="near_ortho">
+                            near_ortho: <input type="range" min="-10" max="5" value="-10" class="slider" id="myRange_near_ortho"> <span id="demo_near_ortho">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            far_ortho: <input type="range" min="-1" max="2" value="1.0" class="slider" id="myRange_far_ortho"> <span id="demo_far_ortho">  </span>
+                        <div class="slidecontainer" id="far_ortho">
+                            far_ortho: <input type="range" min="-10" max="20" value="10" class="slider" id="myRange_far_ortho"> <span id="demo_far_ortho">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            fovy_persp: <input type="range" min="0" max="200" value="45" class="slider" id="myRange_fovy_persp"> <span id="demo_fovy_persp">  </span>
+                        <div class="slidecontainer" id="fovy_persp" hidden>
+                            fovy_persp: <input type="range" min="0" max="180" value="180" class="slider" id="myRange_fovy_persp"> <span id="demo_fovy_persp">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            aspect_persp: <input type="range" min="-5" max="5" value="1" class="slider" id="myRange_aspect_persp"> <span id="demo_aspect_persp">  </span>
+                        <div class="slidecontainer" id="aspect_persp" hidden>
+                            aspect_persp: <input type="range" min="-50" max="50" value="10" class="slider" id="myRange_aspect_persp"> <span id="demo_aspect_persp">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            near_persp: <input type="range" min="-10" max="5" value="0.05" class="slider" id="myRange_near_persp"> <span id="demo_near_persp">  </span>
+                        <div class="slidecontainer" id="near_persp" hidden>
+                            near_persp: <input type="range" min="-20" max="10" value="0" class="slider" id="myRange_near_persp"> <span id="demo_near_persp">  </span>
                         </div>
 
-                        <div class="slidecontainer">
-                            far_persp: <input type="range" min="-10.0" max="30" value="10" class="slider" id="myRange_far_persp"> <span id="demo_far_persp">  </span>
+                        <div class="slidecontainer" id="far_persp" hidden>
+                            far_persp: <input type="range" min="-10.0" max="101" value="100" class="slider" id="myRange_far_persp"> <span id="demo_far_persp">  </span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <p><button id="getTile">Get tile</button></p>
+            <p><button class="button" id="getTile">Get tile</button></p>
 
-            <p> <button id="tile1">Tile 1</button>
-
-                <button id="tile2">Tile 2</button>
-
-                <button id="tile3">Tile 3</button>
-
-                <button id="tile4">Tile 4</button>
-
-                <button id="tile5">Tile 5</button>
-
-                <button id="tile6">Tile 6</button>
-
-                <button id="tile7">Tile 7</button>
-
-                <button id="tile8">Tile 8</button>
-
-                <button id="tile9">Tile 9</button>
-                <button id="tile10">Tile 10</button>
-                <button id="tile11">Tile 11</button>
-                <button id="tile12">Tile 12</button>
-                <button id="tile13">Tile 13</button>
-                <button id="tile14">Tile 14</button>
-                <button id="tile15">Tile 15</button>
-                <button id="tile16">Tile 16</button>
-                <button id="tile17">Tile 17</button>
-                <button id="tile18">Tile 18</button>
-                <button id="tile19">Tile 19</button>
-                <button id="tile20">Tile 20</button>
-                <button id="tile21">Tile 21</button>
+            <p>
+                <button class="button" id="tile1">Tile 1</button>
+                <button class="button" id="tile2">Tile 2</button>
+                <button class="button" id="tile3">Tile 3</button>
+                <button class="button" id="tile4">Tile 4</button>
+                <button class="button" id="tile5">Tile 5</button>
+                <button class="button" id="tile6">Tile 6</button>
+                <button class="button" id="tile7">Tile 7</button>
+                <button class="button" id="tile8" style="display: none;">Tile 8</button>
+                <button class="button" id="tile9" style="display: none;">Tile 9</button>
+                <button class="button" id="tile10" style="display: none;">Tile 10</button>
+            </p>
+            <p>
+                <button class="button" id="tile11" style="display: none;">Tile 11</button>
+                <button class="button" id="tile12" style="display: none;">Tile 12</button>
+                <button class="button" id="tile13" style="display: none;">Tile 13</button>
+                <button class="button" id="tile14" style="display: none;">Tile 14</button>
+                <button class="button" id="tile15" style="display: none;">Tile 15</button>
+                <button class="button" id="tile16" style="display: none;">Tile 16</button>
+                <button class="button" id="tile17" style="display: none;">Tile 17</button>
+                <button class="button" id="tile18" style="display: none;">Tile 18</button>
+                <button class="button" id="tile19" style="display: none;">Tile 19</button>
+                <button class="button" id="tile20" style="display: none;">Tile 20</button>
+                <button class="button" id="tile21" style="display: none;">Tile 21</button>
             </p>
             <p>Use cursor keys to spin and <code>Page Up</code>/<code>Page Down</code> to zoom out/in.</p>
 

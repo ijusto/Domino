@@ -44,7 +44,7 @@ var tcx = [-16.5, -15, -13.5, -12, -10.5, -9];
 var tcy = [15, 15, 15, 15, 15, 15];
 var tcz = [0, 0, 0, 0, 0, 0];
 
-var tbx = [8];
+var tbx = [0];
 var tby = [0];
 var tbz = [0];
 
@@ -57,15 +57,20 @@ var tz = 0.0;
 var angleXX = 0.0;
 var angleYY = 0.0;
 var angleZZ = 0.0;
+var rotateZ = false;
 
 var anglepXX = [0, 0, 0, 0, 0, 0, 0];
 var anglepYY = [0, 0, 0, 0, 0, 0, 0];
 var anglepZZ = [0, 0, 0, 0, 0, 0, 0];
 
-var tileIndex = 0;
+var tileIndex = null;
+
+var tilesSelected = [];
+for(let i = 0; i < 7; i++){tilesSelected[i] = false;}
 
 //Textures player
 var playerTextures = [];
+var playerTiles = [];
 
 //Textures computer
 var pcTextures = [];
@@ -73,10 +78,11 @@ var pcTextures = [];
 //Textures "deck"
 var deckTextures = [];
 var deckTileNumber = 0;
+var deckTiles = [];
 
 // board pieces
 var boardTextures = [];
-var angleX_board = 0, angleY_board = 25, angleZ_board = 90;
+var angleX_board = 12, angleY_board = 339, angleZ_board = 266;
 
 // The scaling factors
 var sx = 0.10;
@@ -107,8 +113,10 @@ var primitiveType = null;
 // To allow choosing the projection type
 var projectionType = 0;
 var left_ortho = -1.0, right_ortho = 1.0, bottom_ortho = -1.0, top_ortho = 1.0, near_ortho = -1.0, far_ortho = 1.0;
-var fovy_persp = 45, aspect_persp = 1, near_persp = 0.05, far_persp = 10;
-
+var fovy_persp = 45; // angle in degrees
+var aspect_persp = 1;
+var near_persp = 0.05, far_persp = 10;
+//45,1
 // From learningwebgl.com
 
 // NEW --- Storing the vertices defining the cube faces
@@ -252,7 +260,7 @@ var webGLTexture_black_faces = null;
 function initTextures() {
 	// 6_6.png
 	bindImgToTexture(boardTextures, 0, null);
-	boardTextures[0].image.src = tiles[27];
+	boardTextures[0].image.src = "imgs/" + tiles[27];
 	tiles.splice(27, 1);
 
 	var i = 0;
@@ -279,7 +287,12 @@ function initTextures() {
 function addTextureToList(textureList, index, fromList) {
 	bindImgToTexture(textureList, index, null);
 	let random_tile = Math.floor(Math.random() * fromList.length);
-	textureList[index].image.src = fromList[random_tile];
+	if(textureList === playerTextures){
+		playerTiles[index] = fromList[random_tile];
+	} else if(textureList === deckTextures){
+		deckTiles[index] = fromList[random_tile];
+	}
+	textureList[index].image.src = "imgs/" + fromList[random_tile];
 	fromList.splice(random_tile, 1);
 }
 
@@ -290,7 +303,7 @@ function bindImgToTexture(textureList, index, img){
 		textureList.image.onload = function () {
 			handleLoadedTexture(textureList)
 		};
-		textureList.image.src = img;
+		textureList.image.src = "imgs/" + img;
 	} else {
 		textureList[index] = gl.createTexture();
 		textureList[index].image = new Image();
@@ -492,7 +505,11 @@ function drawScene() {
 		let slider = document.getElementById(elemId);
 		elemId = "demo_" + id;
 		let output = document.getElementById(elemId);
-		output.innerHTML = slider.value;
+		if(id === "near_ortho" || id === "far_ortho" || id === "near_persp" || id === "aspect_persp"){
+			output.innerHTML = parseFloat(slider.value)/10;
+		}else{
+			output.innerHTML = slider.value;
+		}
 		slider.oninput = function() {
 			output.innerHTML = this.value;
 			switch(id){
@@ -515,19 +532,19 @@ function drawScene() {
 					bottom_ortho = this.value;
 					break;
 				case "near_ortho":
-					near_ortho = this.value;
+					near_ortho = parseFloat(this.value)/10;
 					break;
 				case "far_ortho":
-					far_ortho = this.value;
+					far_ortho = parseFloat(this.value)/10;
 					break;
 				case "fovy_persp":
 					fovy_persp = this.value;
 					break;
 				case "aspect_persp":
-					aspect_persp = this.value;
+					aspect_persp = parseFloat(this.value)/10;
 					break;
 				case "near_persp":
-					near_persp = this.value;
+					near_persp = parseFloat(this.value)/10;
 					break;
 				case "far_persp":
 					far_persp = this.value;
@@ -562,7 +579,7 @@ function drawScene() {
 		
 		pMatrix = perspective(fovy_persp, aspect_persp, near_persp, far_persp);
 		
-		tz = -2.25;
+		tz = - (7 * 0.25);
 
 	}
 	
@@ -587,6 +604,11 @@ function drawScene() {
 		primitiveType, deckTextures[0] );
 	 */
 
+	for(let i = 8; i<22; i++) {
+		document.getElementById("tile"+i).hidden = true;
+	}
+
+	// Player pieces
 	for(let i = 0; i < tpx.length; i++){
 		drawDominoModel(anglepXX[i],anglepYY[i],anglepZZ[i],
 			sx, sy, sz,
@@ -594,6 +616,11 @@ function drawScene() {
 			mvMatrix,
 			primitiveType, playerTextures[i]
 		);
+		let id = i + 1;
+		console.log(id);
+		document.getElementById("tile"+ id).innerHTML = playerTiles[i].split(".")[0];
+		document.getElementById("tile"+ id).style.display= "";
+		// TODO: Update player tiles
 	}
 
 	// Board pieces
@@ -626,6 +653,13 @@ function drawScene() {
 		document.getElementById("tile" + j.toString()).disabled = true;
 	}
 
+	if(rotateZ && tileIndex !== null) {
+		anglepZZ[tileIndex] -= 90;
+		if (angleZZ[tileIndex] === -4) {
+			angleZZ[tileIndex] = 356;
+		}
+		rotateZ = false;
+	}
 }
 
 
@@ -687,20 +721,64 @@ function handleKeys() {
 	} else {
 		if (currentlyPressedKeys[37]) {
 			// Left cursor key
-			tpx[tileIndex] -= 0.05;
+			if(tileIndex !== null) {
+				tpx[tileIndex] -= 0.05;
+			}
+			/*
+			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
+			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
+			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
+			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
+			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
+			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
+
+			 */
 		}
 		if (currentlyPressedKeys[39]) {
 			// Right cursor key
-			tpx[tileIndex] += 0.05;
+			if(tileIndex !== null) {
+				tpx[tileIndex] += 0.05;
+			}
+			/*
+			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
+			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
+			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
+			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
+			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
+			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
+
+			 */
 		}
 		if (currentlyPressedKeys[38]) {
 			// Up cursor key
-			tpy[tileIndex] += 0.05;
+			if(tileIndex !== null) {
+				tpy[tileIndex] += 0.05;
+			}
+			/*
+			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
+			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
+			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
+			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
+			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
+			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
+
+			 */
 		}
 
 		if (currentlyPressedKeys[40]) {
 			// Down cursor key
-			tpy[tileIndex] -= 0.05;
+			if(tileIndex !== null) {
+				tpy[tileIndex] -= 0.05;
+			}
+			/*
+			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
+			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
+			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
+			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
+			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
+			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
+
+			 */
 		}
 	}
 
@@ -714,7 +792,18 @@ function handleKeys() {
 
 		switch(key){
 			case 114:
-				anglepZZ[tileIndex] += 90;
+				if(tileIndex !== null) {
+					rotateZ = true;
+				}
+				/*
+				console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
+				console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
+				console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
+				console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
+				console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
+				console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
+				 */
+				break;
 		}
 
 		// Render the viewport
@@ -736,9 +825,9 @@ var lastMouseY = null;
 
 function handleMouseDown(event) {
     mouseDown = true;
-  
+
     lastMouseX = event.clientX;
-  
+
     lastMouseY = event.clientY;
 }
 
@@ -749,26 +838,26 @@ function handleMouseUp(event) {
 function handleMouseMove(event) {
 
     if (!mouseDown) {
-	  
+
       return;
     }
 
     // Rotation angles proportional to cursor displacement
-    
+
     var newX = event.clientX;
-  
+
     var newY = event.clientY;
 
     var deltaX = newX - lastMouseX;
-    
+
     angleYY += radians( 10 * deltaX  );
 
     var deltaY = newY - lastMouseY;
-    
+
     angleXX += radians( 10 * deltaY  );
-    
+
     lastMouseX = newX;
-    
+
     lastMouseY = newY;
   }
 //----------------------------------------------------------------------------
@@ -776,15 +865,15 @@ function handleMouseMove(event) {
 // Timer
 
 function tick() {
-	
+
 	requestAnimFrame(tick);
-	
-	// NEW --- Processing keyboard events 
-	
+
+	// NEW --- Processing keyboard events
+
 	handleKeys();
-	
+
 	drawScene();
-	
+
 	animate();
 }
 
@@ -800,19 +889,19 @@ function outputInfos(){
 //----------------------------------------------------------------------------
 
 function setEventListeners( canvas ){
-	
+
 	// NEW ---Handling the mouse
-	
+
 	// From learningwebgl.com
 
     canvas.onmousedown = handleMouseDown;
-    
+
     document.onmouseup = handleMouseUp;
-    
+
     document.onmousemove = handleMouseMove;
-    
+
     // NEW ---Handling the keyboard
-	
+
 	// From learningwebgl.com
 
     function handleKeyDown(event) {
@@ -824,28 +913,40 @@ function setEventListeners( canvas ){
     }
 
 	document.onkeydown = handleKeyDown;
-    
+
     document.onkeyup = handleKeyUp;
-	
+
 	// Dropdown list
-	
+
 	var projection = document.getElementById("projection-selection");
-	
+
 	projection.addEventListener("click", function(){
 		// Getting the selection
 		var p = projection.selectedIndex;
-				
+
 		switch(p){
 			case 0 : projectionType = 0;
-				break;
+					document.getElementById("near_ortho").hidden = false;
+					document.getElementById("far_ortho").hidden = false;
+					document.getElementById("fovy_persp").hidden = true;
+					document.getElementById("aspect_persp").hidden = true;
+					document.getElementById("near_persp").hidden = true;
+					document.getElementById("far_persp").hidden = true;
+					break;
 			case 1 : projectionType = 1;
-				break;
-		}  	
-	});      
+					document.getElementById("near_ortho").hidden = true;
+					document.getElementById("far_ortho").hidden = true;
+					document.getElementById("fovy_persp").hidden = false;
+					document.getElementById("aspect_persp").hidden = false;
+					document.getElementById("near_persp").hidden = false;
+					document.getElementById("far_persp").hidden = false;
+					break;
+		}
+	});
 
 
 	// Button events
-	
+
 	document.getElementById("XX-on-off-button").onclick = function(){
 		// Switching on / off
 		if( rotationXX_ON ) {
@@ -853,7 +954,7 @@ function setEventListeners( canvas ){
 		}
 		else {
 			rotationXX_ON = 1;
-		}  
+		}
 	};
 
 	document.getElementById("XX-direction-button").onclick = function(){
@@ -863,16 +964,16 @@ function setEventListeners( canvas ){
 		}
 		else {
 			rotationXX_DIR = 1;
-		}  
-	};      
+		}
+	};
 
 	document.getElementById("XX-slower-button").onclick = function(){
-		rotationXX_SPEED *= 0.75;  
-	};      
+		rotationXX_SPEED *= 0.75;
+	};
 
 	document.getElementById("XX-faster-button").onclick = function(){
-		rotationXX_SPEED *= 1.25;  
-	};      
+		rotationXX_SPEED *= 1.25;
+	};
 
 	document.getElementById("YY-on-off-button").onclick = function(){
 		// Switching on / off
@@ -881,7 +982,7 @@ function setEventListeners( canvas ){
 		}
 		else {
 			rotationYY_ON = 1;
-		}  
+		}
 	};
 
 	document.getElementById("YY-direction-button").onclick = function(){
@@ -891,16 +992,16 @@ function setEventListeners( canvas ){
 		}
 		else {
 			rotationYY_DIR = 1;
-		}  
-	};      
+		}
+	};
 
 	document.getElementById("YY-slower-button").onclick = function(){
-		rotationYY_SPEED *= 0.75;  
-	};      
+		rotationYY_SPEED *= 0.75;
+	};
 
 	document.getElementById("YY-faster-button").onclick = function(){
-		rotationYY_SPEED *= 1.25;  
-	};      
+		rotationYY_SPEED *= 1.25;
+	};
 
 	document.getElementById("ZZ-on-off-button").onclick = function(){
 		// Switching on / off
@@ -909,7 +1010,7 @@ function setEventListeners( canvas ){
 		}
 		else {
 			rotationZZ_ON = 1;
-		}  
+		}
 	};
 
 	document.getElementById("ZZ-direction-button").onclick = function(){
@@ -919,16 +1020,16 @@ function setEventListeners( canvas ){
 		}
 		else {
 			rotationZZ_DIR = 1;
-		}  
-	};      
+		}
+	};
 
 	document.getElementById("ZZ-slower-button").onclick = function(){
-		rotationZZ_SPEED *= 0.75;  
-	};      
+		rotationZZ_SPEED *= 0.75;
+	};
 
 	document.getElementById("ZZ-faster-button").onclick = function(){
-		rotationZZ_SPEED *= 1.25;  
-	};      
+		rotationZZ_SPEED *= 1.25;
+	};
 
 	document.getElementById("reset-button").onclick = function(){
 		// The initial values
@@ -947,7 +1048,7 @@ function setEventListeners( canvas ){
 		scx = 0.05;
 		scy = 0.05;
 		scz = 0.05;
-		
+
 		rotationXX_ON = 0;
 		rotationXX_DIR = 1;
 		rotationXX_SPEED = 1;
@@ -961,28 +1062,36 @@ function setEventListeners( canvas ){
 		rotationZZ_SPEED = 1;
 	};
 
-	document.getElementById("tile1").onclick = function(){
+	document.getElementById("tile1").onmousedown = function(){
 		tileIndex = 0;
+		selectPlayerTile();
+		document.getElementById("tile1").style.backgroundColor ="#81F41B";
+	};document.getElementById("tile1").onmouseup = function() {
+		document.getElementById("tile1").style.backgroundColor = "#f4511e";
 	};
-
 	document.getElementById("tile2").onclick = function(){
 		tileIndex = 1;
+		selectPlayerTile();
 	};
 
 	document.getElementById("tile3").onclick = function(){
 		tileIndex = 2;
+		selectPlayerTile();
 	};
 
 	document.getElementById("tile4").onclick = function(){
 		tileIndex = 3;
+		selectPlayerTile();
 	};
 
 	document.getElementById("tile5").onclick = function(){
 		tileIndex = 4;
+		selectPlayerTile();
 	};
 
 	document.getElementById("tile6").onclick = function(){
 		tileIndex = 5;
+		selectPlayerTile();
 	};
 
 	if(tpx.length<7){
@@ -991,10 +1100,77 @@ function setEventListeners( canvas ){
 
 	document.getElementById("tile7").onclick = function(){
 		tileIndex = 6;
+		selectPlayerTile();
 	};
 
 	document.getElementById("tile8").onclick = function(){
 		tileIndex = 7;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile9").onclick = function(){
+		tileIndex = 8;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile10").onclick = function(){
+		tileIndex = 9;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile11").onclick = function(){
+		tileIndex = 10;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile12").onclick = function(){
+		tileIndex = 11;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile13").onclick = function(){
+		tileIndex = 12;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile14").onclick = function(){
+		tileIndex = 13;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile15").onclick = function(){
+		tileIndex = 14;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile16").onclick = function(){
+		tileIndex = 15;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile17").onclick = function(){
+		tileIndex = 16;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile18").onclick = function(){
+		tileIndex = 17;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile19").onclick = function(){
+		tileIndex = 18;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile20").onclick = function(){
+		tileIndex = 19;
+		selectPlayerTile();
+	};
+
+	document.getElementById("tile21").onclick = function(){
+		tileIndex = 20;
+		selectPlayerTile();
 	};
 
 	document.getElementById("getTile").onclick = function(){
@@ -1002,7 +1178,9 @@ function setEventListeners( canvas ){
 			let index = playerTextures.length;
 			let random_tile = Math.floor(Math.random() * deckTextures.length);
 			playerTextures[index] = deckTextures[random_tile];
+			playerTiles[index] = deckTiles[random_tile];
 			deckTextures.splice(random_tile, 1);
+			deckTiles.splice(random_tile, 1);
 			deckTileNumber = deckTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckTileNumber;
 
@@ -1021,11 +1199,30 @@ function setEventListeners( canvas ){
 			anglepZZ[anglepZZ.length] = 0;
 			if(deckTileNumber === 0){
 				document.getElementById("getTile").disabled = true;
+				document.getElementById("getTile").style.display = "none";
 			}
 		}
 
 	};
 
+}
+
+function selectPlayerTile() {
+	if(!tilesSelected[tileIndex]) {
+		anglepXX[tileIndex] = angleX_board;
+		anglepYY[tileIndex] = angleY_board;
+		anglepZZ[tileIndex] = angleZ_board;
+		tpy[tileIndex] = -3;
+		tpx[tileIndex] = 0;
+		tpz[tileIndex] = tbz[0];
+		let tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
+		if (!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("red_")) {
+			bindImgToTexture(playerTextures, tileIndex, null);
+			console.log("imgs/red_" + tile);
+			playerTextures[tileIndex].image.src = "imgs/red_" + tile;
+		}
+	}
+	tilesSelected[tileIndex] = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1036,50 +1233,49 @@ function setEventListeners( canvas ){
 function initWebGL( canvas ) {
 	try {
 		// Create the WebGL context
-		
+
 		// Some browsers still need "experimental-webgl"
-		
+
 		gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-		
-		// DEFAULT: The viewport occupies the whole canvas 
-		
+
+		// DEFAULT: The viewport occupies the whole canvas
+
 		// DEFAULT: The viewport background color is WHITE
-		
+
 		// NEW - Drawing the triangles defining the model
-		
+
 		primitiveType = gl.TRIANGLES;
-		
+
 		// DEFAULT: The Depth-Buffer is DISABLED
-		
+
 		// Enable it !
-		
+
 		gl.enable( gl.DEPTH_TEST );
-		
 	} catch (e) {
 	}
 	if (!gl) {
 		alert("Could not initialise WebGL, sorry! :-(");
-	}        
+	}
 }
 
 //----------------------------------------------------------------------------
 
 
 function runWebGL() {
-	
+
 	var canvas = document.getElementById("my-canvas");
-	
+
 	initWebGL( canvas );
 
 	shaderProgram = initShaders( gl );
-	
+
 	setEventListeners( canvas );
-	
+
 	initBuffers();
-	
+
 	initTextures();
-	
-	tick();		// A timer controls the rendering / animation    
+
+	tick();		// A timer controls the rendering / animation
 
 	outputInfos();
 }
