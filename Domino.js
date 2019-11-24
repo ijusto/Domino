@@ -73,10 +73,6 @@ var player_angZZ = [0, 0, 0, 0, 0, 0, 0];
 
 var tileIndex = null;
 
-var tilesSelected = [];
-for(let i = 0; i < 7; i++){
-	tilesSelected[i] = false;
-}
 var selectedTile = null;
 
 // Textures player
@@ -1213,7 +1209,7 @@ function setEventListeners( canvas ){
 }
 
 function selectPlayerTile() {
-	if(!tilesSelected[tileIndex]) {
+	if(selectedTile !== tileIndex) {
 		player_angX[tileIndex] = angleX_board;
 		player_angYY[tileIndex] = angleY_board;
 		player_angZZ[tileIndex] = angleZ_board;
@@ -1226,8 +1222,16 @@ function selectPlayerTile() {
 			//console.log("imgs/red_" + tile);
 			playerTextures[tileIndex].image.src = "imgs/red_" + tile;
 		}
+
+		if ( selectedTile !== null && playerTextures[selectedTile].image.src.split("imgs/")[1].includes("red_")) {
+			let tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("red_")[1];
+			bindImgToTexture(playerTextures, selectedTile, null);
+			//console.log("imgs/red_" + tile);
+			playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
+		}
+
+		selectedTile = tileIndex;
 	}
-	tilesSelected[tileIndex] = true;
 }
 
 //----------------------------------------------------------------------------
