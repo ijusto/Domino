@@ -947,6 +947,7 @@ function setEventListeners( canvas ){
 
 	// Button events
 
+	/*
 	document.getElementById("XX-on-off-button").onclick = function(){
 		// Switching on / off
 		if( rotationXX_ON ) {
@@ -1061,6 +1062,8 @@ function setEventListeners( canvas ){
 		rotationZZ_DIR = 1;
 		rotationZZ_SPEED = 1;
 	};
+
+	*/
 
 	document.getElementById("tile1").onmousedown = function(){
 		tileIndex = 0;
