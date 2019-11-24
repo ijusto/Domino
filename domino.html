@@ -157,8 +157,10 @@
                         <button class="button" id="tile20" style="display: none;">Tile 20</button>
                         <button class="button" id="tile21" style="display: none;">Tile 21</button>
                     </p>
-                    <p style="text-align: left">Use cursor keys to spin and <code>Page Up</code>/<code>Page Down</code> to zoom out/in.</p>
-                    <p style="text-align: left">Move: <img src="imgs/arrows.png" style="float: inside;height: 50px; alignment-baseline: auto" alt="&#8592; &#8593; &#8595; &#8594; : arrow keys"/> &#8195; &#8195; &#8631; : <img src="imgs/r-butoon-md.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="R"/></p>
+                    <p style="text-align: left; font-size: 20px"><img src="imgs/zoom-in-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom in: "/>&#x20; - &#x20;<img src="imgs/Page_Up.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Up key "/></p>
+                    <p style="text-align: left; font-size: 20px"><img src="imgs/zoom-out-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom out: "/>&#x20; - &#x20;<img src="imgs/Page_Down.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Down key "/></p>
+                    <p style="text-align: left; font-size: 20px">&#8631;&#x20;&#x20;&#x20;&#x20;- <img src="imgs/r-butoon-md.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="R"/></p>
+                    <p style="text-align: left">Move: <img src="imgs/arrows.png" style="float: inside;height: 50px; alignment-baseline: auto" alt="&#8592; &#8593; &#8595; &#8594; : arrow keys"/></p>
                     <!-- TODO -->
                     <p style="text-align: left">Press any mouse button and move the cursor to rotate the models.</p>
                 </div>
@@ -167,15 +169,15 @@
                 </div>
                 <div class="column right"><div style="position: absolute; top: 20px;">Number of tiles in deck: <span id="deck_tile_number"></span></div>
                     <br/>
-                    <div style="position: absolute; top: 50px;">Choose the <b>projection type:</b></div>
-                    <div style="position: absolute; top: 70px;">
+                    <div style="position: absolute; top: 70px;"><b>Projection type:</b></div>
+                    <div style="position: absolute; top: 95px;">
                         <select id="projection-selection">
                             <option value="0">Orthogonal Projection</option>
                             <option value="1">Perspective Projection</option>
                         </select>
                     </div>
                     <br/>
-                    <div style="position: absolute; top: 120px;">Values:</div>
+                    <div style="position: absolute; top: 140px;">Values:</div>
                     <!--
                     <div class="slidecontainer">
                         left_ortho: <input type="range" min="-1.0" max="0.9" value="-1.0" class="slider" id="myRange_left_ortho"> <span id="demo_left_ortho">  </span>
@@ -189,7 +191,7 @@
                         bottom_ortho: <input type="range" min="-1" max="1" value="1.0" class="slider" id="myRange_bottom_ortho"> <span id="demo_bottom_ortho">  </span>
                     </div>
                     -->
-                    <div style="position: absolute; top:160px;">
+                    <div style="position: absolute; top:180px;">
                         Board:
                         <div class="slidecontainer" id="rotx">
                             rotx: <input type="range" min="0" max="360" value="12" class="slider" id="myRange_rotx"> <span id="demo_rotx">  </span>
