@@ -1210,21 +1210,26 @@ function setEventListeners( canvas ){
 
 function selectPlayerTile() {
 	if(selectedTile !== tileIndex) {
-		player_angX[tileIndex] = angleX_board;
-		player_angYY[tileIndex] = angleY_board;
-		player_angZZ[tileIndex] = angleZ_board;
-		player_ty[tileIndex] = -3;
-		player_tx[tileIndex] = 0;
-		player_tz[tileIndex] = board_tz[0];
-		let tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
+		let tile = null;
 		if (!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("red_")) {
+			if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("blue_")){
+				tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
+				player_angX[tileIndex] = angleX_board;
+				player_angYY[tileIndex] = angleY_board;
+				player_angZZ[tileIndex] = angleZ_board;
+				player_ty[tileIndex] = -3;
+				player_tx[tileIndex] = 0;
+				player_tz[tileIndex] = board_tz[0];
+			} else {
+				tile = playerTextures[tileIndex].image.src.split("imgs/blue_")[1];
+			}
 			bindImgToTexture(playerTextures, tileIndex, null);
 			//console.log("imgs/red_" + tile);
 			playerTextures[tileIndex].image.src = "imgs/red_" + tile;
 		}
 
 		if ( selectedTile !== null && playerTextures[selectedTile].image.src.split("imgs/")[1].includes("red_")) {
-			let tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("red_")[1];
+			tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("red_")[1];
 			bindImgToTexture(playerTextures, selectedTile, null);
 			//console.log("imgs/red_" + tile);
 			playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
