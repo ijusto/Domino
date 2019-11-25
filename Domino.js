@@ -50,19 +50,21 @@ for(let i = 1; i < 7; i++) {
 var player_ty = [-7, -7, -7, -7, -7, -7, -7];
 var player_tz = [0, 0, 0, 0, 0, 0, 0];
 var player_tz_ortho = [0, 0, 0, 0, 0, 0, 0];
-var player_tz_persp = [-35, -35, -35, -35, -35, -35, -35];
-
-var pc_tx = [-16.5, -15, -13.5, -12, -10.5, -9];
-var pc_ty = [15, 15, 15, 15, 15, 15];
-var pc_tz = [0, 0, 0, 0, 0, 0];
-var pc_tz_ortho = [0, 0, 0, 0, 0, 0];
+var player_tz_persp = [-25, -25, -25, -25, -25, -25, -25];
+var pc_tx = [-9.4];
+for(let i = 1; i < 6; i++) {
+	pc_tx[i] = pc_tx[i-1] + dist_between_tiles;
+}
+var pc_ty = [8.8, 8.8, 8.8, 8.8, 8.8, 8.8];
+var pc_tz = [-3, -3, -3, -3, -3, -3];
+var pc_tz_ortho = [-40, -40, -40, -40, -40, -40];
 var pc_tz_persp = [-40, -40, -40, -40, -40, -40];
 
 var board_tx = [0];
 var board_ty = [0];
 var board_tz = [0];
 var board_tz_ortho = [0];
-var board_tz_persp = [-40];
+var board_tz_persp = [-27];
 
 var change_proj = false;
 
@@ -242,6 +244,29 @@ for(let main_number = 0; main_number < 7; main_number++) {
 
 var checker = false;
 
+// NEW - GLOBAL Animation controls
+
+var globalRotationYY_ON = 1;
+var globalRotationYY_DIR = 1;
+var globalRotationYY_SPEED = 1;
+
+var globalRotationXX_ON = 1;
+var globalRotationXX_DIR = 1;
+var globalRotationXX_SPEED = 1;
+
+var globalRotationZZ_ON = 1;
+var globalRotationZZ_DIR = 1;
+var globalRotationZZ_SPEED = 1;
+
+// The GLOBAL transformation parameters
+
+var globalAngleYY = 0.0;
+var globalAngleXX = 0.0;
+var globalAngleZZ = 0.0;
+
+var rotateDeck = false;
+
+
 //console.log(tiles.slice(0, tiles.length));
 
 //----------------------------------------------------------------------------
@@ -419,19 +444,20 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 						 front_face_texture) {
     // Pay attention to transformation order !!
 
-	mvMatrix = mult( mvMatrix, translationMatrix( tx, ty, tz ) );
+	mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
 
-	mvMatrix = mult( mvMatrix, rotationZZMatrix( angleZZ ) );
-	mvMatrix = mult( mvMatrix, rotationYYMatrix( angleYY ) );
-	mvMatrix = mult( mvMatrix, rotationXXMatrix( angleXX ) );
+	mvMatrix = mult(mvMatrix, rotationZZMatrix(angleZZ));
+	mvMatrix = mult(mvMatrix, rotationYYMatrix(angleYY));
+	mvMatrix = mult(mvMatrix, rotationXXMatrix(angleXX));
 
-	mvMatrix = mult( mvMatrix, scalingMatrix( sx, sy, sz ) );
+	mvMatrix = mult(mvMatrix, scalingMatrix(sx, sy, sz));
 
 	// Passing the Model View Matrix to apply the current transformation
-	
+
 	var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-	
+
 	gl.uniformMatrix4fv(mvUniform, false, new Float32Array(flatten(mvMatrix)));
+
 
 	// Passing the buffers
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
@@ -504,6 +530,8 @@ function drawScene() {
 	var pMatrix;
 	
 	var mvMatrix = mat4();
+
+	var mvBoardMatrix = mat4();
 	
 	// Clearing with the background color
 	
@@ -606,6 +634,7 @@ function drawScene() {
 		// TO BE DONE !
 		
 		// Allow the user to control the size of the view volume
+
 	}
 	else {	
 
@@ -648,21 +677,22 @@ function drawScene() {
 	let pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
 
 	gl.uniformMatrix4fv(pUniform, false, new Float32Array(flatten(pMatrix)));
-	
+
+
+	// NEW --- GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
+	if(rotateDeck) {
+		mvBoardMatrix = mult(mvBoardMatrix, rotationYYMatrix(globalAngleYY));
+
+		mvBoardMatrix = mult(mvBoardMatrix, rotationXXMatrix(globalAngleXX));
+
+		mvBoardMatrix = mult(mvBoardMatrix, rotationZZMatrix(globalAngleZZ));
+	}
+
 	// NEW --- Instantianting the same model more than once !!
 	
 	// And with diferent transformation parameters !!
 	
 	// Call the drawModel function
-
-	/*
-	// Instance middle board
-	drawDominoModel(0, 0, angleZZ,
-		sx, sy, sz,
-		tx*sx, ty*sy, tz*sz,
-		mvMatrix,
-		primitiveType, deckTextures[0] );
-	 */
 
 	for(let i = 8; i<22; i++) {
 		document.getElementById("tile"+i).hidden = true;
@@ -674,7 +704,8 @@ function drawScene() {
 			sx, sy, sz,
 			player_tx[i]*sx, player_ty[i]*sy, player_tz[i]*sz,
 			mvMatrix,
-			primitiveType, playerTextures[i]
+			primitiveType,
+			playerTextures[i]
 		);
 		let id = i + 1;
 		document.getElementById("tile"+ id).innerHTML = playerTiles[i].split(".")[0];
@@ -687,18 +718,20 @@ function drawScene() {
 		drawDominoModel( angleX_board[i], angleY_board[i], angleZ_board[i],
 			sx, sy, sz,
 			board_tx[i]*sx, board_ty[i]*sy, board_tz[i]*sz,
-			mvMatrix,
-			primitiveType, boardTextures[i]
+			mvBoardMatrix,
+			primitiveType,
+			boardTextures[i]
 		);
 	}
 
 	// Computer pieces
 	for(let i = 0; i < pcTextures.length; i++){
 		drawDominoModel( 0, 180, 0,
-			pc_sx, pc_sy, pc_sz,
-			pc_tx[i]*pc_sx, pc_ty[i]*pc_sy, pc_tz[i]*pc_sz,
+			sx, sy, sz,
+			pc_tx[i]*sx, pc_ty[i]*sy, pc_tz[i]*sz,
 			mvMatrix,
-			primitiveType, pcTextures[i]
+			primitiveType,
+			pcTextures[i]
 		);
 	}
 
@@ -787,6 +820,7 @@ function drawScene() {
 			document.getElementById("snapTile").style.display = "none";
 		}
 	}
+
 }
 
 function colorGreen(){
@@ -815,7 +849,24 @@ function animate() {
 	if( lastTime !== 0 ) {
 		
 		var elapsed = timeNow - lastTime;
-		
+
+		// Global rotation
+
+		if( globalRotationYY_ON ) {
+
+			globalAngleYY += globalRotationYY_DIR * globalRotationYY_SPEED * (90 * elapsed) / 1000.0;
+		}
+		if( globalRotationXX_ON ) {
+
+			globalAngleXX += globalRotationXX_DIR * globalRotationXX_SPEED * (90 * elapsed) / 1000.0;
+		}
+		if( globalRotationZZ_ON ) {
+
+			globalAngleZZ += globalRotationZZ_DIR * globalRotationZZ_SPEED * (90 * elapsed) / 1000.0;
+		}
+
+		// Local rotations
+
 		if( rotationXX_ON ) {
 			angleXX += rotationXX_DIR * rotationXX_SPEED * (90 * elapsed) / 1000.0;
 	    }
@@ -1202,6 +1253,10 @@ function setEventListeners( canvas ){
 	};
 
 	*/
+
+	document.getElementById("rotateDeck").onclick = function(){
+		rotateDeck = !rotateDeck;
+	};
 
 	document.getElementById("tile1").onmousedown = function(){
 		tileIndex = 0;
