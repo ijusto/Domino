@@ -120,7 +120,7 @@ var primitiveType = null;
 // To allow choosing the projection type
 var projectionType = 0;
 var left_ortho = -1.0, right_ortho = 1.0, bottom_ortho = -1.0, top_ortho = 1.0, near_ortho = -1.0, far_ortho = 1.0;
-var fovy_persp = 45; // angle in degrees
+var fovy_persp = 173;//45; // angle in degrees
 var aspect_persp = 1;
 var near_persp = 0.05, far_persp = 10;
 
@@ -503,14 +503,16 @@ function drawScene() {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-	for(let id of [/*"left_ortho", "right_ortho", "bottom_ortho",*/ "rotx", "roty", "rotz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]){
+	for(let id of [/*"left_ortho", "right_ortho", "bottom_ortho",*/ "tz", "rotx", "roty", "rotz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]){
 		let elemId = "myRange_" + id;
 		let slider = document.getElementById(elemId);
 		elemId = "demo_" + id;
 		let output = document.getElementById(elemId);
 		if(id === "near_ortho" || id === "far_ortho" || id === "near_persp" || id === "aspect_persp"){
 			output.innerHTML = parseFloat(slider.value)/10;
-		}else{
+		} else if(id === "tz") {
+			output.innerHTML = parseFloat(slider.value)/100;
+		} else {
 			output.innerHTML = slider.value;
 		}
 		slider.oninput = function() {
@@ -552,6 +554,9 @@ function drawScene() {
 				case "far_persp":
 					far_persp = this.value;
 					break;
+				case "tz":
+					tz = this.value;
+					break;
 			}
 		};
 
@@ -582,7 +587,7 @@ function drawScene() {
 		
 		pMatrix = perspective(fovy_persp, aspect_persp, near_persp, far_persp);
 		
-		tz = - (7 * 0.25);
+		tz = - 1.75;
 
 	}
 	
@@ -934,6 +939,7 @@ function setEventListeners( canvas ){
 					document.getElementById("aspect_persp").hidden = true;
 					document.getElementById("near_persp").hidden = true;
 					document.getElementById("far_persp").hidden = true;
+					document.getElementById("tz").hidden = true;
 					break;
 			case 1 : projectionType = 1;
 					document.getElementById("near_ortho").hidden = true;
@@ -942,6 +948,7 @@ function setEventListeners( canvas ){
 					document.getElementById("aspect_persp").hidden = false;
 					document.getElementById("near_persp").hidden = false;
 					document.getElementById("far_persp").hidden = false;
+					document.getElementById("tz").hidden = false;
 					break;
 		}
 	});
