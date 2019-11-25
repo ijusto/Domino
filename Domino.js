@@ -667,6 +667,50 @@ function drawScene() {
 		}
 		rotateZ = false;
 	}
+    var checker=false;
+    if(player_angZZ[tileIndex]==266 || player_angZZ[tileIndex]==86){
+        if(player_tx[tileIndex]-board_tx[0]>-3 && player_tx[tileIndex]-board_tx[0]<3){
+            if(player_ty[tileIndex]-board_ty[0]>-1 && player_ty[tileIndex]-board_ty[0]<1){
+                checker = true;
+                if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
+                    tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
+                    playerTextures[tileIndex].image.src = "imgs/green_" + tile;
+					document.getElementById("snapTile").disabled = false;
+					document.getElementById("snapTile").style.display = "";
+                }
+            }
+        }
+    }
+    else{
+        if(player_tx[tileIndex]-board_tx[0]>-2.5 && player_tx[tileIndex]-board_tx[0]<2.5){
+            if(player_ty[tileIndex]-board_ty[0]>-1.5 && player_ty[tileIndex]-board_ty[0]<1.5){
+                checker = true;
+                if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
+                    tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
+                    playerTextures[tileIndex].image.src = "imgs/green_" + tile;
+					document.getElementById("snapTile").disabled = false;
+					document.getElementById("snapTile").style.display = "";
+                }
+            }
+        }
+    }
+    if(tileIndex!=null) {
+        if (!playerTextures[tileIndex].image.src.includes("imgs/red")) {
+            if (checker == false) {
+                tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
+                playerTextures[tileIndex].image.src = "imgs/red_" + tile;
+				document.getElementById("snapTile").disabled = true;
+				document.getElementById("snapTile").style.display = "none";
+
+            }
+        }
+    }
+    else{
+    	if(document.getElementById("snapTile").disabled==false) {
+			document.getElementById("snapTile").disabled = true;
+			document.getElementById("snapTile").style.display = "none";
+		}
+	}
 }
 
 
@@ -1213,6 +1257,55 @@ function setEventListeners( canvas ){
 
 	};
 
+	document.getElementById("snapTile").onclick = function(){
+		tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
+		facesPlayer =  tile.replace(".png","").split("_");
+		console.log(facesPlayer);
+		tileBoard = boardTextures[0].image.src.split("imgs/")[1];
+		facesBoard =  tileBoard.replace(".png","").split("_");
+		console.log(facesBoard);
+		if(player_angZZ==266){
+			if(player_tx[tileIndex]-boardTextures[0]<0){
+				if(facesPlayer[0].localeCompare(facesBoard[0])){
+					console.log("here1");
+				}
+			}
+			else{
+				if(facesPlayer[1].localeCompare(facesBoard[1])){
+					console.log("here2");
+				}
+			}
+		}
+		else if(player_angZZ==86){
+			if(player_tx[tileIndex]-boardTextures[0]<0){
+				if(facesPlayer[1].localeCompare(facesBoard[0])){
+					console.log("here3");
+				}
+			}
+			else{
+				if(facesPlayer[0].localeCompare(facesBoard[1])){
+					console.log("here4");
+				}
+			}
+		}
+		else if(player_angZZ==-4){
+			if(facesPlayer[0].localeCompare(facesBoard[0])){
+				console.log("here5")
+			}
+			else if(facesPlayer[0].localeCompare(facesBoard[0])){
+				console.log("here6")
+			}
+		}
+		else{
+			if(facesPlayer[0].localeCompare(facesBoard[1])){
+				console.log("here7")
+			}
+			else if(facesPlayer[0].localeCompare(facesBoard[1])){
+				console.log("here8")
+			}
+		}
+	}
+
 }
 
 function selectPlayerTile() {
@@ -1244,6 +1337,8 @@ function selectPlayerTile() {
 
 		selectedTile = tileIndex;
 	}
+    console.log("tpx:"+player_tx[tileIndex],", tpy:"+player_ty[tileIndex],", angpz:"+player_angZZ[tileIndex]);
+    console.log("tbx:"+board_tx[0], ", tby:"+board_ty[tileIndex]);
 }
 
 //----------------------------------------------------------------------------
