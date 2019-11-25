@@ -49,18 +49,22 @@ for(let i = 1; i < 7; i++) {
 }
 var player_ty = [-7, -7, -7, -7, -7, -7, -7];
 var player_tz = [0, 0, 0, 0, 0, 0, 0];
+var player_tz_ortho = [0, 0, 0, 0, 0, 0, 0];
+var player_tz_persp = [-35, -35, -35, -35, -35, -35, -35];
 
 var pc_tx = [-16.5, -15, -13.5, -12, -10.5, -9];
 var pc_ty = [15, 15, 15, 15, 15, 15];
 var pc_tz = [0, 0, 0, 0, 0, 0];
+var pc_tz_ortho = [0, 0, 0, 0, 0, 0];
+var pc_tz_persp = [-40, -40, -40, -40, -40, -40];
 
 var board_tx = [0];
 var board_ty = [0];
 var board_tz = [0];
+var board_tz_ortho = [0];
+var board_tz_persp = [-40];
 
-var tx = 0.0;
-var ty = 0.0;
-var tz = 0.0;
+var change_proj = false;
 
 // The rotation angles in degrees
 
@@ -89,7 +93,7 @@ var deckTiles = [];
 
 // Textures board tiles
 var boardTextures = [];
-var angleX_board = 12, angleY_board = 339, angleZ_board = 266;
+var angleX_board = [0]/*12*/, angleY_board = [0]/*339*/, angleZ_board = [90]/*266*/;
 
 // The scaling factors
 var sx = 0.10;
@@ -120,9 +124,9 @@ var primitiveType = null;
 // To allow choosing the projection type
 var projectionType = 0;
 var left_ortho = -1.0, right_ortho = 1.0, bottom_ortho = -1.0, top_ortho = 1.0, near_ortho = -1.0, far_ortho = 1.0;
-var fovy_persp = 173;//45; // angle in degrees
+var fovy_persp = 45;//45; // angle in degrees
 var aspect_persp = 1;
-var near_persp = 0.05, far_persp = 10;
+var near_persp = 0.05, far_persp = 70;
 
 // From learningwebgl.com
 
@@ -235,6 +239,9 @@ for(let main_number = 0; main_number < 7; main_number++) {
 		count++;
 	}
 }
+
+var checker = false;
+
 //console.log(tiles.slice(0, tiles.length));
 
 //----------------------------------------------------------------------------
@@ -503,29 +510,29 @@ function drawScene() {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-	for(let id of [/*"left_ortho", "right_ortho", "bottom_ortho",*/ "tz", "rotx", "roty", "rotz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]){
+	for(let id of [/*"left_ortho", "right_ortho", "bottom_ortho", "tz", */"rotx", "roty", "rotz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]){
 		let elemId = "myRange_" + id;
 		let slider = document.getElementById(elemId);
 		elemId = "demo_" + id;
 		let output = document.getElementById(elemId);
 		if(id === "near_ortho" || id === "far_ortho" || id === "near_persp" || id === "aspect_persp"){
 			output.innerHTML = parseFloat(slider.value)/10;
-		} else if(id === "tz") {
+		} /*else if(id === "tz") {
 			output.innerHTML = parseFloat(slider.value)/100;
-		} else {
+		} */else {
 			output.innerHTML = slider.value;
 		}
 		slider.oninput = function() {
-			output.innerHTML = this.value;
+			//output.innerHTML = this.value;
 			switch(id){
 				case "rotx":
-					angleX_board = this.value;
+					angleX_board[0] = this.value;
 					break;
 				case "roty":
-					angleY_board = this.value;
+					angleY_board[0] = this.value;
 					break;
 				case "rotz":
-					angleZ_board = this.value;
+					angleZ_board[0] = this.value;
 					break;
 				case "left_ortho":
 					left_ortho = this.value;
@@ -554,9 +561,10 @@ function drawScene() {
 				case "far_persp":
 					far_persp = this.value;
 					break;
+					/*
 				case "tz":
-					tz = this.value;
-					break;
+					tz = parseFloat(this.value)/100;
+					break;*/
 			}
 		};
 
@@ -570,8 +578,30 @@ function drawScene() {
 		// For now, the default orthogonal view volume
 		
 		pMatrix = ortho(left_ortho, right_ortho, bottom_ortho, top_ortho, near_ortho, far_ortho);
-		
-		tz = 0;
+
+		if(change_proj) {
+			for(let i = 0; i < player_tz.length; i++){
+				player_tz_persp[i] = player_tz[i];
+			}
+			for(let i = 0; i < pc_tz.length; i++){
+				pc_tz_persp[i] = pc_tz[i];
+			}
+			for (let i = 0; i < board_tz.length; i++) {
+				board_tz_persp[i] = board_tz[i];
+			}
+
+			for (let i = 0; i < player_tz.length; i++) {
+				player_tz[i] = player_tz_ortho[i];
+			}
+			for (let i = 0; i < pc_tz.length; i++) {
+				pc_tz[i] = pc_tz_ortho[i];
+			}
+			for (let i = 0; i < board_tz.length; i++) {
+				board_tz[i] = board_tz_ortho[i];
+			}
+		}
+
+		change_proj = false;
 		
 		// TO BE DONE !
 		
@@ -586,9 +616,31 @@ function drawScene() {
 		// Ensure that the model is "inside" the view volume
 		
 		pMatrix = perspective(fovy_persp, aspect_persp, near_persp, far_persp);
-		
-		tz = - 1.75;
 
+		if(!change_proj){
+			for(let i = 0; i < player_tz.length; i++){
+				player_tz_ortho[i] = player_tz[i];
+			}
+			for(let i = 0; i < pc_tz.length; i++){
+				pc_tz_ortho[i] = pc_tz[i];
+			}
+			for(let i = 0; i < board_tz.length; i++){
+				board_tz_ortho[i] = board_tz[i];
+			}
+			for(let i = 0; i < player_tz.length; i++){
+				player_tz[i] = player_tz_persp[i];
+			}
+
+			for(let i = 0; i < pc_tz.length; i++){
+				pc_tz[i] = pc_tz_persp[i];
+			}
+
+			for(let i = 0; i < board_tz.length; i++){
+				board_tz[i] = board_tz_persp[i];
+			}
+		}
+
+		change_proj = true;
 	}
 	
 	// Passing the Projection Matrix to apply the current projection
@@ -632,7 +684,7 @@ function drawScene() {
 
 	// Board pieces
 	for(let i = 0; i < boardTextures.length; i++){
-		drawDominoModel( angleX_board, angleY_board, angleZ_board,
+		drawDominoModel( angleX_board[i], angleY_board[i], angleZ_board[i],
 			sx, sy, sz,
 			board_tx[i]*sx, board_ty[i]*sy, board_tz[i]*sz,
 			mvMatrix,
@@ -661,42 +713,66 @@ function drawScene() {
 	}
 
 	if(rotateZ && tileIndex !== null) {
-		player_angZZ[tileIndex] -= 90;
-		if (angleZZ[tileIndex] === -4) {
-			angleZZ[tileIndex] = 356;
+		if (player_angZZ[tileIndex] === 0) {
+			player_angZZ[tileIndex] = 270;
+
+		} else {
+			player_angZZ[tileIndex] -= 90;
 		}
 		rotateZ = false;
 	}
-    var checker=false;
-    if(player_angZZ[tileIndex]==266 || player_angZZ[tileIndex]==86){
-        if(player_tx[tileIndex]-board_tx[0]>-3 && player_tx[tileIndex]-board_tx[0]<3){
-            if(player_ty[tileIndex]-board_ty[0]>-1 && player_ty[tileIndex]-board_ty[0]<1){
-                checker = true;
-                if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
-                    tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
-                    playerTextures[tileIndex].image.src = "imgs/green_" + tile;
-					document.getElementById("snapTile").disabled = false;
-					document.getElementById("snapTile").style.display = "";
-                }
+	/*
+	console.log("angX: " + player_angZZ[tileIndex]);
+	console.log("tx dif: " + String(player_tx[tileIndex] - board_tx[0]));
+	console.log("ty dif: " + String(player_ty[tileIndex] - board_ty[0]));
+	 */
+    checker = false;
+    // parallel to board piece
+    if(player_angZZ[tileIndex] === angleZ_board[0] || player_angZZ[tileIndex] === angleZ_board[0] + 180){
+    	// left of the board piece
+        if(player_tx[tileIndex] - board_tx[0] > -2.5 /*-3*/ && player_tx[tileIndex] - board_tx[0] < -1.8/*3*/){
+            if(player_ty[tileIndex] - board_ty[0] > -0.4 && player_ty[tileIndex]-board_ty[0] < 0.4){
+                colorGreen();
             }
         }
+        // right of the board piece
+		else if(player_tx[tileIndex] - board_tx[0] < 2.5 /*-3*/ && player_tx[tileIndex] - board_tx[0] >1.8/*3*/){
+			if(player_ty[tileIndex] - board_ty[0] > -0.4 && player_ty[tileIndex]-board_ty[0] < 0.4){
+				colorGreen();
+			}
+		}
+
     }
+	// prependicular to board piece
     else{
-        if(player_tx[tileIndex]-board_tx[0]>-2.5 && player_tx[tileIndex]-board_tx[0]<2.5){
+		// left of the board piece
+		if(player_tx[tileIndex] - board_tx[0] > -1.9 /*-3*/ && player_tx[tileIndex] - board_tx[0] < -1.4 /*3*/){
+			if(player_ty[tileIndex] - board_ty[0] > -0.4 && player_ty[tileIndex]-board_ty[0] < 0.4){
+				colorGreen();
+			}
+		}
+		// right of the board piece
+		else if(player_tx[tileIndex] - board_tx[0] < 1.9 /*-3*/ && player_tx[tileIndex] - board_tx[0] > 1.4/*3*/){
+			if(player_ty[tileIndex] - board_ty[0] > -0.4 && player_ty[tileIndex]-board_ty[0] < 0.4){
+				colorGreen();
+			}
+		}
+		// up of the board piece
+
+		// down of the board piece
+
+
+
+    	//console.log(player_angZZ[tileIndex]);
+        if(player_tx[tileIndex]-board_tx[0] > 1.8 && player_tx[tileIndex]-board_tx[0]< 2.5){
             if(player_ty[tileIndex]-board_ty[0]>-1.5 && player_ty[tileIndex]-board_ty[0]<1.5){
-                checker = true;
-                if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
-                    tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
-                    playerTextures[tileIndex].image.src = "imgs/green_" + tile;
-					document.getElementById("snapTile").disabled = false;
-					document.getElementById("snapTile").style.display = "";
-                }
+				colorGreen();
             }
         }
     }
-    if(tileIndex!=null) {
+    if(tileIndex != null) {
         if (!playerTextures[tileIndex].image.src.includes("imgs/red")) {
-            if (checker == false) {
+            if (checker === false) {
                 tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
                 playerTextures[tileIndex].image.src = "imgs/red_" + tile;
 				document.getElementById("snapTile").disabled = true;
@@ -706,13 +782,22 @@ function drawScene() {
         }
     }
     else{
-    	if(document.getElementById("snapTile").disabled==false) {
+    	if(document.getElementById("snapTile").disabled === false) {
 			document.getElementById("snapTile").disabled = true;
 			document.getElementById("snapTile").style.display = "none";
 		}
 	}
 }
 
+function colorGreen(){
+	checker = true;
+	if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
+		let tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
+		playerTextures[tileIndex].image.src = "imgs/green_" + tile;
+		document.getElementById("snapTile").disabled = false;
+		document.getElementById("snapTile").style.display = "";
+	}
+}
 
 //----------------------------------------------------------------------------
 //
@@ -1264,7 +1349,7 @@ function setEventListeners( canvas ){
 		tileBoard = boardTextures[0].image.src.split("imgs/")[1];
 		facesBoard =  tileBoard.replace(".png","").split("_");
 		console.log(facesBoard);
-		if(player_angZZ==266){
+		if(player_angZZ === 266){
 			if(player_tx[tileIndex]-boardTextures[0]<0){
 				if(facesPlayer[0].localeCompare(facesBoard[0])){
 					console.log("here1");
@@ -1276,7 +1361,7 @@ function setEventListeners( canvas ){
 				}
 			}
 		}
-		else if(player_angZZ==86){
+		else if(player_angZZ === 86){
 			if(player_tx[tileIndex]-boardTextures[0]<0){
 				if(facesPlayer[1].localeCompare(facesBoard[0])){
 					console.log("here3");
@@ -1288,7 +1373,7 @@ function setEventListeners( canvas ){
 				}
 			}
 		}
-		else if(player_angZZ==-4){
+		else if(player_angZZ === -4){
 			if(facesPlayer[0].localeCompare(facesBoard[0])){
 				console.log("here5")
 			}
@@ -1314,9 +1399,9 @@ function selectPlayerTile() {
 		if (!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("red_")) {
 			if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("blue_")){
 				tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
-				player_angX[tileIndex] = angleX_board;
-				player_angYY[tileIndex] = angleY_board;
-				player_angZZ[tileIndex] = angleZ_board;
+				player_angX[tileIndex] = angleX_board[0];
+				player_angYY[tileIndex] = angleY_board[0];
+				player_angZZ[tileIndex] = angleZ_board[0];
 				player_ty[tileIndex] = -3;
 				player_tx[tileIndex] = 0;
 				player_tz[tileIndex] = board_tz[0];
