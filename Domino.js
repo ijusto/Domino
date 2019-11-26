@@ -769,53 +769,59 @@ function drawScene() {
 		for (let j=0;j < boardTextures.length;j++) {
 			if (boardTextures[j].image.src.includes(i)) {
 				// parallel to board piece
+				tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
+				tile = tile.replace("red_","");
+				tile = tile.replace("green_","");
+				facesPlayer = tile.replace(".png", "").split("_");
 				if(angleZ_board[j]+180>=360){
 					angZBoardAux=angleZ_board[j]+180-360;
 				}
 				else{
 					angZBoardAux=angleZ_board[j]+180;
 				}
-				if(player_angZZ[tileIndex] === angleZ_board[j] || player_angZZ[tileIndex] === angZBoardAux){
-					// left of the board piece
-					if(ends[i].includes("e")) {
-						if (player_tx[tileIndex] - board_tx[j] > -2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.8/*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
-								colorGreen();
-								snapTileIndex=j;
+				if(facesPlayer[0]!==facesPlayer[1]) {
+					if (player_angZZ[tileIndex] === angleZ_board[j] || player_angZZ[tileIndex] === angZBoardAux) {
+						// left of the board piece
+						if (ends[i].includes("e")) {
+							if (player_tx[tileIndex] - board_tx[j] > -2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.8/*3*/) {
+								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+									colorGreen();
+									snapTileIndex = j;
+								}
 							}
 						}
-					}
-					// right of the board piece
-					if(ends[i].includes("d")) {
-						if (player_tx[tileIndex] - board_tx[j] < 2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.8/*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
-								colorGreen();
-								snapTileIndex=j;
+						// right of the board piece
+						if (ends[i].includes("d")) {
+							if (player_tx[tileIndex] - board_tx[j] < 2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.8/*3*/) {
+								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+									colorGreen();
+									snapTileIndex = j;
+								}
 							}
 						}
-					}
-					//down of the board piece
-					if(ends[i].includes("b")) {
-						if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] > -2.5 && player_ty[tileIndex] - board_ty[j] < -1.8) {
-								colorGreen();
-								snapTileIndex=j;
+						//down of the board piece
+						if (ends[i].includes("b")) {
+							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
+								if (player_ty[tileIndex] - board_ty[j] > -2.5 && player_ty[tileIndex] - board_ty[j] < -1.8) {
+									colorGreen();
+									snapTileIndex = j;
+								}
 							}
 						}
-					}
-					// up of the board piece
-					if(ends[i].includes("c")) {
-						if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] < 2.5 && player_ty[tileIndex] - board_ty[j] > 1.8) {
-								colorGreen();
-								snapTileIndex=j;
+						// up of the board piece
+						if (ends[i].includes("c")) {
+							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
+								if (player_ty[tileIndex] - board_ty[j] < 2.5 && player_ty[tileIndex] - board_ty[j] > 1.8) {
+									colorGreen();
+									snapTileIndex = j;
+								}
 							}
 						}
-					}
 
+					}
 				}
 				// prependicular to board piece
-				else{
+				if(player_angZZ[tileIndex] !== angleZ_board[j] && player_angZZ[tileIndex] !== angZBoardAux){
 					// left of the board piece
 					if(ends[i].includes("e")) {
 						if (player_tx[tileIndex] - board_tx[j] > -1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.4 /*3*/) {
@@ -835,7 +841,7 @@ function drawScene() {
 						}
 					}
 					// down of the board piece
-					if(ends[i].includes("d")) {
+					if(ends[i].includes("b")) {
 						if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4 /*3*/) {
 							if (player_ty[tileIndex] - board_ty[j] > -1.9 && player_ty[tileIndex] - board_ty[j] < -1.4) {
 								colorGreen();
@@ -1132,61 +1138,63 @@ function outputInfos(){
 
 //----------------------------------------------------------------------------
 
-function setEventListeners( canvas ){
+function setEventListeners( canvas ) {
 
 	// NEW ---Handling the mouse
 
 	// From learningwebgl.com
 
-    canvas.onmousedown = handleMouseDown;
+	canvas.onmousedown = handleMouseDown;
 
-    document.onmouseup = handleMouseUp;
+	document.onmouseup = handleMouseUp;
 
-    document.onmousemove = handleMouseMove;
+	document.onmousemove = handleMouseMove;
 
-    // NEW ---Handling the keyboard
+	// NEW ---Handling the keyboard
 
 	// From learningwebgl.com
 
-    function handleKeyDown(event) {
-        currentlyPressedKeys[event.keyCode] = true;
-    }
+	function handleKeyDown(event) {
+		currentlyPressedKeys[event.keyCode] = true;
+	}
 
-    function handleKeyUp(event) {
-        currentlyPressedKeys[event.keyCode] = false;
-    }
+	function handleKeyUp(event) {
+		currentlyPressedKeys[event.keyCode] = false;
+	}
 
 	document.onkeydown = handleKeyDown;
 
-    document.onkeyup = handleKeyUp;
+	document.onkeyup = handleKeyUp;
 
 	// Dropdown list
 
 	var projection = document.getElementById("projection-selection");
 
-	projection.addEventListener("click", function(){
+	projection.addEventListener("click", function () {
 		// Getting the selection
 		var p = projection.selectedIndex;
 
-		switch(p){
-			case 0 : projectionType = 0;
-					document.getElementById("near_ortho").hidden = false;
-					document.getElementById("far_ortho").hidden = false;
-					document.getElementById("fovy_persp").hidden = true;
-					document.getElementById("aspect_persp").hidden = true;
-					document.getElementById("near_persp").hidden = true;
-					document.getElementById("far_persp").hidden = true;
-					//document.getElementById("tz").hidden = true;
-					break;
-			case 1 : projectionType = 1;
-					document.getElementById("near_ortho").hidden = true;
-					document.getElementById("far_ortho").hidden = true;
-					document.getElementById("fovy_persp").hidden = false;
-					document.getElementById("aspect_persp").hidden = false;
-					document.getElementById("near_persp").hidden = false;
-					document.getElementById("far_persp").hidden = false;
-					//document.getElementById("tz").hidden = false;
-					break;
+		switch (p) {
+			case 0 :
+				projectionType = 0;
+				document.getElementById("near_ortho").hidden = false;
+				document.getElementById("far_ortho").hidden = false;
+				document.getElementById("fovy_persp").hidden = true;
+				document.getElementById("aspect_persp").hidden = true;
+				document.getElementById("near_persp").hidden = true;
+				document.getElementById("far_persp").hidden = true;
+				//document.getElementById("tz").hidden = true;
+				break;
+			case 1 :
+				projectionType = 1;
+				document.getElementById("near_ortho").hidden = true;
+				document.getElementById("far_ortho").hidden = true;
+				document.getElementById("fovy_persp").hidden = false;
+				document.getElementById("aspect_persp").hidden = false;
+				document.getElementById("near_persp").hidden = false;
+				document.getElementById("far_persp").hidden = false;
+				//document.getElementById("tz").hidden = false;
+				break;
 		}
 	});
 
@@ -1311,17 +1319,17 @@ function setEventListeners( canvas ){
 
 	*/
 
-	document.getElementById("rotateDeck").onclick = function(){
+	document.getElementById("rotateDeck").onclick = function () {
 		rotateDeck = !rotateDeck;
 	};
 
-	document.getElementById("tile1").onmousedown = function(){
+	document.getElementById("tile1").onmousedown = function () {
 		tileIndex = 0;
 		selectPlayerTile();
-		document.getElementById("tile1").style.backgroundColor ="#81F41B";
+		document.getElementById("tile1").style.backgroundColor = "#81F41B";
 	};
 
-	document.getElementById("tile1").onmouseup = function() {
+	document.getElementById("tile1").onmouseup = function () {
 		document.getElementById("tile1").style.backgroundColor = "#f4511e";
 	};
 
@@ -1330,17 +1338,17 @@ function setEventListeners( canvas ){
 		document.getElementById("tile7").disabled = true;
 	}
 	 */
-	for(let i = 2; i < playerTilesLength + 1; i++){
+	for (let i = 2; i < playerTilesLength + 1; i++) {
 		let elemId = "tile" + i;
 		console.log(elemId);
 		document.getElementById(elemId).disabled = false;
-		document.getElementById(elemId).onclick = function(){
+		document.getElementById(elemId).onclick = function () {
 			tileIndex = i - 1;
 			selectPlayerTile();
 		};
 	}
-	document.getElementById("getTile").onclick = function(){
-		if(deckLength !== 0) {
+	document.getElementById("getTile").onclick = function () {
+		if (deckLength !== 0) {
 			let index = playerTextures.length;
 			let random_tile = Math.floor(Math.random() * deckTextures.length);
 			playerTextures[index] = deckTextures[random_tile];
@@ -1350,14 +1358,14 @@ function setEventListeners( canvas ){
 			deckTiles.splice(random_tile, 1);
 
 			deckLength = deckTextures.length;
-            playerTilesLength = playerTextures.length;
+			playerTilesLength = playerTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckLength;
-            document.getElementById("player_tile_number").innerHTML = playerTilesLength;
-			for(let i = 2; i < playerTilesLength + 1; i++){
+			document.getElementById("player_tile_number").innerHTML = playerTilesLength;
+			for (let i = 2; i < playerTilesLength + 1; i++) {
 				let elemId = "tile" + i;
 				console.log(elemId);
 				document.getElementById(elemId).disabled = false;
-				document.getElementById(elemId).onclick = function(){
+				document.getElementById(elemId).onclick = function () {
 					tileIndex = i - 1;
 					selectPlayerTile();
 				};
@@ -1367,13 +1375,13 @@ function setEventListeners( canvas ){
 			player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
 			player_tz[player_tz.length] = 0;
 
-            player_tz_ortho[player_tz_ortho.length] = 0;
-            player_tz_persp[player_tz_persp.length] = player_tz_persp[0];
+			player_tz_ortho[player_tz_ortho.length] = 0;
+			player_tz_persp[player_tz_persp.length] = player_tz_persp[0];
 
 			player_angX[player_angX.length] = 0;
 			player_angYY[player_angYY.length] = 0;
 			player_angZZ[player_angZZ.length] = 0;
-			if(deckLength === 0){
+			if (deckLength === 0) {
 				document.getElementById("getTile").disabled = true;
 				document.getElementById("getTile").style.display = "none";
 			}
@@ -1382,1061 +1390,295 @@ function setEventListeners( canvas ){
 	};
 
 
-	document.getElementById("snapTile").onclick = function(){
+	document.getElementById("snapTile").onclick = function () {
 		tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
-		facesPlayer =  tile.replace(".png","").split("_");
+		facesPlayer = tile.replace(".png", "").split("_");
 		tileBoard = boardTextures[snapTileIndex].image.src.split("imgs/")[1];
-		facesBoard =  tileBoard.replace(".png","").split("_");
-		//PEÇA DO PLAYER +180 QUE O BOARD
-		if(angleZ_board[snapTileIndex]+180===360){
-			angZBoardAux = angleZ_board[snapTileIndex]+180-360;
-		}
-		else{
-			angZBoardAux = angleZ_board[snapTileIndex]+180;
-		}
-		if(player_angZZ[tileIndex] === angZBoardAux){
-			//PEÇA DO PLAYER A 90º OU 270º
-			if(player_angZZ[tileIndex]===90 || player_angZZ[tileIndex]===270) {
-				if (player_tx[tileIndex] - board_tx[snapTileIndex] < 0) {
-					if (facesPlayer[0] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="e") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["e"];
-						console.log(ends);
-					}
-				}
-				else {
-					if (facesPlayer[1] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="d") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["d"];
-						console.log(ends);
-					}
+		facesBoard = tileBoard.replace(".png", "").split("_");
+		//Paralelo
+		if (player_angZZ[tileIndex] === 0 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
 				}
 			}
-			//PEÇA DO PLAYER A 180
-			else if(player_angZZ[tileIndex]===180){
-				if (player_ty[tileIndex] - board_ty[snapTileIndex] < 0) {
-					if (facesPlayer[1] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
-					}
-				} else {
-					if (facesPlayer[0] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="c") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["c"];
-						console.log(ends);
-					}
-				}
-			}
-			//PEÇA DO PLAYER A 0
-			else if(player_angZZ[tileIndex]===0){
-				if (player_ty[tileIndex] - board_ty[snapTileIndex] < 0) {
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
-					}
-				} else {
-					if (facesPlayer[1] === facesBoard[1] || facesPlayer[0] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="c") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["c"];
-						console.log(ends);
-					}
+			else{
+				if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
 				}
 			}
 		}
-		//PEÇA DO PLAYER 90º E DO TABULEIRO 270º
-		else if(player_angZZ[tileIndex]+180 === angleZ_board[snapTileIndex]){
-			if(player_angZZ[tileIndex]===90) {
-				if (player_tx[tileIndex] - board_tx[snapTileIndex] < 0) {
-					if (facesPlayer[1] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="e") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["e"];
-						console.log(ends);
-					}
-				} else {
-					if (facesPlayer[0] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="d") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["d"];
-						console.log(ends);
-					}
+		else if (player_angZZ[tileIndex] === 90 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+				if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
 				}
 			}
-			//PEÇA A 0º
+			else{
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex] === 180 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex] === 270 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
+				}
+			}
+			else{
+				if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
+				}
+			}
+			else{
+				if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+				if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
+				}
+			}
+			else{
+				if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+				}
+			}
+		}
+		//PERPENDICULAR +90
+		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
 				/*
-			else if(player_angZZ[tileIndex]===0){
-				if (player_ty[tileIndex] - board_ty[snapTileIndex] < 0) {
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							ends[dicBoardKey].splice("b", 1);
-						}
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, -1.5, -0, "e", "[b,c]");
 					}
 				}
-				else {
-					if (facesPlayer[1] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							ends[dicBoardKey].splice("c", 1);
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["c"];
-					}
-				}
-			}
-
-				 */
-		}
-		//PEÇAS COM O MESMO VALOR
-		else if(player_angZZ[tileIndex] === angleZ_board[snapTileIndex]){
-			//AMBAS A 90
-			if(player_angZZ[tileIndex]===90) {
-				if (player_tx[tileIndex] - board_tx[snapTileIndex] < 0) {
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="e") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["e"];
-						console.log(ends);
-					}
-				}
-				else {
-					if (facesPlayer[0] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="d") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["d"];
-					}
-				}
-			}
-			if(player_angZZ[tileIndex]===270) {
-				if (player_tx[tileIndex] - board_tx[snapTileIndex] < 0) {
-					if (facesPlayer[0] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="e") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["e"];
-						console.log(ends);
-					}
-				}
-				else {
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 2;
-						board_ty[board_ty.length] = board_ty[snapTileIndex];
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="d") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["d"];
-					}
-				}
-			}
-			//AMBAS AS PEÇAS A 0
-			else if(player_angZZ[tileIndex]==0){
-				if (player_ty[tileIndex] - board_ty[snapTileIndex] < 0) {
-					if (facesPlayer[0] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
-					}
-				}
-				else {
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="c") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["c"];
-					}
-				}
-			}
-			//AMBAS AS PEÇAS A 180
-			else if(player_angZZ[tileIndex]===180){
-				if (player_ty[tileIndex] - board_ty[snapTileIndex] < 0) {
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
-					}
-				}
-				else {
-					if (facesPlayer[0] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex];
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 2;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for(let k=0;k<ends[dicBoardKey].length;k++){
-								if(ends[dicBoardKey][k]==="c") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["c"];
-					}
-				}
-			}
-		}
-
-		//peça do player a 0 ou 180 e tabuleiro a 90 ou 270
-		else if(player_angZZ[tileIndex] === angleZ_board[snapTileIndex]+90){
-			if(player_angZZ[tileIndex]===0 || player_angZZ[tileIndex]===180) {
-				if (player_tx[tileIndex] - board_tx[snapTileIndex] < 0) {
+				else {*/
 					if (facesPlayer[0] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 1.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 0.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "c") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["c"];
-						console.log(ends);
+						player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
 					}
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 1.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 0.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
-					}
-				}
-				else {
-					if (facesPlayer[0] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 1.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 0.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
-					}
-					if (facesPlayer[1] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 1.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 0.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "d") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["b"];
-						console.log(ends);
-					}
-				}
+				//}
 			}
-			//Peça player a 90 e tabuleiro a 0
 			else{
-				if (player_ty[tileIndex] - board_ty[snapTileIndex] < 0) {
-					if (facesPlayer[0] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 0.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 1.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["d"];
-						console.log(ends);
-					}
-					if (facesPlayer[1] === facesBoard[0]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] - 0.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 1.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "b") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["e"];
-						console.log(ends);
-					}
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
 				}
-				else {
-					if (facesPlayer[0] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 0.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] - 1.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "c") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["e"];
-						console.log(ends);
-					}
-					if (facesPlayer[1] === facesBoard[1]) {
-						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-						board_tx[board_tx.length] = board_tx[snapTileIndex] + 0.5;
-						board_ty[board_ty.length] = board_ty[snapTileIndex] + 1.5;
-						board_tz[board_tz.length] = board_tz[snapTileIndex];
-						angleX_board[angleX_board.length] = player_angX[tileIndex];
-						angleY_board[angleY_board.length] = player_angYY[tileIndex];
-						angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-						playerTextures.splice(tileIndex, 1);
-						player_tx.splice(tileIndex, 1);
-						player_ty.splice(tileIndex, 1);
-						player_tz.splice(tileIndex, 1);
-						player_angX.splice(tileIndex, 1);
-						player_angYY.splice(tileIndex, 1);
-						player_angZZ.splice(tileIndex, 1);
-						selectedTile = null;
-						tileIndex = null;
-						dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-						dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-						if (ends[dicBoardKey].length == 1) {
-							delete ends[dicBoardKey];
-						} else {
-							for (let k = 0; k < ends[dicBoardKey].length; k++) {
-								if (ends[dicBoardKey][k] === "c") {
-									ends[dicBoardKey].splice(k, 1);
-								}
-							}
-						}
-						console.log(ends[dicBoardKey]);
-						ends[dicPlayerKey] = ["d"];
-						console.log(ends);
-					}
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
 				}
 			}
 		}
-
-		//OUTROS
-		else{
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0){
-				if(facesPlayer[0]===facesBoard[0]){
-					deleteTileButton();
-					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-					board_tx[board_tx.length] = board_tx[snapTileIndex]-1.5;
-					board_ty[board_ty.length] = board_ty[snapTileIndex]-0.5;
-					board_tz[board_tz.length] = board_tz[snapTileIndex];
-					angleX_board[angleX_board.length] = player_angX[tileIndex];
-					angleY_board[angleY_board.length] = player_angYY[tileIndex];
-					angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-					playerTextures.splice(tileIndex,1);
-					player_tx.splice(tileIndex,1);
-					player_ty.splice(tileIndex,1);
-					player_tz.splice(tileIndex,1);
-					player_angX.splice(tileIndex,1);
-					player_angYY.splice(tileIndex,1);
-					player_angZZ.splice(tileIndex,1);
-					selectedTile=null;
-					tileIndex=null;
-					dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-					dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-					if (ends[dicBoardKey].length == 1) {
-						delete ends[dicBoardKey];
-					} else {
-						for(let k=0;k<ends[dicBoardKey].length;k++){
-							if(ends[dicBoardKey][k]==="b") {
-								ends[dicBoardKey].splice(k, 1);
-							}
-						}
-					}
-					console.log(ends[dicBoardKey]);
-					ends[dicPlayerKey] = ["b"];
-					console.log(ends);
+		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
 				}
-				if(facesPlayer[1]===facesBoard[0] || facesPlayer[0]===facesBoard[1]){
-					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-					board_tx[board_tx.length] = board_tx[snapTileIndex]-1.5;
-					board_ty[board_ty.length] = board_ty[snapTileIndex]+0.5;
-					board_tz[board_tz.length] = board_tz[snapTileIndex];
-					angleX_board[angleX_board.length] = player_angX[tileIndex];
-					angleY_board[angleY_board.length] = player_angYY[tileIndex];
-					angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-					playerTextures.splice(tileIndex,1);
-					player_tx.splice(tileIndex,1);
-					player_ty.splice(tileIndex,1);
-					player_tz.splice(tileIndex,1);
-					player_angX.splice(tileIndex,1);
-					player_angYY.splice(tileIndex,1);
-					player_angZZ.splice(tileIndex,1);
-					selectedTile=null;
-					tileIndex=null;
-					dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-					dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-					if (ends[dicBoardKey].length == 1) {
-						delete ends[dicBoardKey];
-					} else {
-						for(let k=0;k<ends[dicBoardKey].length;k++){
-							if(ends[dicBoardKey][k]==="e") {
-								ends[dicBoardKey].splice(k, 1);
-							}
-						}
-					}
-					console.log(ends[dicBoardKey]);
-					ends[dicPlayerKey] = ["c"];
-					console.log(ends);
+				else if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
 				}
 			}
 			else{
-				if(facesPlayer[0]===facesBoard[1]){
-					deleteTileButton();
-					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-					board_tx[board_tx.length] = board_tx[snapTileIndex]+1.5;
-					board_ty[board_ty.length] = board_ty[snapTileIndex]-0.5;
-					board_tz[board_tz.length] = board_tz[snapTileIndex];
-					angleX_board[angleX_board.length] = player_angX[tileIndex];
-					angleY_board[angleY_board.length] = player_angYY[tileIndex];
-					angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-					playerTextures.splice(tileIndex,1);
-					player_tx.splice(tileIndex,1);
-					player_ty.splice(tileIndex,1);
-					player_tz.splice(tileIndex,1);
-					player_angX.splice(tileIndex,1);
-					player_angYY.splice(tileIndex,1);
-					player_angZZ.splice(tileIndex,1);
-					selectedTile=null;
-					tileIndex=null;
-					dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-					dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-					if (ends[dicBoardKey].length == 1) {
-						delete ends[dicBoardKey];
-					} else {
-						for(let k=0;k<ends[dicBoardKey].length;k++){
-							if(ends[dicBoardKey][k]==="d") {
-								ends[dicBoardKey].splice(k, 1);
-							}
-						}
-					}
-					console.log(ends[dicBoardKey]);
-					ends[dicPlayerKey] = ["b"];
-					console.log(ends);
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
 				}
-				if(facesPlayer[1]===facesBoard[1] || facesPlayer[0]===facesBoard[0]){
-					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-					board_tx[board_tx.length] = board_tx[snapTileIndex]+1.5;
-					board_ty[board_ty.length] = board_ty[snapTileIndex]+0.5;
-					board_tz[board_tz.length] = board_tz[snapTileIndex];
-					angleX_board[angleX_board.length] = player_angX[tileIndex];
-					angleY_board[angleY_board.length] = player_angYY[tileIndex];
-					angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-					playerTextures.splice(tileIndex,1);
-					player_tx.splice(tileIndex,1);
-					player_ty.splice(tileIndex,1);
-					player_tz.splice(tileIndex,1);
-					player_angX.splice(tileIndex,1);
-					player_angYY.splice(tileIndex,1);
-					player_angZZ.splice(tileIndex,1);
-					selectedTile=null;
-					tileIndex=null;
-					dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-					dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-					if (ends[dicBoardKey].length == 1) {
-						delete ends[dicBoardKey];
-					} else {
-						for(let k=0;k<ends[dicBoardKey].length;k++){
-							if(ends[dicBoardKey][k]==="d") {
-								ends[dicBoardKey].splice(k, 1);
-							}
-						}
-					}
-					console.log(ends[dicBoardKey]);
-					ends[dicPlayerKey] = ["c"];
-					console.log(ends);
-
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
+				}
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
+				}
+				else if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
+				}
+				else if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				}
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
+				}
+			}
+		}
+		//PERPENDICULAR +180
+		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+				}
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
+				}
+				else if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
+				}
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
+				}
+				else if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
+				}
+				else if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
+				}
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+				if (facesPlayer[0] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
+				}
+				else if (facesPlayer[1] === facesBoard[0]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
+				}
+			}
+			else{
+				if (facesPlayer[0] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				}
+				else if (facesPlayer[1] === facesBoard[1]) {
+					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
 				}
 			}
 		}
 	}
+}
 
+function player_to_board(facesPlayer,facesBoard,tx,ty,rem,add){
+	addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+	board_tx[board_tx.length] = board_tx[snapTileIndex]+tx;
+	board_ty[board_ty.length] = board_ty[snapTileIndex]+ty;
+	board_tz[board_tz.length] = board_tz[snapTileIndex];
+	angleX_board[angleX_board.length] = player_angX[tileIndex];
+	angleY_board[angleY_board.length] = player_angYY[tileIndex];
+	angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
+	playerTextures.splice(tileIndex,1);
+	player_tx.splice(tileIndex,1);
+	player_ty.splice(tileIndex,1);
+	player_tz.splice(tileIndex,1);
+	player_angX.splice(tileIndex,1);
+	player_angYY.splice(tileIndex,1);
+	player_angZZ.splice(tileIndex,1);
+	selectedTile=null;
+	tileIndex=null;
+	dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
+	dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
+	if (ends[dicBoardKey].length == 1) {
+		delete ends[dicBoardKey];
+	} else {
+		for(let k=0;k<ends[dicBoardKey].length;k++){
+			if(ends[dicBoardKey][k]===rem) {
+				ends[dicBoardKey].splice(k, 1);
+			}
+		}
+	}
+	ends[dicPlayerKey] = [add];
+	board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+	board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
 }
 
 function addToTz(list, index, value){
@@ -2611,5 +1853,6 @@ function runWebGL() {
 
 	outputInfos();
 }
+
 
 
