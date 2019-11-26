@@ -102,6 +102,10 @@ var sx = 0.10;
 var sy = 0.10;
 var sz = 0.10;
 
+var pc_sx = 0.05;
+var pc_sy = 0.05;
+var pc_sz = 0.05;
+
 var playerTilesLength = 7;
 
 var ends = {};
@@ -300,7 +304,11 @@ function initTextures() {
 	bindImgToTexture(boardTextures, 0, null);
 	boardTextures[0].image.src = "imgs/" + tiles[27];
 	tiles.splice(27, 1);
+<<<<<<< HEAD
+	ends.push({"6_6":["e","d"]});
+=======
 	ends["6_6"]=["e","d"];
+>>>>>>> master
 
 	var i = 0;
 	while(i < 6) {
@@ -543,6 +551,11 @@ function drawScene() {
 
 	var mvMatrix = mat4();
 
+<<<<<<< HEAD
+=======
+	var mvBoardMatrix = mat4();
+	
+>>>>>>> 7ec517f959d1450fc6384d45d772d1a270f40367
 	// Clearing with the background color
 
 	gl.clear(gl.COLOR_BUFFER_BIT);
@@ -644,8 +657,13 @@ function drawScene() {
 		// TO BE DONE !
 
 		// Allow the user to control the size of the view volume
-
+<<<<<<< HEAD
 	} else {
+=======
+
+	}
+	else {	
+>>>>>>> 7ec517f959d1450fc6384d45d772d1a270f40367
 
 		// A standard view volume.
 
@@ -687,14 +705,44 @@ function drawScene() {
 
 	gl.uniformMatrix4fv(pUniform, false, new Float32Array(flatten(pMatrix)));
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+	// NEW --- GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
+	if(rotateDeck) {
+		mvBoardMatrix = mult(mvBoardMatrix, rotationYYMatrix(globalAngleYY));
+
+		mvBoardMatrix = mult(mvBoardMatrix, rotationXXMatrix(globalAngleXX));
+
+		mvBoardMatrix = mult(mvBoardMatrix, rotationZZMatrix(globalAngleZZ));
+	}
+
+>>>>>>> 7ec517f959d1450fc6384d45d772d1a270f40367
+>>>>>>> master
 	// NEW --- Instantianting the same model more than once !!
 
 	// And with diferent transformation parameters !!
 
 	// Call the drawModel function
 
+<<<<<<< HEAD
+	/*
+	// Instance middle board
+	drawDominoModel(0, 0, angleZZ,
+		sx, sy, sz,
+		tx*sx, ty*sy, tz*sz,
+		mvMatrix,
+		primitiveType, deckTextures[0] );
+	 */
+
+	for (let i = 8; i < 22; i++) {
+		document.getElementById("tile" + i).hidden = true;
+=======
 	for(let i = 8; i<22; i++) {
 		document.getElementById("tile"+i).hidden = true;
+>>>>>>> 7ec517f959d1450fc6384d45d772d1a270f40367
 	}
 
 	// Player pieces
@@ -708,10 +756,15 @@ function drawScene() {
 			false
 		);
 		let id = i + 1;
+<<<<<<< HEAD
 		if(!document.getElementById("tile"+ id).disable) {
 			document.getElementById("tile" + id).innerHTML = playerTiles[i].split(".")[0];
 			document.getElementById("tile" + id).style.display = "";
 		}
+=======
+		document.getElementById("tile" + id).innerHTML = playerTiles[i].split(".")[0];
+		document.getElementById("tile" + id).style.display = "";
+>>>>>>> master
 		// TODO: Update player tiles
 	}
 
@@ -719,19 +772,36 @@ function drawScene() {
 	for (let i = 0; i < boardTextures.length; i++) {
 		drawDominoModel(angleX_board[i], angleY_board[i], angleZ_board[i],
 			sx, sy, sz,
-			board_tx[i]*sx, board_ty[i]*sy, board_tz[i]*sz,
+<<<<<<< HEAD
+			board_tx[i] * sx, board_ty[i] * sy, board_tz[i] * sz,
 			mvMatrix,
+			primitiveType, boardTextures[i]
+=======
+			board_tx[i]*sx, board_ty[i]*sy, board_tz[i]*sz,
+			mvBoardMatrix,
 			primitiveType,
+<<<<<<< HEAD
 			boardTextures[i],
 			true
+=======
+			boardTextures[i]
+>>>>>>> 7ec517f959d1450fc6384d45d772d1a270f40367
+>>>>>>> master
 		);
 	}
 
 	// Computer pieces
+<<<<<<< HEAD
+	for (let i = 0; i < pcTextures.length; i++) {
+		drawDominoModel(0, 180, 0,
+			pc_sx, pc_sy, pc_sz,
+			pc_tx[i] * pc_sx, pc_ty[i] * pc_sy, pc_tz[i] * pc_sz,
+=======
 	for(let i = 0; i < pcTextures.length; i++){
 		drawDominoModel( 0, 180, 0,
 			sx, sy, sz,
 			pc_tx[i]*sx, pc_ty[i]*sy, pc_tz[i]*sz,
+>>>>>>> 7ec517f959d1450fc6384d45d772d1a270f40367
 			mvMatrix,
 			primitiveType,
 			pcTextures[i],
@@ -1336,22 +1406,17 @@ function setEventListeners( canvas ){
 			let random_tile = Math.floor(Math.random() * deckTextures.length);
 			playerTextures[index] = deckTextures[random_tile];
 			playerTiles[index] = deckTiles[random_tile];
-
 			deckTextures.splice(random_tile, 1);
 			deckTiles.splice(random_tile, 1);
-
 			deckLength = deckTextures.length;
             playerTilesLength = playerTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckLength;
             document.getElementById("player_tile_number").innerHTML = playerTilesLength;
-
 			player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
 			player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
 			player_tz[player_tz.length] = 0;
-
             player_tz_ortho[player_tz_ortho.length] = 0;
             player_tz_persp[player_tz_persp.length] = player_tz_persp[0];
-
 			player_angX[player_angX.length] = 0;
 			player_angYY[player_angYY.length] = 0;
 			player_angZZ[player_angZZ.length] = 0;
@@ -1380,6 +1445,52 @@ function setEventListeners( canvas ){
 		facesPlayer =  tile.replace(".png","").split("_");
 		tileBoard = boardTextures[snapTileIndex].image.src.split("imgs/")[1];
 		facesBoard =  tileBoard.replace(".png","").split("_");
+<<<<<<< HEAD
+		console.log(facesBoard);
+		if(player_angZZ[tileIndex] === angleZ_board[0] + 180){
+			if(player_tx[tileIndex] - board_tx[0] < 0){
+				if(facesPlayer[0] === facesBoard[0]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]-2;
+					board_ty[board_ty.length] = board_ty[0];
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+				}
+			}
+			else{
+				if(facesPlayer[1]===facesBoard[1]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]+2;
+					board_ty[board_ty.length] = board_ty[0];
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+				}
+			}
+		}
+		else if(player_angZZ[tileIndex] === angleZ_board[0]){
+			if(player_tx[tileIndex]-board_tx[0]<0){
+				if(facesPlayer[1]===facesBoard[0]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]-2;
+					board_ty[board_ty.length] = board_ty[0];
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+					/*
+					dicBoardKey=facesBoard[0]+"_"+facesBoard[1];
+					dicPlayerKey=facesPlayer[0]+"_"+facesPlayer[1];
+					console.log(ends[dicBoardKey]);
+					if(ends[dicBoardKey].length === 1){
+						ends[dicBoardKey].remove();
+=======
 		//PEÇA DO PLAYER +180 QUE O BOARD
 		if(angleZ_board[snapTileIndex]+180===360){
 			angZBoardAux = angleZ_board[snapTileIndex]+180-360;
@@ -1669,6 +1780,7 @@ function setEventListeners( canvas ){
 						ends[dicPlayerKey] = ["d"];
 						console.log(ends);
 					}
+>>>>>>> master
 				}
 			}
 			//PEÇA A 0º
@@ -1731,6 +1843,47 @@ function setEventListeners( canvas ){
 						console.log(ends[dicBoardKey]);
 						ends[dicPlayerKey] = ["c"];
 					}
+<<<<<<< HEAD
+					ends.push({dicPlayerKey:["e"]});
+					console.log(ends);
+					 */
+				}
+			}
+			else{
+				if(facesPlayer[0]===facesBoard[1]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]+2;
+					board_ty[board_ty.length] = board_ty[0];
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+				}
+			}
+		}
+		else if(player_angZZ[tileIndex] === angleZ_board[0]+90){
+			if(player_tx[tileIndex]-board_tx[0]<0){
+				if(facesPlayer[0]===facesBoard[0]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]-1.5;
+					board_ty[board_ty.length] = board_ty[0]-0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+				}
+				if(facesPlayer[1]===facesBoard[0]) {
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]-1.5;
+					board_ty[board_ty.length] = board_ty[0]-0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+=======
 				}
 			}
 
@@ -2151,10 +2304,32 @@ function setEventListeners( canvas ){
 						ends[dicPlayerKey] = ["b"];
 						console.log(ends);
 					}
+>>>>>>> master
 				}
 			}
 			//Peça player a 90 e tabuleiro a 0
 			else{
+<<<<<<< HEAD
+				if(facesPlayer[0]===facesBoard[1]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]+1.5;
+					board_ty[board_ty.length] = board_ty[0]-0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+				}
+				if(facesPlayer[1]===facesBoard[1]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]+1.5;
+					board_ty[board_ty.length] = board_ty[0]+0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+=======
 				if (player_ty[tileIndex] - board_ty[snapTileIndex] < 0) {
 					if (facesPlayer[0] === facesBoard[0]) {
 						addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
@@ -2286,6 +2461,7 @@ function setEventListeners( canvas ){
 						ends[dicPlayerKey] = ["d"];
 						console.log(ends);
 					}
+>>>>>>> master
 				}
 			}
 		}
@@ -2296,6 +2472,24 @@ function setEventListeners( canvas ){
 				if(facesPlayer[0]===facesBoard[0]){
 					deleteTileButton();
 					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+<<<<<<< HEAD
+					board_tx[board_tx.length] = board_tx[0]-1.5;
+					board_ty[board_ty.length] = board_ty[0]-0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+				}
+				if(facesPlayer[1]===facesBoard[0]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]-1.5;
+					board_ty[board_ty.length] = board_ty[0]+0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+=======
 					board_tx[board_tx.length] = board_tx[snapTileIndex]-1.5;
 					board_ty[board_ty.length] = board_ty[snapTileIndex]-0.5;
 					board_tz[board_tz.length] = board_tz[snapTileIndex];
@@ -2357,12 +2551,31 @@ function setEventListeners( canvas ){
 					console.log(ends[dicBoardKey]);
 					ends[dicPlayerKey] = ["c"];
 					console.log(ends);
+>>>>>>> master
 				}
 			}
 			else{
 				if(facesPlayer[0]===facesBoard[1]){
 					deleteTileButton();
 					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+<<<<<<< HEAD
+					board_tx[board_tx.length] = board_tx[0]+1.5;
+					board_ty[board_ty.length] = board_ty[0]-0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+				}
+				if(facesPlayer[1]===facesBoard[1]){
+					deleteTileButton();
+					addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+					board_tx[board_tx.length] = board_tx[0]+1.5;
+					board_ty[board_ty.length] = board_ty[0]+0.5;
+					board_tz[board_tz.length] = board_tz[0];
+                    board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+                    board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+                    changeTileToBoard("player");
+=======
 					board_tx[board_tx.length] = board_tx[snapTileIndex]+1.5;
 					board_ty[board_ty.length] = board_ty[snapTileIndex]-0.5;
 					board_tz[board_tz.length] = board_tz[snapTileIndex];
@@ -2425,6 +2638,7 @@ function setEventListeners( canvas ){
 					ends[dicPlayerKey] = ["c"];
 					console.log(ends);
 
+>>>>>>> master
 				}
 			}
 		}
