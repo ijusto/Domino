@@ -440,7 +440,7 @@ function initBuffer(isVertexIndices, buffer, coords, itemSize, numItems) {
 
 //  Drawing the model
 
-function drawDominoModel(angleXX, angleYY, angleZZ,
+function drawDominoModel(angx, angy, angz,
 						 sx, sy, sz,
 						 tx, ty, tz,
 						 mvMatrix,
@@ -474,9 +474,15 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
 		}
 
 	}
-	mvMatrix = mult(mvMatrix, rotationZZMatrix(angleZZ));
-	mvMatrix = mult(mvMatrix, rotationYYMatrix(angleYY));
-	mvMatrix = mult(mvMatrix, rotationXXMatrix(angleXX));
+	if(board) {
+		mvMatrix = mult(mvMatrix, rotationZZMatrix(angz + angleZZ));
+		mvMatrix = mult(mvMatrix, rotationYYMatrix(angy + angleYY));
+		mvMatrix = mult(mvMatrix, rotationXXMatrix(angx + angleXX));
+	} else {
+		mvMatrix = mult(mvMatrix, rotationZZMatrix(angz));
+		mvMatrix = mult(mvMatrix, rotationYYMatrix(angy));
+		mvMatrix = mult(mvMatrix, rotationXXMatrix(angx));
+	}
 
 	mvMatrix = mult(mvMatrix, scalingMatrix(sx, sy, sz));
 
@@ -955,7 +961,7 @@ function animate() {
 		}
 
 		// Local rotations
-
+		/*
 		if( rotationXX_ON ) {
 			angleXX += rotationXX_DIR * rotationXX_SPEED * (90 * elapsed) / 1000.0;
 	    }
@@ -967,6 +973,7 @@ function animate() {
 		if( rotationZZ_ON ) {
 			angleZZ += rotationZZ_DIR * rotationZZ_SPEED * (90 * elapsed) / 1000.0;
 	    }
+		 */
 	}
 	
 	lastTime = timeNow;
