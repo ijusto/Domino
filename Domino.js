@@ -1596,27 +1596,15 @@ function setEventListeners( canvas ) {
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
-<<<<<<< HEAD
 					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
-						player_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"]);
-					}
-				}
-				else {
-					if (facesPlayer[0] === facesBoard[1]) {
-						player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"]);
-					} else if (facesPlayer[1] === facesBoard[1]) {
-						player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"]);
-=======
-					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
 						tile_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"],1, 0);
 					}
 				}
 				else {
-					if (facesPlayer[0] === facesBoard[0]) {
+					if (facesPlayer[0] === facesBoard[1]) {
 						tile_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"],1, 0);
-					} else if (facesPlayer[1] === facesBoard[0]) {
+					} else if (facesPlayer[1] === facesBoard[1]) {
 						tile_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"],1, 0);
->>>>>>> bc1d8f0eec4d1e8110dad8632d4e50ff4ebfb51d
 					}
 				}
 			}
@@ -1627,9 +1615,9 @@ function setEventListeners( canvas ) {
 					}
 				}
 				else {
-					if (facesPlayer[0] === facesBoard[1]) {
+					if (facesPlayer[0] === facesBoard[0]) {
 						tile_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", ["e"],1, 0);
-					} else if (facesPlayer[1] === facesBoard[1]) {
+					} else if (facesPlayer[1] === facesBoard[0]) {
 						tile_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", ["d"],1, 0);
 					}
 				}
@@ -1840,105 +1828,169 @@ function pc_move(){
 					let end_num = key.split("_");
 					if(angleZ_board[j]==0){
 						if(ends[key][0]==="c"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,180);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]){
+								if (end_num[0] == pc_ends[0]){
+									tile_to_board(pc_ends, end_num, 0, 1.5, "c", ["e","d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,0);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 180);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="b"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,0);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -1.5, "b", ["e", "d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,180);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 0);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 180);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
 					else if(angleZ_board[j]==90){
 						if(ends[key][0]==="e"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,270);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -1.5, 0, "e", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,90);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 270);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="d"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,90);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 1.5, 0, "d", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,270);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 90);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 270);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
 					else if(angleZ_board[j]==180){
 						if(ends[key][0]==="c"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,180);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, 1.5, "c", ["e", "d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,0);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 180);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="b"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,0);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -1.5, "b", ["e", "d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,180);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 0);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 180);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
 					else if(angleZ_board[j]==270){
 						if(ends[key][0]==="e"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,270);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -1.5, 0, "e", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,90);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 270);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="d"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,90);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 1.5, 0, "d", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,270);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 90);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 270);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
