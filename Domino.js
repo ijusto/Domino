@@ -1399,249 +1399,338 @@ function setEventListeners( canvas ) {
 		if (player_angZZ[tileIndex] === 0 && angleZ_board[snapTileIndex] === 0) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
 				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"]);
 				}
 			}
 			else{
 				if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", ["c"]);
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex] === 90 && angleZ_board[snapTileIndex] === 90) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
 				if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"]);
 				}
 			}
 			else{
 				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", ["d"]);
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex] === 180 && angleZ_board[snapTileIndex] === 180) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
 				if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"]);
 				}
 			}
 			else{
 				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", ["c"]);
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex] === 270 && angleZ_board[snapTileIndex] === 270) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
 				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"]);
 				}
 			}
 			else{
 				if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", ["d"]);
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 180) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
 				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"]);
 				}
 			}
 			else{
 				if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", ["c"]);
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 270) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
 				if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"]);
 				}
 			}
 			else{
 				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", ["d"]);
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 0) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
 				if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, 0, -2, "b", "b");
+					player_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"]);
 				}
 			}
 			else{
 				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, 0, +2, "c", "c");
+					player_to_board(facesPlayer, facesBoard, 0, +2, "c", ["c"]);
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 90) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
 				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -2, 0, "e", "e");
+					player_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"]);
 				}
 			}
 			else{
 				if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +2, 0, "d", "d");
+					player_to_board(facesPlayer, facesBoard, +2, 0, "d", ["d"]);
 				}
 			}
 		}
 		//PERPENDICULAR +90
 		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 90) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
-				/*
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
-						player_to_board(facesPlayer, facesBoard, -1.5, -0, "e", "[b,c]");
+						player_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["b","c"]);
 					}
 				}
-				else {*/
+				else {
 					if (facesPlayer[0] === facesBoard[0]) {
-						player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+						player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", ["b"]);
 					} else if (facesPlayer[1] === facesBoard[0]) {
-						player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
+						player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", ["c"]);
 					}
-				//}
+				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
+						player_to_board(facesPlayer, facesBoard, +1.5, 0, "d", ["b","c"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", ["b"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", ["c"]);
+					}
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 180) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
-				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["d","e"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
+				else {
+					if (facesPlayer[0] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"]);
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"]);
+					}
 				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
+						player_to_board(facesPlayer, facesBoard, 0, +1.5, "c", ["d","e"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", ["d"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", ["e"]);
+					}
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 270) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
+						player_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["c","b"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", ["c"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", ["b"]);
+					}
 				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, +1.5, 0, "d", ["c","b"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
+				else {
+					if (facesPlayer[0] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", ["c"]);
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", ["b"]);
+					}
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
-				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
+				else {
+					if (facesPlayer[0] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"]);
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"]);
+					}
 				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, 0, +1.5, "c", ["e","d"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", ["e"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", ["d"]);
+					}
 				}
 			}
 		}
 		//PERPENDICULAR +180
 		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 270) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
+						player_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["b","c"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", ["b"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", ["c"]);
+					}
 				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, +1.5, 0, "d", ["b","c"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
+				else {
+					if (facesPlayer[0] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", ["b"]);
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", ["c"]);
+					}
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 0) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
+						player_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["d","e"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"]);
+					}
 				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, 0, +1.5, "c", ["d","e"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				else {
+					if (facesPlayer[0] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", ["d"]);
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", ["e"]);
+					}
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 90) {
 			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
-				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", "c");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["c","b"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", "b");
+				else {
+					if (facesPlayer[0] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, -1.5, +0.5, "e", ["c"]);
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, -1.5, -0.5, "e", ["b"]);
+					}
 				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", "c");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
+						player_to_board(facesPlayer, facesBoard, +1.5, 0, "d", ["c","b"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", "b");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, +0.5, "d", ["c"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +1.5, -0.5, "d", ["b"]);
+					}
 				}
 			}
 		}
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 180) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
-				if (facesPlayer[0] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", "e");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+						player_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[0]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", "d");
+				else {
+					if (facesPlayer[0] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"]);
+					} else if (facesPlayer[1] === facesBoard[0]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"]);
+					}
 				}
 			}
 			else{
-				if (facesPlayer[0] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", "e");
+				if(facesPlayer[0]===facesPlayer[1]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
+						player_to_board(facesPlayer, facesBoard, 0, +1.5, "c", ["e","d"]);
+					}
 				}
-				else if (facesPlayer[1] === facesBoard[1]) {
-					player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", "d");
+				else {
+					if (facesPlayer[0] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", ["e"]);
+					} else if (facesPlayer[1] === facesBoard[1]) {
+						player_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", ["d"]);
+					}
 				}
 			}
 		}
@@ -1676,7 +1765,7 @@ function player_to_board(facesPlayer,facesBoard,tx,ty,rem,add){
 			}
 		}
 	}
-	ends[dicPlayerKey] = [add];
+	ends[dicPlayerKey] = add;
 	board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
 	board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
 }
