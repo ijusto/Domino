@@ -37,6 +37,7 @@ var player_tx = [-9.4];
 var player_bottom_pos_x = [-9.4];
 var player_bottom_pos_y = [-7];
 var dist_between_tiles = 1.1; // 1.7
+var totalDist = -9.4;
 for(let i = 1; i < 18; i++) {
 	player_bottom_pos_x[i] = player_bottom_pos_x[i-1] + dist_between_tiles;
 	player_bottom_pos_y[i] = -7;
@@ -46,6 +47,7 @@ for(let i = 18; i < 21; i++){
 	player_bottom_pos_y[i] = -9;
 }
 for(let i = 1; i < 7; i++) {
+	totalDist = totalDist+dist_between_tiles;
 	player_tx[i] = player_tx[i-1] + dist_between_tiles;
 }
 var player_ty = [-7, -7, -7, -7, -7, -7, -7];
@@ -763,7 +765,7 @@ function drawScene() {
 
 	// Computer pieces
 	for(let i = 0; i < pcTextures.length; i++){
-		drawDominoModel( 0, 0/*180*/, 0,
+		drawDominoModel( 0, 180/*0*/, 0,
 			sx, sy, sz,
 			pc_tx[i]*sx, pc_ty[i]*sy, pc_tz[i]*sz,
 			mvMatrix,
@@ -1015,7 +1017,7 @@ function drawScene() {
 			}
 		}
 		if (lose) {
-			console.log("You lose!!")
+			document.getElementById("lose").innerHTML = "You lose";
 		}
 	}
 
@@ -1234,16 +1236,16 @@ function handleMouseMove(event) {
 // Timer
 
 function tick() {
-
-	requestAnimFrame(tick);
-
-	// NEW --- Processing keyboard events
-
-	handleKeys();
-
 	drawScene();
-	handlePlayerButtons();
-	animate();
+	if(!document.getElementById("lose").innerHTML.includes("You")) {
+		requestAnimFrame(tick);
+
+		// NEW --- Processing keyboard events
+
+		handleKeys();
+		handlePlayerButtons();
+		animate();
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -1263,6 +1265,8 @@ function setEventListeners( canvas ) {
 	// NEW ---Handling the mouse
 
 	// From learningwebgl.com
+
+	document.getElementById("lose").innerHTML = "";
 
 	canvas.onmousedown = handleMouseDown;
 
@@ -1463,7 +1467,9 @@ function setEventListeners( canvas ) {
 			playerTilesLength = playerTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckLength;
 
-			player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
+			//player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
+			totalDist+=dist_between_tiles;
+			player_tx[player_tx.length] = totalDist;
 			player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
 			if(projectionType === 0){
 
@@ -1879,7 +1885,7 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 			document.getElementById(id).style.backgroundColor = "#87877f";
 		}
 		if(player_tx.length==0){
-			console.log("You win!!");
+			document.getElementById("lose").innerHTML = "You win!!";
 		}
 		pc_move();
 	}
@@ -1907,7 +1913,7 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 		board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
 		board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
 		if(pc_tx.length==0){
-			console.log("You lose!!");
+			document.getElementById("lose").innerHTML = "You lose";
 		}
 	}
 }
@@ -2135,7 +2141,7 @@ function pc_move(){
 			}
 		}
 		else{
-			console.log("You Win!!");
+			document.getElementById("lose").innerHTML = "You Win!!";
 		}
 	}
 }
