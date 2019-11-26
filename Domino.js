@@ -1127,6 +1127,7 @@ function tick() {
 function outputInfos(){
     document.getElementById("deck_tile_number").innerHTML = deckLength;
     document.getElementById("player_tile_number").innerHTML = playerTilesLength;
+    console.log(playerTilesLength);
 }
 
 //----------------------------------------------------------------------------
@@ -1329,7 +1330,15 @@ function setEventListeners( canvas ){
 		document.getElementById("tile7").disabled = true;
 	}
 	 */
-
+	for(let i = 2; i < playerTilesLength + 1; i++){
+		let elemId = "tile" + i;
+		console.log(elemId);
+		document.getElementById(elemId).disabled = false;
+		document.getElementById(elemId).onclick = function(){
+			tileIndex = i - 1;
+			selectPlayerTile();
+		};
+	}
 	document.getElementById("getTile").onclick = function(){
 		if(deckLength !== 0) {
 			let index = playerTextures.length;
@@ -1344,6 +1353,15 @@ function setEventListeners( canvas ){
             playerTilesLength = playerTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckLength;
             document.getElementById("player_tile_number").innerHTML = playerTilesLength;
+			for(let i = 2; i < playerTilesLength + 1; i++){
+				let elemId = "tile" + i;
+				console.log(elemId);
+				document.getElementById(elemId).disabled = false;
+				document.getElementById(elemId).onclick = function(){
+					tileIndex = i - 1;
+					selectPlayerTile();
+				};
+			}
 
 			player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
 			player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
@@ -1362,18 +1380,7 @@ function setEventListeners( canvas ){
 		}
 
 	};
-	let txt = document.getElementById("player_tile_number").innerHTML;
-	console.log("-"+txt+"-");
 
-    for(let i = 2; i < parseInt(document.getElementById("player_tile_number").innerHTML) + 1; i++){
-        let elemId = "tile" + i;
-        console.log(elemId);
-        document.getElementById(elemId).disabled = false;
-        document.getElementById(elemId).onclick = function(){
-            tileIndex = i - 1;
-            selectPlayerTile();
-        };
-    }
 
 	document.getElementById("snapTile").onclick = function(){
 		tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
