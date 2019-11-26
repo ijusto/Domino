@@ -11,6 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
+
 //----------------------------------------------------------------------------
 //
 // Global Variables
@@ -36,6 +37,7 @@ var player_tx = [-9.4];
 var player_bottom_pos_x = [-9.4];
 var player_bottom_pos_y = [-7];
 var dist_between_tiles = 1.1; // 1.7
+var totalDist = -9.4;
 for(let i = 1; i < 18; i++) {
 	player_bottom_pos_x[i] = player_bottom_pos_x[i-1] + dist_between_tiles;
 	player_bottom_pos_y[i] = -7;
@@ -45,6 +47,7 @@ for(let i = 18; i < 21; i++){
 	player_bottom_pos_y[i] = -9;
 }
 for(let i = 1; i < 7; i++) {
+	totalDist = totalDist+dist_between_tiles;
 	player_tx[i] = player_tx[i-1] + dist_between_tiles;
 }
 var player_ty = [-7, -7, -7, -7, -7, -7, -7];
@@ -815,7 +818,7 @@ function drawScene() {
 
 	// Computer pieces
 	for(let i = 0; i < pcTextures.length; i++){
-		drawDominoModel( 0, 0/*180*/, 0,
+		drawDominoModel( 0, 180/*0*/, 0,
 			sx, sy, sz,
 			pc_tx[i]*sx, pc_ty[i]*sy, pc_tz[i]*sz,
 			mvMatrix,
@@ -966,6 +969,108 @@ function drawScene() {
     	if(document.getElementById("snapTile").disabled === false) {
 			document.getElementById("snapTile").disabled = true;
 			document.getElementById("snapTile").style.display = "none";
+		}
+	}
+	if(deckLength===0) {
+		var lose = true;
+		for (let i = 0; i < player_tx.length; i++) {
+			let player_ends = playerTextures[i].image.src.split(
+				"imgs/")[1].split(
+				".")[0].replace(
+				"green_", "").replace(
+				"red_", "").replace(
+				"blue_", "").split("_");
+			for (let key in ends) {
+				for (let j = 0; j < boardTextures.length; j++) {
+					if (boardTextures[j].image.src.includes(key)) {
+						snapTileIndex = j;
+						let end_num = key.split("_");
+						if (angleZ_board[j] == 0) {
+							if (ends[key][0].includes("c")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("b")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						} else if (angleZ_board[j] == 90) {
+							if (ends[key][0].includes("e")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("d")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						}
+						if (angleZ_board[j] == 180) {
+							if (ends[key][0].includes("c")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("b")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						} else if (angleZ_board[j] == 270) {
+							if (ends[key][0].includes("e")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("d")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						}
+					}
+				}
+				if (!lose) {
+					break;
+				}
+			}
+			if (!lose) {
+				break;
+			}
+		}
+		if (lose) {
+			document.getElementById("lose").innerHTML = "You lose";
 		}
 	}
 
@@ -1184,17 +1289,16 @@ function handleMouseMove(event) {
 // Timer
 
 function tick() {
-
-	requestAnimFrame(tick);
-
-	// NEW --- Processing keyboard events
-
-	handleKeys();
-
 	drawScene();
-	handlePlayerButtons();
-	handleSliders();
-	animate();
+	if(!document.getElementById("lose").innerHTML.includes("You")) {
+		requestAnimFrame(tick);
+	    handleKeys();
+
+	    drawScene();
+	    handlePlayerButtons();
+	    handleSliders();
+        animate();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1214,6 +1318,8 @@ function setEventListeners( canvas ) {
 	// NEW ---Handling the mouse
 
 	// From learningwebgl.com
+
+	document.getElementById("lose").innerHTML = "";
 
 	canvas.onmousedown = handleMouseDown;
 
@@ -1437,7 +1543,9 @@ function setEventListeners( canvas ) {
 			playerTilesLength = playerTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckLength;
 
-			player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
+			//player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
+			totalDist+=dist_between_tiles;
+			player_tx[player_tx.length] = totalDist;
 			player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
 			if(projectionType === 0){
 
@@ -1657,17 +1765,19 @@ function setEventListeners( canvas ) {
 				}
 			}
 		}
+
+		//MUDEI AQUI
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
-					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
 						tile_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"],1, 0);
 					}
 				}
 				else {
-					if (facesPlayer[0] === facesBoard[0]) {
+					if (facesPlayer[0] === facesBoard[1]) {
 						tile_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"],1, 0);
-					} else if (facesPlayer[1] === facesBoard[0]) {
+					} else if (facesPlayer[1] === facesBoard[1]) {
 						tile_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"],1, 0);
 					}
 				}
@@ -1679,9 +1789,9 @@ function setEventListeners( canvas ) {
 					}
 				}
 				else {
-					if (facesPlayer[0] === facesBoard[1]) {
+					if (facesPlayer[0] === facesBoard[0]) {
 						tile_to_board(facesPlayer, facesBoard, -0.5, +1.5, "c", ["e"],1, 0);
-					} else if (facesPlayer[1] === facesBoard[1]) {
+					} else if (facesPlayer[1] === facesBoard[0]) {
 						tile_to_board(facesPlayer, facesBoard, +0.5, +1.5, "c", ["d"],1, 0);
 					}
 				}
@@ -1850,6 +1960,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 			let id = "tile" + j;
 			document.getElementById(id).style.backgroundColor = "#87877f";
 		}
+		if(player_tx.length==0){
+			document.getElementById("lose").innerHTML = "You win!!";
+		}
 		pc_move();
 	}
 	// pc
@@ -1874,6 +1987,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 		ends[dicPlayerKey] = add;
 		board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
 		board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+		if(pc_tx.length==0){
+			document.getElementById("lose").innerHTML = "You lose";
+		}
 	}
 }
 
@@ -1894,105 +2010,169 @@ function pc_move(){
 					let end_num = key.split("_");
 					if(angleZ_board[j]==0){
 						if(ends[key][0]==="c"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,180);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]){
+								if (end_num[0] == pc_ends[0]){
+									tile_to_board(pc_ends, end_num, 0, 1.5, "c", ["e","d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,0);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 180);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="b"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,0);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -1.5, "b", ["e", "d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,180);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 0);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 180);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
 					else if(angleZ_board[j]==90){
 						if(ends[key][0]==="e"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,270);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -1.5, 0, "e", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,90);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 270);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="d"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,90);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 1.5, 0, "d", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,270);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 90);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 270);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
 					else if(angleZ_board[j]==180){
 						if(ends[key][0]==="c"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,180);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, 1.5, "c", ["e", "d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,2,"c","c",0,0);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 180);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="b"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,0);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -1.5, "b", ["e", "d"], 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,0,-2,"b","b",0,180);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 0);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 180);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
 					else if(angleZ_board[j]==270){
 						if(ends[key][0]==="e"){
-							if(end_num[1]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,270);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -1.5, 0, "e", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[1]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,-2,0,"e","e",0,90);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[1] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 270);
+									pc_play = true;
+									break;
+								} else if (end_num[1] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 90);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 						else if(ends[key][0]==="d"){
-							if(end_num[0]==pc_ends[0]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,90);
-								pc_play=true;
-								break;
+							if(pc_ends[0]==pc_ends[1]) {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 1.5, 0, "d", ["c", "b"], 0, 0);
+									pc_play = true;
+									break;
+								}
 							}
-							else if(end_num[0]==pc_ends[1]){
-								tile_to_board(pc_ends,end_num,2,0,"d","d",0,270);
-								pc_play=true;
-								break;
+							else {
+								if (end_num[0] == pc_ends[0]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 90);
+									pc_play = true;
+									break;
+								} else if (end_num[0] == pc_ends[1]) {
+									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 270);
+									pc_play = true;
+									break;
+								}
 							}
 						}
 					}
@@ -2034,6 +2214,9 @@ function pc_move(){
 				document.getElementById("getTile").disabled = true;
 				document.getElementById("getTile").style.display = "none";
 			}
+		}
+		else{
+			document.getElementById("lose").innerHTML = "You Win!!";
 		}
 	}
 }
