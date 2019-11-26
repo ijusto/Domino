@@ -11,6 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
+
 //----------------------------------------------------------------------------
 //
 // Global Variables
@@ -1580,17 +1581,19 @@ function setEventListeners( canvas ) {
 				}
 			}
 		}
+
+		//MUDEI AQUI
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
 			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
-					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
+					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
 						player_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"]);
 					}
 				}
 				else {
-					if (facesPlayer[0] === facesBoard[0]) {
+					if (facesPlayer[0] === facesBoard[1]) {
 						player_to_board(facesPlayer, facesBoard, -0.5, -1.5, "b", ["e"]);
-					} else if (facesPlayer[1] === facesBoard[0]) {
+					} else if (facesPlayer[1] === facesBoard[1]) {
 						player_to_board(facesPlayer, facesBoard, +0.5, -1.5, "b", ["d"]);
 					}
 				}
