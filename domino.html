@@ -163,7 +163,7 @@
                     <p style="text-align: left; font-size: 20px">&#8631;&#x20;&#x20;&#x20;&#x20;- <img src="imgs/r-butoon-md.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="R"/></p>
                     <p style="text-align: left">Move: <img src="imgs/arrows.png" style="float: inside;height: 50px; alignment-baseline: auto" alt="&#8592; &#8593; &#8595; &#8594; : arrow keys"/></p>
                     <!-- TODO -->
-                    <p style="text-align: left">Press any mouse button and move the cursor to rotate the board models.</p>
+                    <!--<p style="text-align: left">Press any mouse button and move the cursor to rotate the board models.</p>-->
                 </div>
                 <div class="column middle" style="padding: 0">
                     <canvas id="my-canvas" style="border:1px solid #000000;" width="630" height="630"></canvas>
@@ -195,16 +195,16 @@
                     -->
                     <div style="position: absolute; top:180px;">
                         Board:
-                        <div class="slidecontainer" id="rotx">
-                            rotx: <input type="range" min="0" max="360" value="0" class="slider" id="myRange_rotx"> <span id="demo_rotx">  </span>
+                        <div class="slidecontainer" id="tx">
+                            tx: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_tx"> <span id="demo_tx">  </span>
                         </div>
 
-                        <div class="slidecontainer" id="roty">
-                            roty: <input type="range" min="0" max="360" value="0" class="slider" id="myRange_roty"> <span id="demo_roty">  </span>
+                        <div class="slidecontainer" id="ty">
+                            ty: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_ty"> <span id="demo_ty">  </span>
                         </div>
 
-                        <div class="slidecontainer" id="rotz">
-                            rotz: <input type="range" min="0" max="360" value="90" class="slider" id="myRange_rotz"> <span id="demo_rotz">  </span>
+                        <div class="slidecontainer" id="tz">
+                            tz: <input type="range" min="-60" max="60" value="0" class="slider" id="myRange_tz"> <span id="demo_tz">  </span>
                         </div>
 
                         <div class="slidecontainer" id="near_ortho">
@@ -236,7 +236,9 @@
                         </div>
                         -->
                         <div class="slidecontainer">
-                            <button class="button" id="rotateDeck">Rotate</button>
+                            <button class="button" id="rotateDeckX">Rotate Deck X</button>
+                            <button class="button" id="rotateDeckY">Rotate Deck Y</button>
+                            <button class="button" id="rotateDeckZ">Rotate Deck Z</button>
                         </div>
                     </div>
 

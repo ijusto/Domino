@@ -266,7 +266,14 @@ var globalAngleYY = 0.0;
 var globalAngleXX = 0.0;
 var globalAngleZZ = 0.0;
 
-var rotateDeck = false;
+var globalTx = 0;
+var globalTy = 0;
+var globalTzPesp = -27;
+var globalTzOrtho = 0;
+
+var rotateDeckX = false;
+var rotateDeckY = false;
+var rotateDeckZ = false;
 
 
 //console.log(tiles.slice(0, tiles.length));
@@ -449,25 +456,51 @@ function drawDominoModel(angx, angy, angz,
 						 board) {
     // Pay attention to transformation order !!
 	// NEW --- GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
-	if(rotateDeck && board) {
-		if(projectionType === 1) {
-			mvMatrix = mult(translationMatrix(0, 0, tz),
-							rotationYYMatrix(globalAngleYY));
-			//mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
-			//mvMatrix = mult(mvMatrix, rotationYYMatrix( globalAngleYY ));
-		} else {
-			mvMatrix = mult(translationMatrix(0, 0, tz),
-							rotationYYMatrix(globalAngleYY));
+	if (board){
+
+		if(rotateDeckX || rotateDeckY || rotateDeckZ) {
+			if(projectionType === 1) {
+				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+			}
+		}
+		if(rotateDeckZ) {
+			if(projectionType === 1) {
+				mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ));
+			} else {
+				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+				mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ));
+			}
+		}
+		if(rotateDeckY) {
+			if(projectionType === 1) {
+				mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY));
+			} else {
+				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+				mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY));
+			}
+		}
+		if(rotateDeckX) {
+			if(projectionType === 1) {
+				mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX));
+			} else {
+				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+				mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX));
+			}
 		}
 	}
+
 	if(projectionType === 0) {
-		mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+		if(board){
+			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, tz));
+		} else {
+			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+		}
 	} else {
 		if(board){
-			if(rotateDeck) {
-				mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, 0));
+			if(rotateDeckX || rotateDeckY || rotateDeckZ) {
+				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, 0));
 			} else {
-				mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty  + globalTy, tz));
 			}
 		} else {
 			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
@@ -475,9 +508,9 @@ function drawDominoModel(angx, angy, angz,
 
 	}
 	if(board) {
-		mvMatrix = mult(mvMatrix, rotationZZMatrix(angz + angleZZ));
-		mvMatrix = mult(mvMatrix, rotationYYMatrix(angy + angleYY));
-		mvMatrix = mult(mvMatrix, rotationXXMatrix(angx + angleXX));
+		mvMatrix = mult(mvMatrix, rotationZZMatrix(angz /*+ angleZZ*/));
+		mvMatrix = mult(mvMatrix, rotationYYMatrix(angy /*+ angleYY*/));
+		mvMatrix = mult(mvMatrix, rotationXXMatrix(angx /*+ angleXX*/));
 	} else {
 		mvMatrix = mult(mvMatrix, rotationZZMatrix(angz));
 		mvMatrix = mult(mvMatrix, rotationYYMatrix(angy));
@@ -570,12 +603,12 @@ function drawScene() {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-	for (let id of [/*"left_ortho", "right_ortho", "bottom_ortho", "tz", */"rotx", "roty", "rotz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]) {
+	for (let id of [/*"left_ortho", "right_ortho", "bottom_ortho", "tz",  "rotx", "roty", "rotz",*/"tx", "ty", "tz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]) {
 		let elemId = "myRange_" + id;
 		let slider = document.getElementById(elemId);
 		elemId = "demo_" + id;
 		let output = document.getElementById(elemId);
-		if (id === "near_ortho" || id === "far_ortho" || id === "near_persp" || id === "aspect_persp") {
+		if (id === "near_ortho" || id === "far_ortho" || id === "near_persp" || id === "aspect_persp" ||  id === "tx") {
 			output.innerHTML = parseFloat(slider.value) / 10;
 		} /*else if(id === "tz") {
 			output.innerHTML = parseFloat(slider.value)/100;
@@ -585,6 +618,7 @@ function drawScene() {
 		slider.oninput = function () {
 			//output.innerHTML = this.value;
 			switch (id) {
+				/*
 				case "rotx":
 					globalAngleXX = this.value;
 					break;
@@ -594,6 +628,25 @@ function drawScene() {
 				case "rotz":
 					globalAngleZZ = this.value;
 					break;
+
+				 */
+				case "tx":
+					globalTx =  parseFloat(this.value) / 10;
+					break;
+				case "ty":
+					globalTy =  parseFloat(this.value) / 10;
+					break;
+				case "tz":
+					let globaldiff = Math.abs(globalTzPesp - globalTzOrtho);
+					if(projectionType === 1){
+						globalTzPesp = this.value;
+						globalTzOrtho = this.value + globaldiff;
+					} else {
+						globalTzPesp = this.value - globaldiff;
+						globalTzOrtho = this.value;
+					}
+					break;
+
 				case "left_ortho":
 					left_ortho = this.value;
 					break;
@@ -1140,6 +1193,7 @@ function tick() {
 
 	drawScene();
 	handlePlayerButtons();
+	handleSliders();
 	animate();
 }
 
@@ -1336,10 +1390,33 @@ function setEventListeners( canvas ) {
 
 	*/
 
-	document.getElementById("rotateDeck").onclick = function () {
-		rotateDeck = !rotateDeck;
+	document.getElementById("rotateDeckX").onclick = function () {
+		rotateDeckX = !rotateDeckX;
+		if(rotateDeckX){
+			document.getElementById("rotateDeckX").style.backgroundColor = "#317bf4";
+		} else {
+			document.getElementById("rotateDeckX").style.backgroundColor = "#87877f";
+		}
+		hideOrShowTransSliders();
 	};
-
+	document.getElementById("rotateDeckY").onclick = function () {
+		rotateDeckY = !rotateDeckY;
+		if(rotateDeckY){
+			document.getElementById("rotateDeckY").style.backgroundColor = "#317bf4";
+		} else {
+			document.getElementById("rotateDeckY").style.backgroundColor = "#87877f";
+		}
+		hideOrShowTransSliders();
+	};
+	document.getElementById("rotateDeckZ").onclick = function () {
+		rotateDeckZ = !rotateDeckZ;
+		if(rotateDeckZ){
+			document.getElementById("rotateDeckZ").style.backgroundColor = "#317bf4";
+		} else {
+			document.getElementById("rotateDeckZ").style.backgroundColor = "#87877f";
+		}
+		hideOrShowTransSliders();
+	};
 	/*
 	if(player_tx.length<7){
 		document.getElementById("tile7").disabled = true;
@@ -1390,7 +1467,7 @@ function setEventListeners( canvas ) {
 	document.getElementById("snapTile").onclick = function () {
 		tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
 		facesPlayer = tile.replace(".png", "").split("_");
-		tileBoard = boardTextures[snapTileIndex].image.src.split("imgs/")[1];
+		tileBoard = boardTextures[snapTileIndex].image.src.split("imgs/")[1].replace("grey_","");
 		facesBoard = tileBoard.replace(".png", "").split("_");
 		//Paralelo
 		if (player_angZZ[tileIndex] === 0 && angleZ_board[snapTileIndex] === 0) {
@@ -1777,8 +1854,7 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 	}
 	// pc
 	else if (type === 0){
-
-		addTextureToList(boardTextures,boardTextures.length,[pcTextures[pcIndex].image.src.split("imgs/")[1]]);
+		addTextureToList(boardTextures,boardTextures.length,["grey_" + pcTextures[pcIndex].image.src.split("imgs/")[1]]);
 		board_tx[board_tx.length] = board_tx[snapTileIndex]+tx;
 		board_ty[board_ty.length] = board_ty[snapTileIndex]+ty;
 		board_tz[board_tz.length] = board_tz[snapTileIndex];
@@ -2137,6 +2213,28 @@ function handlePlayerButtons() {
 				}
 			}
 		};
+	}
+}
+
+function handleSliders() {
+	document.getElementById("tx").value = globalTx;
+	document.getElementById("ty").value = globalTy;
+	if(projectionType === 1){
+		document.getElementById("tz").value = globalTzPesp;
+	} else {
+		document.getElementById("tz").value = globalTzOrtho;
+	}
+}
+
+function hideOrShowTransSliders(){
+	if(rotateDeckX || rotateDeckY || rotateDeckZ){
+		document.getElementById("tx").style.display = "none";
+		document.getElementById("ty").style.display = "none";
+		document.getElementById("tz").style.display = "none";
+	} else{
+		document.getElementById("tx").style.display = "";
+		document.getElementById("ty").style.display = "";
+		document.getElementById("tz").style.display = "";
 	}
 }
 
