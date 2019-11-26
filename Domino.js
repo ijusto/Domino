@@ -1341,16 +1341,6 @@ function setEventListeners( canvas ) {
 		rotateDeck = !rotateDeck;
 	};
 
-	document.getElementById("tile1").onmousedown = function () {
-		tileIndex = 0;
-		selectPlayerTile();
-		document.getElementById("tile1").style.backgroundColor = "#81F41B";
-	};
-
-	document.getElementById("tile1").onmouseup = function () {
-		document.getElementById("tile1").style.backgroundColor = "#f4511e";
-	};
-
 	/*
 	if(player_tx.length<7){
 		document.getElementById("tile7").disabled = true;
@@ -1782,7 +1772,10 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 		ends[dicPlayerKey] = add;
 		board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
 		board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
-
+		for(let j = 1;  j < playerTilesLength + 1; j++) {
+			let id = "tile" + j;
+			document.getElementById(id).style.backgroundColor = "#87877f";
+		}
 		pc_move();
 	}
 	// pc
@@ -2196,13 +2189,20 @@ function initWebGL( canvas ) {
 }
 
 function handlePlayerButtons() {
-	for (let i = 2; i < playerTilesLength + 1; i++) {
+	for (let i = 1; i < playerTilesLength + 1; i++) {
 		let elemId = "tile" + i;
 		//console.log(elemId);
 		document.getElementById(elemId).disabled = false;
 		document.getElementById(elemId).onclick = function () {
 			tileIndex = i - 1;
 			selectPlayerTile();
+			document.getElementById(elemId).style.backgroundColor = "#f43941";
+			for(let j = 1;  j < playerTilesLength + 1; j++) {
+				let id = "tile" + j;
+				if(j != i){
+					document.getElementById(id).style.backgroundColor = "#87877f";
+				}
+			}
 		};
 	}
 }
