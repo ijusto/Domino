@@ -916,6 +916,108 @@ function drawScene() {
 			document.getElementById("snapTile").style.display = "none";
 		}
 	}
+	if(deckLength===0) {
+		var lose = true;
+		for (let i = 0; i < player_tx.length; i++) {
+			let player_ends = playerTextures[i].image.src.split(
+				"imgs/")[1].split(
+				".")[0].replace(
+				"green_", "").replace(
+				"red_", "").replace(
+				"blue_", "").split("_");
+			for (let key in ends) {
+				for (let j = 0; j < boardTextures.length; j++) {
+					if (boardTextures[j].image.src.includes(key)) {
+						snapTileIndex = j;
+						let end_num = key.split("_");
+						if (angleZ_board[j] == 0) {
+							if (ends[key][0].includes("c")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("b")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						} else if (angleZ_board[j] == 90) {
+							if (ends[key][0].includes("e")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("d")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						}
+						if (angleZ_board[j] == 180) {
+							if (ends[key][0].includes("c")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("b")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						} else if (angleZ_board[j] == 270) {
+							if (ends[key][0].includes("e")) {
+								if (end_num[1] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[1] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							} else if (ends[key][0].includes("d")) {
+								if (end_num[0] === player_ends[0]) {
+									lose = false;
+									break;
+								} else if (end_num[0] === player_ends[1]) {
+									lose = false;
+									break;
+								}
+							}
+						}
+					}
+				}
+				if (!lose) {
+					break;
+				}
+			}
+			if (!lose) {
+				break;
+			}
+		}
+		if (lose) {
+			console.log("You lose!!")
+		}
+	}
 
 }
 
@@ -1776,6 +1878,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 			let id = "tile" + j;
 			document.getElementById(id).style.backgroundColor = "#87877f";
 		}
+		if(player_tx.length==0){
+			console.log("You win!!");
+		}
 		pc_move();
 	}
 	// pc
@@ -1801,6 +1906,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 		ends[dicPlayerKey] = add;
 		board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
 		board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+		if(pc_tx.length==0){
+			console.log("You lose!!");
+		}
 	}
 }
 
@@ -2025,6 +2133,9 @@ function pc_move(){
 				document.getElementById("getTile").disabled = true;
 				document.getElementById("getTile").style.display = "none";
 			}
+		}
+		else{
+			console.log("You Win!!");
 		}
 	}
 }
