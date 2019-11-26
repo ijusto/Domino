@@ -684,7 +684,6 @@ function drawScene() {
 			}
 		};
 
-
 	}
 
 	// NEW --- Computing the Projection Matrix
@@ -1294,7 +1293,6 @@ function tick() {
 		requestAnimFrame(tick);
 	    handleKeys();
 
-	    drawScene();
 	    handlePlayerButtons();
 	    handleSliders();
         animate();
