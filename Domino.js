@@ -449,15 +449,30 @@ function drawDominoModel(angleXX, angleYY, angleZZ,
     // Pay attention to transformation order !!
 	// NEW --- GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
 	if(rotateDeck && board) {
-		mvMatrix = mult(translationMatrix( 0, 0, 0),
-			rotationYYMatrix( globalAngleYY ) );
-
-		console.log(board_tx[0]);
-		console.log(board_ty[0]);
-		console.log(board_tz[0]);
+		if(projectionType === 1) {
+			mvMatrix = mult(translationMatrix(0, 0, tz),
+							rotationYYMatrix(globalAngleYY));
+			//mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+			//mvMatrix = mult(mvMatrix, rotationYYMatrix( globalAngleYY ));
+		} else {
+			mvMatrix = mult(translationMatrix(0, 0, tz),
+							rotationYYMatrix(globalAngleYY));
+		}
 	}
-	mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+	if(projectionType === 0) {
+		mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+	} else {
+		if(board){
+			if(rotateDeck) {
+				mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, 0));
+			} else {
+				mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+			}
+		} else {
+			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+		}
 
+	}
 	mvMatrix = mult(mvMatrix, rotationZZMatrix(angleZZ));
 	mvMatrix = mult(mvMatrix, rotationYYMatrix(angleYY));
 	mvMatrix = mult(mvMatrix, rotationXXMatrix(angleXX));
@@ -564,13 +579,13 @@ function drawScene() {
 			//output.innerHTML = this.value;
 			switch (id) {
 				case "rotx":
-					angleX_board[0] = this.value;
+					globalAngleXX = this.value;
 					break;
 				case "roty":
-					angleY_board[0] = this.value;
+					globalAngleYY = this.value;
 					break;
 				case "rotz":
-					angleZ_board[0] = this.value;
+					globalAngleZZ = this.value;
 					break;
 				case "left_ortho":
 					left_ortho = this.value;
@@ -698,6 +713,12 @@ function drawScene() {
 	}
 
 	// Player pieces
+	let id = 0;
+
+	for(let i = player_tx.length + 1; i < 22; i++){
+		document.getElementById("tile" + i).disabled = true;
+		document.getElementById("tile" + i).style.display = "none";
+	}
 	for (let i = 0; i < player_tx.length; i++) {
 		drawDominoModel(player_angX[i], player_angYY[i], player_angZZ[i],
 			sx, sy, sz,
@@ -707,12 +728,17 @@ function drawScene() {
 			playerTextures[i],
 			false
 		);
-		let id = i + 1;
-		if(!document.getElementById("tile"+ id).disable) {
-			document.getElementById("tile" + id).innerHTML = playerTiles[i].split(".")[0];
-			document.getElementById("tile" + id).style.display = "";
-		}
-		// TODO: Update player tiles
+		id = i + 1;
+		document.getElementById("tile" + id).innerHTML = playerTextures[i].image.src.split(
+			"imgs/")[1].split(
+				".")[0].replace(
+					"green_","").replace(
+						"red_","").replace(
+							"blue_","");
+		//console.log(document.getElementById("tile" + id).innerHTML);
+		document.getElementById("tile" + id).style.display = "";
+		document.getElementById("tile" + id).disabled = false;
+		//TODO: Update player tiles
 	}
 
 	// Board pieces
@@ -738,11 +764,13 @@ function drawScene() {
 			false
 		);
 	}
-
+/*
 	let j = 1;
 	for (j; j <= player_tx.length; j++) {
 		document.getElementById("tile" + j.toString()).disabled = false;
 	}
+
+ */
 
 	j = player_tx.length + 1;
 	for (j; j > player_tx.length && j <= 21; j++) {
@@ -765,25 +793,66 @@ function drawScene() {
 	 */
 	checker = false;
 	// parallel to board piece
-	for (var i in ends) {
-		for (let j=0;j < boardTextures.length;j++) {
-			if (boardTextures[j].image.src.includes(i)) {
-				// parallel to board piece
-				tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
-				tile = tile.replace("red_","");
-				tile = tile.replace("green_","");
-				facesPlayer = tile.replace(".png", "").split("_");
-				if(angleZ_board[j]+180>=360){
-					angZBoardAux=angleZ_board[j]+180-360;
-				}
-				else{
-					angZBoardAux=angleZ_board[j]+180;
-				}
-				if(facesPlayer[0]!==facesPlayer[1]) {
-					if (player_angZZ[tileIndex] === angleZ_board[j] || player_angZZ[tileIndex] === angZBoardAux) {
+	if(tileIndex !== null) {
+		for (var i in ends) {
+			for (let j = 0; j < boardTextures.length; j++) {
+				if (boardTextures[j].image.src.includes(i)) {
+					// parallel to board piece
+					tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
+					tile = tile.replace("red_", "");
+					tile = tile.replace("green_", "");
+					facesPlayer = tile.replace(".png", "").split("_");
+					if (angleZ_board[j] + 180 >= 360) {
+						angZBoardAux = angleZ_board[j] + 180 - 360;
+					} else {
+						angZBoardAux = angleZ_board[j] + 180;
+					}
+					if (facesPlayer[0] !== facesPlayer[1]) {
+						if (player_angZZ[tileIndex] === angleZ_board[j] || player_angZZ[tileIndex] === angZBoardAux) {
+							// left of the board piece
+							if (ends[i].includes("e")) {
+								if (player_tx[tileIndex] - board_tx[j] > -2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.8/*3*/) {
+									if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+										colorGreen();
+										snapTileIndex = j;
+									}
+								}
+							}
+							// right of the board piece
+							if (ends[i].includes("d")) {
+								if (player_tx[tileIndex] - board_tx[j] < 2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.8/*3*/) {
+									if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+										colorGreen();
+										snapTileIndex = j;
+									}
+								}
+							}
+							//down of the board piece
+							if (ends[i].includes("b")) {
+								if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
+									if (player_ty[tileIndex] - board_ty[j] > -2.5 && player_ty[tileIndex] - board_ty[j] < -1.8) {
+										colorGreen();
+										snapTileIndex = j;
+									}
+								}
+							}
+							// up of the board piece
+							if (ends[i].includes("c")) {
+								if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
+									if (player_ty[tileIndex] - board_ty[j] < 2.5 && player_ty[tileIndex] - board_ty[j] > 1.8) {
+										colorGreen();
+										snapTileIndex = j;
+									}
+								}
+							}
+
+						}
+					}
+					// prependicular to board piece
+					if (player_angZZ[tileIndex] !== angleZ_board[j] && player_angZZ[tileIndex] !== angZBoardAux) {
 						// left of the board piece
 						if (ends[i].includes("e")) {
-							if (player_tx[tileIndex] - board_tx[j] > -2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.8/*3*/) {
+							if (player_tx[tileIndex] - board_tx[j] > -1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.4 /*3*/) {
 								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
 									colorGreen();
 									snapTileIndex = j;
@@ -792,17 +861,17 @@ function drawScene() {
 						}
 						// right of the board piece
 						if (ends[i].includes("d")) {
-							if (player_tx[tileIndex] - board_tx[j] < 2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.8/*3*/) {
+							if (player_tx[tileIndex] - board_tx[j] < 1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.4/*3*/) {
 								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
 									colorGreen();
 									snapTileIndex = j;
 								}
 							}
 						}
-						//down of the board piece
+						// down of the board piece
 						if (ends[i].includes("b")) {
-							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] > -2.5 && player_ty[tileIndex] - board_ty[j] < -1.8) {
+							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4 /*3*/) {
+								if (player_ty[tileIndex] - board_ty[j] > -1.9 && player_ty[tileIndex] - board_ty[j] < -1.4) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -811,7 +880,7 @@ function drawScene() {
 						// up of the board piece
 						if (ends[i].includes("c")) {
 							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] < 2.5 && player_ty[tileIndex] - board_ty[j] > 1.8) {
+								if (player_ty[tileIndex] - board_ty[j] < 1.9 && player_ty[tileIndex] - board_ty[j] > 1.4) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -820,51 +889,9 @@ function drawScene() {
 
 					}
 				}
-				// prependicular to board piece
-				if(player_angZZ[tileIndex] !== angleZ_board[j] && player_angZZ[tileIndex] !== angZBoardAux){
-					// left of the board piece
-					if(ends[i].includes("e")) {
-						if (player_tx[tileIndex] - board_tx[j] > -1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.4 /*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
-								colorGreen();
-								snapTileIndex=j;
-							}
-						}
-					}
-					// right of the board piece
-					if(ends[i].includes("d")) {
-						if (player_tx[tileIndex] - board_tx[j] < 1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.4/*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
-								colorGreen();
-								snapTileIndex=j;
-							}
-						}
-					}
-					// down of the board piece
-					if(ends[i].includes("b")) {
-						if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4 /*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] > -1.9 && player_ty[tileIndex] - board_ty[j] < -1.4) {
-								colorGreen();
-								snapTileIndex=j;
-							}
-						}
-					}
-					// up of the board piece
-					if(ends[i].includes("c")) {
-						if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-							if (player_ty[tileIndex] - board_ty[j] < 1.9 && player_ty[tileIndex] - board_ty[j] > 1.4) {
-								colorGreen();
-								snapTileIndex=j;
-							}
-						}
-					}
-
-				}
 			}
 		}
-	}
-	// prependicular to board piece
-    if(tileIndex != null) {
+		// prependicular to board piece
         if (!playerTextures[tileIndex].image.src.includes("imgs/red")) {
             if (checker === false) {
                 tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
@@ -874,8 +901,7 @@ function drawScene() {
 
             }
         }
-    }
-    else{
+    } else {
     	if(document.getElementById("snapTile").disabled === false) {
 			document.getElementById("snapTile").disabled = true;
 			document.getElementById("snapTile").style.display = "none";
@@ -1018,15 +1044,6 @@ function handleKeys() {
 			if(tileIndex !== null) {
 				player_ty[tileIndex] -= 0.05;
 			}
-			/*
-			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
-			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
-			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
-			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
-			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
-			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
-
-			 */
 		}
 	}
 
@@ -1043,14 +1060,6 @@ function handleKeys() {
 				if(tileIndex !== null) {
 					rotateZ = true;
 				}
-				/*
-				console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
-				console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
-				console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
-				console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
-				console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
-				console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
-				 */
 				break;
 		}
 
@@ -1121,7 +1130,7 @@ function tick() {
 	handleKeys();
 
 	drawScene();
-
+	handlePlayerButtons();
 	animate();
 }
 
@@ -1132,8 +1141,7 @@ function tick() {
 
 function outputInfos(){
     document.getElementById("deck_tile_number").innerHTML = deckLength;
-    document.getElementById("player_tile_number").innerHTML = playerTilesLength;
-    console.log(playerTilesLength);
+    //console.log(playerTilesLength);
 }
 
 //----------------------------------------------------------------------------
@@ -1338,15 +1346,7 @@ function setEventListeners( canvas ) {
 		document.getElementById("tile7").disabled = true;
 	}
 	 */
-	for (let i = 2; i < playerTilesLength + 1; i++) {
-		let elemId = "tile" + i;
-		console.log(elemId);
-		document.getElementById(elemId).disabled = false;
-		document.getElementById(elemId).onclick = function () {
-			tileIndex = i - 1;
-			selectPlayerTile();
-		};
-	}
+
 	document.getElementById("getTile").onclick = function () {
 		if (deckLength !== 0) {
 			let index = playerTextures.length;
@@ -1360,23 +1360,20 @@ function setEventListeners( canvas ) {
 			deckLength = deckTextures.length;
 			playerTilesLength = playerTextures.length;
 			document.getElementById("deck_tile_number").innerHTML = deckLength;
-			document.getElementById("player_tile_number").innerHTML = playerTilesLength;
-			for (let i = 2; i < playerTilesLength + 1; i++) {
-				let elemId = "tile" + i;
-				console.log(elemId);
-				document.getElementById(elemId).disabled = false;
-				document.getElementById(elemId).onclick = function () {
-					tileIndex = i - 1;
-					selectPlayerTile();
-				};
-			}
 
 			player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
 			player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
-			player_tz[player_tz.length] = 0;
+			if(projectionType === 0){
+
+				player_tz[player_tz.length] = 0;
+			} else {
+
+				player_tz[player_tz.length] = -25;
+			}
 
 			player_tz_ortho[player_tz_ortho.length] = 0;
-			player_tz_persp[player_tz_persp.length] = player_tz_persp[0];
+			player_tz_persp[player_tz_persp.length] = -25;
+			console.log("otho: " + player_tz_ortho.length + "persp: "+ player_tz_persp.length);
 
 			player_angX[player_angX.length] = 0;
 			player_angYY[player_angYY.length] = 0;
@@ -1737,26 +1734,28 @@ function setEventListeners( canvas ) {
 	}
 }
 
+function updateTileButtons(playerTilesLength) {
+	for (let i = 2; i < playerTilesLength + 1; i++) {
+		let elemId = "tile" + i;
+		//console.log(elemId);
+		document.getElementById(elemId).disabled = false;
+		document.getElementById(elemId).onclick = function () {
+			tileIndex = i - 1;
+			selectPlayerTile();
+		};
+	}
+}
+
 function player_to_board(facesPlayer,facesBoard,tx,ty,rem,add){
+	//deleteTileButton();
 	addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
 	board_tx[board_tx.length] = board_tx[snapTileIndex]+tx;
 	board_ty[board_ty.length] = board_ty[snapTileIndex]+ty;
 	board_tz[board_tz.length] = board_tz[snapTileIndex];
-	angleX_board[angleX_board.length] = player_angX[tileIndex];
-	angleY_board[angleY_board.length] = player_angYY[tileIndex];
-	angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-	playerTextures.splice(tileIndex,1);
-	player_tx.splice(tileIndex,1);
-	player_ty.splice(tileIndex,1);
-	player_tz.splice(tileIndex,1);
-	player_angX.splice(tileIndex,1);
-	player_angYY.splice(tileIndex,1);
-	player_angZZ.splice(tileIndex,1);
-	selectedTile=null;
-	tileIndex=null;
+	changeTileToBoard("player");
 	dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
 	dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-	if (ends[dicBoardKey].length == 1) {
+	if (ends[dicBoardKey].length === 1) {
 		delete ends[dicBoardKey];
 	} else {
 		for(let k=0;k<ends[dicBoardKey].length;k++){
@@ -1842,14 +1841,14 @@ function deletefromTz(list){
 
 function deleteTileButton() {
 	let tile_name = playerTextures[tileIndex].image.src.split("imgs/green_")[1].split(".png")[0];
-	console.log(tile_name);
+	//console.log(tile_name);
 	let tile = tileIndex + 1;
 	let elemId = "tile" +  tile;
-	console.log(elemId);
+	//console.log(elemId);
 	if (document.getElementById(elemId).innerHTML === tile_name) {
-		console.log("yaaaaaayy");
+		//console.log("yaaaaaayy");
 		document.getElementById(elemId).disabled = true;
-		console.log(document.getElementById(elemId).disabled);
+		//console.log(document.getElementById(elemId).disabled);
 		document.getElementById(elemId).style.display = "none";
 	}
 }
@@ -1884,8 +1883,8 @@ function selectPlayerTile() {
 
 		selectedTile = tileIndex;
 	}
-    console.log("tpx:"+player_tx[tileIndex],", tpy:"+player_ty[tileIndex],", angpz:"+player_angZZ[tileIndex]);
-    console.log("tbx:"+board_tx[0], ", tby:"+board_ty[tileIndex]);
+    //console.log("tpx:"+player_tx[tileIndex],", tpy:"+player_ty[tileIndex],", angpz:"+player_angZZ[tileIndex]);
+    //console.log("tbx:"+board_tx[0], ", tby:"+board_ty[tileIndex]);
 }
 
 //----------------------------------------------------------------------------
@@ -1918,6 +1917,18 @@ function initWebGL( canvas ) {
 	}
 	if (!gl) {
 		alert("Could not initialise WebGL, sorry! :-(");
+	}
+}
+
+function handlePlayerButtons() {
+	for (let i = 2; i < playerTilesLength + 1; i++) {
+		let elemId = "tile" + i;
+		//console.log(elemId);
+		document.getElementById(elemId).disabled = false;
+		document.getElementById(elemId).onclick = function () {
+			tileIndex = i - 1;
+			selectPlayerTile();
+		};
 	}
 }
 
