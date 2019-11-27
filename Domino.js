@@ -35,7 +35,7 @@ var cubeVertexTextureCoordBufferFrontFace = null, cubeVertexTextureCoordBufferNo
 // The translation vector
 var player_tx = [-9.4];
 var player_bottom_pos_x = [-9.4];
-var player_bottom_pos_y = [-7];
+var player_bottom_pos_y = [-7];0
 var dist_between_tiles = 1.1; // 1.7
 var totalDist = -9.4;
 for(let i = 1; i < 18; i++) {
@@ -916,7 +916,7 @@ function drawScene() {
 						// left of the board piece
 						if (ends[i].includes("e")) {
 							if (player_tx[tileIndex] - board_tx[j] > -1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.4 /*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+								if (player_ty[tileIndex] - board_ty[j] > -0.6 && player_ty[tileIndex] - board_ty[j] < 0.6) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -925,7 +925,7 @@ function drawScene() {
 						// right of the board piece
 						if (ends[i].includes("d")) {
 							if (player_tx[tileIndex] - board_tx[j] < 1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.4/*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+								if (player_ty[tileIndex] - board_ty[j] > -0.6 && player_ty[tileIndex] - board_ty[j] < 0.6) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -933,7 +933,7 @@ function drawScene() {
 						}
 						// down of the board piece
 						if (ends[i].includes("b")) {
-							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4 /*3*/) {
+							if (player_tx[tileIndex] - board_tx[j] > -0.6 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.6 /*3*/) {
 								if (player_ty[tileIndex] - board_ty[j] > -1.9 && player_ty[tileIndex] - board_ty[j] < -1.4) {
 									colorGreen();
 									snapTileIndex = j;
@@ -942,7 +942,7 @@ function drawScene() {
 						}
 						// up of the board piece
 						if (ends[i].includes("c")) {
-							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
+							if (player_tx[tileIndex] - board_tx[j] > -0.6 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.6/*3*/) {
 								if (player_ty[tileIndex] - board_ty[j] < 1.9 && player_ty[tileIndex] - board_ty[j] > 1.4) {
 									colorGreen();
 									snapTileIndex = j;
@@ -954,7 +954,6 @@ function drawScene() {
 				}
 			}
 		}
-		// prependicular to board piece
         if (!playerTextures[tileIndex].image.src.includes("imgs/red")) {
             if (checker === false) {
                 tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
@@ -1073,6 +1072,52 @@ function drawScene() {
 		}
 	}
 
+}
+
+function collisionDetection(tx,ty){
+	check = false;
+	for(let i = 0;i<board_tx.length;i++){
+		if(i!==snapTileIndex) {
+			if (angleZ_board[i] == 0 || angleZ_board[i] == 180) {
+				if (player_angZZ[tileIndex] == 0 || player_angZZ[tileIndex] == 180) {
+					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[i] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 1.1)))) {
+						console.log(i);
+						return true;
+					}
+				} else {
+					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 1.1)))) {
+						console.log(i);
+						return true;
+					}
+				}
+			} else {
+				if (player_angZZ[tileIndex] == 0 || player_angZZ[tileIndex] == 180) {
+					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[i] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 0.6)))) {
+						console.log(i);
+						return true;
+					}
+				} else {
+					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 0.6)))) {
+						console.log(i);
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
 }
 
 function colorGreen(){
@@ -1288,9 +1333,9 @@ function handleMouseMove(event) {
 // Timer
 
 function tick() {
+	requestAnimFrame(tick);
 	drawScene();
 	if(!document.getElementById("lose").innerHTML.includes("You")) {
-		requestAnimFrame(tick);
 	    handleKeys();
 
 	    handlePlayerButtons();
@@ -1934,34 +1979,36 @@ function updateTileButtons(playerTilesLength) {
 function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 	// player
 	if(type === 1){
-		addTextureToList(boardTextures,boardTextures.length,[playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-		board_tx[board_tx.length] = board_tx[snapTileIndex]+tx;
-		board_ty[board_ty.length] = board_ty[snapTileIndex]+ty;
-		board_tz[board_tz.length] = board_tz[snapTileIndex];
-		angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-		changeTileToBoard(1);
-		dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-		dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-		if (ends[dicBoardKey].length === 1) {
-			delete ends[dicBoardKey];
-		} else {
-			for(let k=0;k<ends[dicBoardKey].length;k++){
-				if(ends[dicBoardKey][k] === rem) {
-					ends[dicBoardKey].splice(k, 1);
+		if(!collisionDetection(tx,ty)) {
+			addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
+			board_tx[board_tx.length] = board_tx[snapTileIndex] + tx;
+			board_ty[board_ty.length] = board_ty[snapTileIndex] + ty;
+			board_tz[board_tz.length] = board_tz[snapTileIndex];
+			angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
+			changeTileToBoard(1);
+			dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
+			dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
+			if (ends[dicBoardKey].length === 1) {
+				delete ends[dicBoardKey];
+			} else {
+				for (let k = 0; k < ends[dicBoardKey].length; k++) {
+					if (ends[dicBoardKey][k] === rem) {
+						ends[dicBoardKey].splice(k, 1);
+					}
 				}
 			}
+			ends[dicPlayerKey] = add;
+			board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
+			board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
+			for (let j = 1; j < playerTilesLength + 1; j++) {
+				let id = "tile" + j;
+				document.getElementById(id).style.backgroundColor = "#87877f";
+			}
+			if (player_tx.length == 0) {
+				document.getElementById("lose").innerHTML = "You win!!";
+			}
+			pc_move();
 		}
-		ends[dicPlayerKey] = add;
-		board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
-		board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
-		for(let j = 1;  j < playerTilesLength + 1; j++) {
-			let id = "tile" + j;
-			document.getElementById(id).style.backgroundColor = "#87877f";
-		}
-		if(player_tx.length==0){
-			document.getElementById("lose").innerHTML = "You win!!";
-		}
-		pc_move();
 	}
 	// pc
 	else if (type === 0){
