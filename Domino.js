@@ -1080,36 +1080,36 @@ function collisionDetection(tx,ty){
 		if(i!==snapTileIndex) {
 			if (angleZ_board[i] == 0 || angleZ_board[i] == 180) {
 				if (player_angZZ[tileIndex] == 0 || player_angZZ[tileIndex] == 180) {
-					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[i] + 0.6)) ||
-						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 0.6))) &&
-						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 1.1)) ||
-							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 1.1)))) {
+					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[i] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 1.1)))) {
 						console.log(i);
 						return true;
 					}
 				} else {
-					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 0.6)) ||
-						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 0.4) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 0.6))) &&
-						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 1.1)) ||
-							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 0.9) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 1.1)))) {
+					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 1.1)))) {
 						console.log(i);
 						return true;
 					}
 				}
 			} else {
 				if (player_angZZ[tileIndex] == 0 || player_angZZ[tileIndex] == 180) {
-					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[i] + 1.1)) ||
-						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 1.1))) &&
-						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 0.6)) ||
-							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 0.6)))) {
+					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[i] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 0.6)))) {
 						console.log(i);
 						return true;
 					}
 				} else {
-					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 1.1)) ||
-						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 0.9) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 1.1))) &&
-						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 0.6)) ||
-							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 0.4) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 0.6)))) {
+					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 0.6)))) {
 						console.log(i);
 						return true;
 					}
