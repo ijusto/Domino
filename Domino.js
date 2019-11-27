@@ -21,7 +21,7 @@ var gl = null; // WebGL context
 
 var shaderProgram = null; 
 
-// NEW --- Buffers
+// Buffers
 
 var cubeVertexPositionBuffer = null;
 
@@ -35,7 +35,7 @@ var cubeVertexTextureCoordBufferFrontFace = null, cubeVertexTextureCoordBufferNo
 // The translation vector
 var player_tx = [-9.4];
 var player_bottom_pos_x = [-9.4];
-var player_bottom_pos_y = [-7];0
+var player_bottom_pos_y = [-7];
 var dist_between_tiles = 1.1; // 1.7
 var totalDist = -9.4;
 for(let i = 1; i < 18; i++) {
@@ -111,20 +111,6 @@ var playerTilesLength = 7;
 var ends = {};
 var snapTileIndex;
 
-// Animation controls
-
-var rotationXX_ON = 1;
-var rotationXX_DIR = 1;
-var rotationXX_SPEED = 1;
- 
-var rotationYY_ON = 1;
-var rotationYY_DIR = 1;
-var rotationYY_SPEED = 1;
- 
-var rotationZZ_ON = 1;
-var rotationZZ_DIR = 1;
-var rotationZZ_SPEED = 1;
- 
 // To allow choosing the way of drawing the model triangles
 var primitiveType = null;
  
@@ -249,7 +235,7 @@ for(let main_number = 0; main_number < 7; main_number++) {
 
 var checker = false;
 
-// NEW - GLOBAL Animation controls
+// GLOBAL Animation controls
 
 var globalRotationYY_ON = 1;
 var globalRotationYY_DIR = 1;
@@ -273,7 +259,6 @@ var globalTx = 0;
 var globalTy = 0;
 var localTx = 0;
 var localTy = 0;
-var tx_slider = false, ty_slider = false;
 
 var rotateDeckX = false;
 var rotateDeckY = false;
@@ -312,9 +297,9 @@ function initTextures() {
 	bindImgToTexture(boardTextures, 0, null);
 	boardTextures[0].image.src = "imgs/" + tiles[27];
 	tiles.splice(27, 1);
-	ends["6_6"]=["e","d"];
+	ends["6_6"] = ["e","d"];
 
-	var i = 0;
+	let i = 0;
 	while(i < 6) {
 		addTextureToList(pcTextures, i, tiles);
 		i++;
@@ -365,14 +350,6 @@ function bindImgToTexture(textureList, index, img){
 		};
 	}
 }
-
-/*
-function changeTexture(){
-	var random_tile = Math.floor(Math.random() * tiles.length);
-	webGLTexture_dots_face.image.src = tiles[random_tile];
-	tiles.splice(random_tile, 1);
-}
- */
 
 //----------------------------------------------------------------------------
 
@@ -459,7 +436,7 @@ function drawDominoModel(angx, angy, angz,
 						 front_face_texture,
 						 board) {
     // Pay attention to transformation order !!
-	// NEW --- GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
+	// GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
 	if (board){
 
 		if(rotateDeckX || rotateDeckY || rotateDeckZ) {
@@ -496,8 +473,6 @@ function drawDominoModel(angx, angy, angz,
 	if(projectionType === 0) {
 		if(board){
 			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, tz));
-			//console.log(tx + globalTx);
-			//mvMatrix = mult(mvMatrix, translationMatrix(tx , ty, tz));
 		} else {
 			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
 		}
@@ -505,10 +480,8 @@ function drawDominoModel(angx, angy, angz,
 		if(board){
 			if(rotateDeckX || rotateDeckY || rotateDeckZ) {
 				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, 0));
-				//mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, 0));
 			} else {
 				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty  + globalTy, tz));
-				//mvMatrix = mult(mvMatrix, translationMatrix(tx, ty , tz));
 			}
 		} else {
 			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
@@ -549,7 +522,7 @@ function drawDominoModel(angx, angy, angz,
 	// The vertex indices
 	// Front Face
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBufferFrontFace);
-	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
+	// Drawing the triangles
 	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBufferFrontFace.numItems, gl.UNSIGNED_SHORT, 0);
 
 	// Textures
@@ -563,7 +536,7 @@ function drawDominoModel(angx, angy, angz,
 	// The vertex indices
 	// Other Faces
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBufferNotFrontFace);
-	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
+	// Drawing the triangles
 	gl.drawElements(gl.TRIANGLES, cubeVertexIndexBufferNotFrontFace.numItems, gl.UNSIGNED_SHORT, 0);
 
 	/*
@@ -611,7 +584,7 @@ function drawScene() {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-	for (let id of [/*"left_ortho", "right_ortho", "bottom_ortho", "tz",  "rotx", "roty", "rotz",*/"tx", "ty", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]) {
+	for (let id of ["tx", "ty", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]) {
 		let elemId = "myRange_" + id;
 		let slider = document.getElementById(elemId);
 		elemId = "demo_" + id;
@@ -626,12 +599,10 @@ function drawScene() {
 				case "tx":
 					localTx = parseFloat(this.value);
 					globalTx =  parseFloat(this.value) *sx;
-					tx_slider = true;
 					break;
 				case "ty":
 					localTy = parseFloat(this.value);
 					globalTy =  parseFloat(this.value) *sy;
-					ty_slider = true;
 					break;
 				case "left_ortho":
 					left_ortho = this.value;
@@ -774,22 +745,6 @@ function drawScene() {
 	}
 
 	// Board pieces
-	/*
-	if(tx_slider){
-		for (let i = 0; i < board_tx.length; i++) {
-			board_tx[i] += globalTx;
-		}
-	}
-	if(ty_slider){
-		for (let i = 0; i < board_ty.length; i++) {
-			board_ty[i] += globalTy;
-		}
-	}
-	 */
-
-	tx_slider = false;
-	ty_slider = false;
-
 	for (let i = 0; i < boardTextures.length; i++) {
 		drawDominoModel(angleX_board[i], angleY_board[i], angleZ_board[i],
 			sx, sy, sz,
@@ -803,7 +758,7 @@ function drawScene() {
 
 	// Computer pieces
 	for(let i = 0; i < pcTextures.length; i++){
-		drawDominoModel( 0, 180/*0*/, 0,
+		drawDominoModel( 0, 180/*for testing purposes: 0*/, 0,
 			sx, sy, sz,
 			pc_tx[i]*sx, pc_ty[i]*sy, pc_tz[i]*sz,
 			mvMatrix,
@@ -812,13 +767,6 @@ function drawScene() {
 			false
 		);
 	}
-/*
-	let j = 1;
-	for (j; j <= player_tx.length; j++) {
-		document.getElementById("tile" + j.toString()).disabled = false;
-	}
-
- */
 
 	j = player_tx.length + 1;
 	for (j; j > player_tx.length && j <= 21; j++) {
@@ -835,11 +783,7 @@ function drawScene() {
 		rotateZ = false;
 		console.log(player_angZZ[tileIndex]);
 	}
-	/*
-	console.log("angX: " + player_angZZ[tileIndex]);
-	console.log("tx dif: " + String(player_tx[tileIndex] - board_tx[0]));
-	console.log("ty dif: " + String(player_ty[tileIndex] - board_ty[0]));
-	 */
+
 	checker = false;
 	// parallel to board piece
 	if(tileIndex !== null) {
@@ -941,6 +885,7 @@ function drawScene() {
 				}
 			}
 		}
+
         if (!playerTextures[tileIndex].image.src.includes("imgs/red")) {
             if (checker === false) {
                 tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
@@ -950,6 +895,7 @@ function drawScene() {
 
             }
         }
+
     } else {
     	if(document.getElementById("snapTile").disabled === false) {
 			document.getElementById("snapTile").disabled = true;
@@ -971,7 +917,7 @@ function drawScene() {
 					if (boardTextures[j].image.src.includes(key)) {
 						snapTileIndex = j;
 						let end_num = key.split("_");
-						if (angleZ_board[j] == 0) {
+						if (angleZ_board[j] === 0) {
 							if (ends[key][0].includes("c")) {
 								if (end_num[0] === player_ends[0]) {
 									lose = false;
@@ -989,7 +935,7 @@ function drawScene() {
 									break;
 								}
 							}
-						} else if (angleZ_board[j] == 90) {
+						} else if (angleZ_board[j] === 90) {
 							if (ends[key][0].includes("e")) {
 								if (end_num[0] === player_ends[0]) {
 									lose = false;
@@ -1008,7 +954,7 @@ function drawScene() {
 								}
 							}
 						}
-						if (angleZ_board[j] == 180) {
+						if (angleZ_board[j] === 180) {
 							if (ends[key][0].includes("c")) {
 								if (end_num[1] === player_ends[0]) {
 									lose = false;
@@ -1026,7 +972,7 @@ function drawScene() {
 									break;
 								}
 							}
-						} else if (angleZ_board[j] == 270) {
+						} else if (angleZ_board[j] === 270) {
 							if (ends[key][0].includes("e")) {
 								if (end_num[1] === player_ends[0]) {
 									lose = false;
@@ -1149,7 +1095,7 @@ function colorGreen(){
 
 //----------------------------------------------------------------------------
 //
-//  NEW --- Animation
+//  Animation
 //
 
 // Animation --- Updating transformation parameters
@@ -1211,45 +1157,18 @@ function handleKeys() {
 			if(tileIndex !== null) {
 				player_tx[tileIndex] -= 0.05;
 			}
-			/*
-			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
-			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
-			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
-			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
-			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
-			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
-
-			 */
 		}
 		if (currentlyPressedKeys[39]) {
 			// Right cursor key
 			if(tileIndex !== null) {
 				player_tx[tileIndex] += 0.05;
 			}
-			/*
-			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
-			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
-			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
-			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
-			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
-			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
-
-			 */
 		}
 		if (currentlyPressedKeys[38]) {
 			// Up cursor key
 			if(tileIndex !== null) {
 				player_ty[tileIndex] += 0.05;
 			}
-			/*
-			console.log("angXB: "+angleX_board+", angXP: "+anglepXX[tileIndex]);
-			console.log("angYB: "+angleY_board+", angYP: "+anglepYY[tileIndex]);
-			console.log("angZB: "+angleZ_board+", angZP: "+anglepZZ[tileIndex]);
-			console.log("tbx: "+tbx[0]+", tpx: "+tpx[tileIndex]);
-			console.log("tby: "+tby[0]+", tpy: "+tpy[tileIndex]);
-			console.log("tbz: "+tbz[0]+", tpz: "+tpz[tileIndex]);
-
-			 */
 		}
 
 		if (currentlyPressedKeys[40]) {
@@ -1360,7 +1279,7 @@ function outputInfos(){
 
 function setEventListeners( canvas ) {
 
-	// NEW ---Handling the mouse
+	// Handling the mouse
 
 	// From learningwebgl.com
 
@@ -1372,7 +1291,7 @@ function setEventListeners( canvas ) {
 
 	document.onmousemove = handleMouseMove;
 
-	// NEW ---Handling the keyboard
+	// Handling the keyboard
 
 	// From learningwebgl.com
 
@@ -1405,7 +1324,6 @@ function setEventListeners( canvas ) {
 				document.getElementById("aspect_persp").hidden = true;
 				document.getElementById("near_persp").hidden = true;
 				document.getElementById("far_persp").hidden = true;
-				//document.getElementById("tz").hidden = true;
 				break;
 			case 1 :
 				projectionType = 1;
@@ -1415,132 +1333,12 @@ function setEventListeners( canvas ) {
 				document.getElementById("aspect_persp").hidden = false;
 				document.getElementById("near_persp").hidden = false;
 				document.getElementById("far_persp").hidden = false;
-				//document.getElementById("tz").hidden = false;
 				break;
 		}
 	});
 
 
 	// Button events
-
-	/*
-	document.getElementById("XX-on-off-button").onclick = function(){
-		// Switching on / off
-		if( rotationXX_ON ) {
-			rotationXX_ON = 0;
-		}
-		else {
-			rotationXX_ON = 1;
-		}
-	};
-
-	document.getElementById("XX-direction-button").onclick = function(){
-		// Switching the direction
-		if( rotationXX_DIR === 1 ) {
-			rotationXX_DIR = -1;
-		}
-		else {
-			rotationXX_DIR = 1;
-		}
-	};
-
-	document.getElementById("XX-slower-button").onclick = function(){
-		rotationXX_SPEED *= 0.75;
-	};
-
-	document.getElementById("XX-faster-button").onclick = function(){
-		rotationXX_SPEED *= 1.25;
-	};
-
-	document.getElementById("YY-on-off-button").onclick = function(){
-		// Switching on / off
-		if( rotationYY_ON ) {
-			rotationYY_ON = 0;
-		}
-		else {
-			rotationYY_ON = 1;
-		}
-	};
-
-	document.getElementById("YY-direction-button").onclick = function(){
-		// Switching the direction
-		if( rotationYY_DIR === 1 ) {
-			rotationYY_DIR = -1;
-		}
-		else {
-			rotationYY_DIR = 1;
-		}
-	};
-
-	document.getElementById("YY-slower-button").onclick = function(){
-		rotationYY_SPEED *= 0.75;
-	};
-
-	document.getElementById("YY-faster-button").onclick = function(){
-		rotationYY_SPEED *= 1.25;
-	};
-
-	document.getElementById("ZZ-on-off-button").onclick = function(){
-		// Switching on / off
-		if( rotationZZ_ON ) {
-			rotationZZ_ON = 0;
-		}
-		else {
-			rotationZZ_ON = 1;
-		}
-	};
-
-	document.getElementById("ZZ-direction-button").onclick = function(){
-		// Switching the direction
-		if( rotationZZ_DIR === 1 ) {
-			rotationZZ_DIR = -1;
-		}
-		else {
-			rotationZZ_DIR = 1;
-		}
-	};
-
-	document.getElementById("ZZ-slower-button").onclick = function(){
-		rotationZZ_SPEED *= 0.75;
-	};
-
-	document.getElementById("ZZ-faster-button").onclick = function(){
-		rotationZZ_SPEED *= 1.25;
-	};
-
-	document.getElementById("reset-button").onclick = function(){
-		// The initial values
-		tx = 0.0;
-		ty = 0.0;
-		tz = 0.0;
-
-		angleXX = 0.0;
-		angleYY = 0.0;
-		angleZZ = 0.0;
-
-		sx = 0.1;
-		sy = 0.1;
-		sz = 0.1;
-
-		scx = 0.05;
-		scy = 0.05;
-		scz = 0.05;
-
-		rotationXX_ON = 0;
-		rotationXX_DIR = 1;
-		rotationXX_SPEED = 1;
-
-		rotationYY_ON = 0;
-		rotationYY_DIR = 1;
-		rotationYY_SPEED = 1;
-
-		rotationZZ_ON = 0;
-		rotationZZ_DIR = 1;
-		rotationZZ_SPEED = 1;
-	};
-
-	*/
-
 	document.getElementById("resetPosition").onclick = function () {
 		resetDeckPos();
 	};
@@ -1572,11 +1370,6 @@ function setEventListeners( canvas ) {
 		}
 		hideOrShowTransSliders();
 	};
-	/*
-	if(player_tx.length<7){
-		document.getElementById("tile7").disabled = true;
-	}
-	 */
 
 	document.getElementById("getTile").onclick = function () {
 		if (deckLength !== 0) {
@@ -1593,7 +1386,7 @@ function setEventListeners( canvas ) {
 			document.getElementById("deck_tile_number").innerHTML = deckLength;
 
 			//player_tx[player_tx.length] = player_bottom_pos_x[playerTiles.length - 1];
-			totalDist+=dist_between_tiles;
+			totalDist += dist_between_tiles;
 			player_tx[player_tx.length] = totalDist;
 			player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
 			if(projectionType === 0){
@@ -1970,18 +1763,6 @@ function setEventListeners( canvas ) {
 	}
 }
 
-function updateTileButtons(playerTilesLength) {
-	for (let i = 2; i < playerTilesLength + 1; i++) {
-		let elemId = "tile" + i;
-		//console.log(elemId);
-		document.getElementById(elemId).disabled = false;
-		document.getElementById(elemId).onclick = function () {
-			tileIndex = i - 1;
-			selectPlayerTile();
-		};
-	}
-}
-
 function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 	// player
 	if(type === 1){
@@ -2010,11 +1791,14 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 				let id = "tile" + j;
 				document.getElementById(id).style.backgroundColor = "#87877f";
 			}
-			if (player_tx.length == 0) {
+			if (player_tx.length === 0) {
 				document.getElementById("lose").innerHTML = "You win!!";
 			}
 				pc_move();
 		}
+
+
+
 	}
 	// pc
 	else if (type === 0){
@@ -2094,41 +1878,41 @@ function pc_move(){
 				if (boardTextures[j].image.src.includes(key)) {
 					snapTileIndex=j;
 					let end_num = key.split("_");
-					if(angleZ_board[j]==0){
+					if(angleZ_board[j] === 0){
 						if(ends[key][0]==="c"){
-							if(pc_ends[0]==pc_ends[1]){
-								if (end_num[0] == pc_ends[0]){
+							if(pc_ends[0] === pc_ends[1]){
+								if (end_num[0] === pc_ends[0]){
 									tile_to_board(pc_ends, end_num, 0, 1.5, "c", ["e","d"], 0, 90);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[0] == pc_ends[0]) {
+								if (end_num[0] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 180);
 									pc_play = true;
 									break;
-								} else if (end_num[0] == pc_ends[1]) {
+								} else if (end_num[0] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 0);
 									pc_play = true;
 									break;
 								}
 							}
 						}
-						else if(ends[key][0]==="b"){
-							if(pc_ends[0]==pc_ends[1]) {
-								if (end_num[1] == pc_ends[0]) {
+						else if(ends[key][0] === "b"){
+							if(pc_ends[0] === pc_ends[1]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 0, -1.5, "b", ["e", "d"], 0, 90);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[1] == pc_ends[0]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 0);
 									pc_play = true;
 									break;
-								} else if (end_num[1] == pc_ends[1]) {
+								} else if (end_num[1] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 180);
 									pc_play = true;
 									break;
@@ -2136,41 +1920,41 @@ function pc_move(){
 							}
 						}
 					}
-					else if(angleZ_board[j]==90){
+					else if(angleZ_board[j] === 90){
 						if(ends[key][0]==="e"){
-							if(pc_ends[0]==pc_ends[1]) {
-								if (end_num[0] == pc_ends[0]) {
+							if(pc_ends[0] === pc_ends[1]) {
+								if (end_num[0] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, -1.5, 0, "e", ["c", "b"], 0, 0);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[0] == pc_ends[0]) {
+								if (end_num[0] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 270);
 									pc_play = true;
 									break;
-								} else if (end_num[0] == pc_ends[1]) {
+								} else if (end_num[0] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 90);
 									pc_play = true;
 									break;
 								}
 							}
 						}
-						else if(ends[key][0]==="d"){
-							if(pc_ends[0]==pc_ends[1]) {
-								if (end_num[1] == pc_ends[0]) {
+						else if(ends[key][0] === "d"){
+							if(pc_ends[0] === pc_ends[1]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 1.5, 0, "d", ["c", "b"], 0, 0);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[1] == pc_ends[0]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 90);
 									pc_play = true;
 									break;
-								} else if (end_num[1] == pc_ends[1]) {
+								} else if (end_num[1] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 270);
 									pc_play = true;
 									break;
@@ -2178,41 +1962,41 @@ function pc_move(){
 							}
 						}
 					}
-					else if(angleZ_board[j]==180){
-						if(ends[key][0]==="c"){
-							if(pc_ends[0]==pc_ends[1]) {
-								if (end_num[1] == pc_ends[0]) {
+					else if(angleZ_board[j] === 180){
+						if(ends[key][0] === "c"){
+							if(pc_ends[0] === pc_ends[1]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 0, 1.5, "c", ["e", "d"], 0, 90);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[1] == pc_ends[0]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 180);
 									pc_play = true;
 									break;
-								} else if (end_num[1] == pc_ends[1]) {
+								} else if (end_num[1] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, 0, 2, "c", "c", 0, 0);
 									pc_play = true;
 									break;
 								}
 							}
 						}
-						else if(ends[key][0]==="b"){
-							if(pc_ends[0]==pc_ends[1]) {
-								if (end_num[0] == pc_ends[0]) {
+						else if(ends[key][0] === "b"){
+							if(pc_ends[0] === pc_ends[1]) {
+								if (end_num[0] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 0, -1.5, "b", ["e", "d"], 0, 90);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[0] == pc_ends[0]) {
+								if (end_num[0] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 0);
 									pc_play = true;
 									break;
-								} else if (end_num[0] == pc_ends[1]) {
+								} else if (end_num[0] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, 0, -2, "b", "b", 0, 180);
 									pc_play = true;
 									break;
@@ -2220,21 +2004,21 @@ function pc_move(){
 							}
 						}
 					}
-					else if(angleZ_board[j]==270){
+					else if(angleZ_board[j] === 270){
 						if(ends[key][0]==="e"){
-							if(pc_ends[0]==pc_ends[1]) {
-								if (end_num[1] == pc_ends[0]) {
+							if(pc_ends[0] === pc_ends[1]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, -1.5, 0, "e", ["c", "b"], 0, 0);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[1] == pc_ends[0]) {
+								if (end_num[1] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 270);
 									pc_play = true;
 									break;
-								} else if (end_num[1] == pc_ends[1]) {
+								} else if (end_num[1] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, -2, 0, "e", "e", 0, 90);
 									pc_play = true;
 									break;
@@ -2242,19 +2026,19 @@ function pc_move(){
 							}
 						}
 						else if(ends[key][0]==="d"){
-							if(pc_ends[0]==pc_ends[1]) {
-								if (end_num[0] == pc_ends[0]) {
+							if(pc_ends[0]===pc_ends[1]) {
+								if (end_num[0] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 1.5, 0, "d", ["c", "b"], 0, 0);
 									pc_play = true;
 									break;
 								}
 							}
 							else {
-								if (end_num[0] == pc_ends[0]) {
+								if (end_num[0] === pc_ends[0]) {
 									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 90);
 									pc_play = true;
 									break;
-								} else if (end_num[0] == pc_ends[1]) {
+								} else if (end_num[0] === pc_ends[1]) {
 									tile_to_board(pc_ends, end_num, 2, 0, "d", "d", 0, 270);
 									pc_play = true;
 									break;
@@ -2277,7 +2061,6 @@ function pc_move(){
 			let index = pcTextures.length;
 			let random_tile = Math.floor(Math.random() * deckTextures.length);
 			pcTextures[index] = deckTextures[random_tile];
-			//playerTiles[index] = deckTiles[random_tile];
 
 			deckTextures.splice(random_tile, 1);
 			deckTiles.splice(random_tile, 1);
@@ -2378,18 +2161,8 @@ function deletefromTz(list){
     }
 }
 
-function deleteTileButton() {
-	let tile_name = playerTextures[tileIndex].image.src.split("imgs/green_")[1].split(".png")[0];
-	//console.log(tile_name);
-	let tile = tileIndex + 1;
-	let elemId = "tile" +  tile;
-	//console.log(elemId);
-	if (document.getElementById(elemId).innerHTML === tile_name) {
-		//console.log("yaaaaaayy");
-		document.getElementById(elemId).disabled = true;
-		//console.log(document.getElementById(elemId).disabled);
-		document.getElementById(elemId).style.display = "none";
-	}
+function points(){
+
 }
 
 function selectPlayerTile() {
@@ -2429,8 +2202,6 @@ function selectPlayerTile() {
 
 		selectedTile = tileIndex;
 	}
-    //console.log("tpx:"+player_tx[tileIndex],", tpy:"+player_ty[tileIndex],", angpz:"+player_angZZ[tileIndex]);
-    //console.log("tbx:"+board_tx[0], ", tby:"+board_ty[tileIndex]);
 }
 
 //----------------------------------------------------------------------------
@@ -2450,7 +2221,7 @@ function initWebGL( canvas ) {
 
 		// DEFAULT: The viewport background color is WHITE
 
-		// NEW - Drawing the triangles defining the model
+		// Drawing the triangles defining the model
 
 		primitiveType = gl.TRIANGLES;
 
@@ -2477,7 +2248,7 @@ function handlePlayerButtons() {
 			document.getElementById(elemId).style.backgroundColor = "#f43941";
 			for(let j = 1;  j < playerTilesLength + 1; j++) {
 				let id = "tile" + j;
-				if(j != i){
+				if(j !== i){
 					document.getElementById(id).style.backgroundColor = "#87877f";
 				}
 			}
@@ -2505,8 +2276,7 @@ function hideOrShowTransSliders(){
 		document.getElementById("ty").style.display = "none";
 		document.getElementById("resetPosition").style.display = "none";
 		resetDeckPos();
-
-	} else{
+	} else {
 		document.getElementById("tx").style.display = "";
 		document.getElementById("ty").style.display = "";
 		document.getElementById("resetPosition").style.display = "";
