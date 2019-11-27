@@ -181,19 +181,6 @@
                     </div>
                     <br/>
                     <div style="position: absolute; top: 140px;">Values:</div>
-                    <!--
-                    <div class="slidecontainer">
-                        left_ortho: <input type="range" min="-1.0" max="0.9" value="-1.0" class="slider" id="myRange_left_ortho"> <span id="demo_left_ortho">  </span>
-                    </div>
-
-                    <div class="slidecontainer">
-                        right_ortho: <input type="range" min="1.0" max="2.0" value="1.0" class="slider" id="myRange_right_ortho"> <span id="demo_right_ortho">  </span>
-                    </div>
-
-                    <div class="slidecontainer">
-                        bottom_ortho: <input type="range" min="-1" max="1" value="1.0" class="slider" id="myRange_bottom_ortho"> <span id="demo_bottom_ortho">  </span>
-                    </div>
-                    -->
                     <div style="position: absolute; top:180px;">
                         Board:
                         <div class="slidecontainer" id="tx">
@@ -203,9 +190,8 @@
                         <div class="slidecontainer" id="ty">
                             ty: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_ty"> <span id="demo_ty">  </span>
                         </div>
-
-                        <div class="slidecontainer" id="tz">
-                            tz: <input type="range" min="-60" max="60" value="0" class="slider" id="myRange_tz"> <span id="demo_tz">  </span>
+                        <div class="slidecontainer">
+                            <button class="button" id="resetPosition">Reset Deck Position</button>
                         </div>
 
                         <div class="slidecontainer" id="near_ortho">
@@ -231,11 +217,6 @@
                         <div class="slidecontainer" id="far_persp" hidden>
                             far_persp: <input type="range" min="-10.0" max="101" value="100" class="slider" id="myRange_far_persp"> <span id="demo_far_persp">  </span>
                         </div>
-                        <!--
-                        <div class="slidecontainer" id="tz" hidden>
-                            tz: <input type="range" min="-50000" max="10000" value="-175" class="slider" id="myRange_tz"> <span id="demo_tz">  </span>
-                        </div>
-                        -->
                         <div class="slidecontainer">
                             <button class="button" id="rotateDeckX">Rotate Deck X</button>
                             <button class="button" id="rotateDeckY">Rotate Deck Y</button>
@@ -247,50 +228,6 @@
                 </div>
 
             </div>
-
-
-            <!--
-            <p>XX rotation:
-
-                <button id="XX-on-off-button">On / Off</button>
-
-                <button id="XX-direction-button">Change Direction</button>
-
-                <button id="XX-slower-button">Slower</button>
-
-                <button id="XX-faster-button">Faster</button>
-
-            </p>
-
-            <p>YY rotation:
-
-                <button id="YY-on-off-button">On / Off</button>
-
-                <button id="YY-direction-button">Change Direction</button>
-
-                <button id="YY-slower-button">Slower</button>
-
-                <button id="YY-faster-button">Faster</button>
-
-            </p>
-
-            <p>ZZ rotation:
-
-                <button id="ZZ-on-off-button">On / Off</button>
-
-                <button id="ZZ-direction-button">Change Direction</button>
-
-                <button id="ZZ-slower-button">Slower</button>
-
-                <button id="ZZ-faster-button">Faster</button>
-
-            </p>
-            <p>
-
-                <button id="reset-button">Reset</button>
-
-            </p>
-            -->
 
         </div>
     </body>

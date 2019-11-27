@@ -68,7 +68,7 @@ var board_tx = [0];
 var board_ty = [0];
 var board_tz = [0];
 var board_tz_ortho = [0];
-var board_tz_persp = [-27];
+var board_tz_persp = [-25];
 
 var change_proj = false;
 
@@ -271,8 +271,9 @@ var globalAngleZZ = 0.0;
 
 var globalTx = 0;
 var globalTy = 0;
-var globalTzPesp = -27;
-var globalTzOrtho = 0;
+var localTx = 0;
+var localTy = 0;
+var tx_slider = false, ty_slider = false;
 
 var rotateDeckX = false;
 var rotateDeckY = false;
@@ -495,6 +496,8 @@ function drawDominoModel(angx, angy, angz,
 	if(projectionType === 0) {
 		if(board){
 			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, tz));
+			//console.log(tx + globalTx);
+			//mvMatrix = mult(mvMatrix, translationMatrix(tx , ty, tz));
 		} else {
 			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
 		}
@@ -502,8 +505,10 @@ function drawDominoModel(angx, angy, angz,
 		if(board){
 			if(rotateDeckX || rotateDeckY || rotateDeckZ) {
 				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, 0));
+				//mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, 0));
 			} else {
 				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty  + globalTy, tz));
+				//mvMatrix = mult(mvMatrix, translationMatrix(tx, ty , tz));
 			}
 		} else {
 			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
@@ -606,50 +611,28 @@ function drawScene() {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 
-	for (let id of [/*"left_ortho", "right_ortho", "bottom_ortho", "tz",  "rotx", "roty", "rotz",*/"tx", "ty", "tz", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]) {
+	for (let id of [/*"left_ortho", "right_ortho", "bottom_ortho", "tz",  "rotx", "roty", "rotz",*/"tx", "ty", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]) {
 		let elemId = "myRange_" + id;
 		let slider = document.getElementById(elemId);
 		elemId = "demo_" + id;
 		let output = document.getElementById(elemId);
-		if (id === "near_ortho" || id === "far_ortho" || id === "near_persp" || id === "aspect_persp" ||  id === "tx") {
+		if (id === "near_ortho" || id === "far_ortho" || id === "near_persp" || id === "aspect_persp") {
 			output.innerHTML = parseFloat(slider.value) / 10;
-		} /*else if(id === "tz") {
-			output.innerHTML = parseFloat(slider.value)/100;
-		} */ else {
+		} else {
 			output.innerHTML = slider.value;
 		}
 		slider.oninput = function () {
-			//output.innerHTML = this.value;
 			switch (id) {
-				/*
-				case "rotx":
-					globalAngleXX = this.value;
-					break;
-				case "roty":
-					globalAngleYY = this.value;
-					break;
-				case "rotz":
-					globalAngleZZ = this.value;
-					break;
-
-				 */
 				case "tx":
-					globalTx =  parseFloat(this.value) / 10;
+					localTx = parseFloat(this.value);
+					globalTx =  parseFloat(this.value) *sx;
+					tx_slider = true;
 					break;
 				case "ty":
-					globalTy =  parseFloat(this.value) / 10;
+					localTy = parseFloat(this.value);
+					globalTy =  parseFloat(this.value) *sy;
+					ty_slider = true;
 					break;
-				case "tz":
-					let globaldiff = Math.abs(globalTzPesp - globalTzOrtho);
-					if(projectionType === 1){
-						globalTzPesp = this.value;
-						globalTzOrtho = this.value + globaldiff;
-					} else {
-						globalTzPesp = this.value - globaldiff;
-						globalTzOrtho = this.value;
-					}
-					break;
-
 				case "left_ortho":
 					left_ortho = this.value;
 					break;
@@ -677,20 +660,16 @@ function drawScene() {
 				case "far_persp":
 					far_persp = this.value;
 					break;
-				/*
-            case "tz":
-                tz = parseFloat(this.value)/100;
-                break;*/
 			}
 		};
 
 	}
 
-	// NEW --- Computing the Projection Matrix
+	// Computing the Projection Matrix
 
 	if (projectionType === 0) {
 
-		// For now, the default orthogonal view volume
+		// the default orthogonal view volume
 
 		pMatrix = ortho(left_ortho, right_ortho, bottom_ortho, top_ortho, near_ortho, far_ortho);
 
@@ -718,17 +697,11 @@ function drawScene() {
 
 		change_proj = false;
 
-		// TO BE DONE !
-
-		// Allow the user to control the size of the view volume
-
 	} else {
 
 		// A standard view volume.
 
 		// Viewer is at (0,0,0)
-
-		// Ensure that the model is "inside" the view volume
 
 		pMatrix = perspective(fovy_persp, aspect_persp, near_persp, far_persp);
 
@@ -764,23 +737,20 @@ function drawScene() {
 
 	gl.uniformMatrix4fv(pUniform, false, new Float32Array(flatten(pMatrix)));
 
-	// NEW --- Instantianting the same model more than once !!
+	// Instantianting the same model more than once !!
 
 	// And with diferent transformation parameters !!
 
-	// Call the drawModel function
-
-	for(let i = 8; i<22; i++) {
-		document.getElementById("tile"+i).hidden = true;
-	}
+	// Call the drawDominoModel function
 
 	// Player pieces
-	let id = 0;
-
+	// Disable and hideall tile buttons
 	for(let i = player_tx.length + 1; i < 22; i++){
 		document.getElementById("tile" + i).disabled = true;
 		document.getElementById("tile" + i).style.display = "none";
 	}
+	// Draw all the player tiles and Enable and Display all the player tile buttons
+	let id = 0;
 	for (let i = 0; i < player_tx.length; i++) {
 		drawDominoModel(player_angX[i], player_angYY[i], player_angZZ[i],
 			sx, sy, sz,
@@ -804,6 +774,22 @@ function drawScene() {
 	}
 
 	// Board pieces
+	/*
+	if(tx_slider){
+		for (let i = 0; i < board_tx.length; i++) {
+			board_tx[i] += globalTx;
+		}
+	}
+	if(ty_slider){
+		for (let i = 0; i < board_ty.length; i++) {
+			board_ty[i] += globalTy;
+		}
+	}
+	 */
+
+	tx_slider = false;
+	ty_slider = false;
+
 	for (let i = 0; i < boardTextures.length; i++) {
 		drawDominoModel(angleX_board[i], angleY_board[i], angleZ_board[i],
 			sx, sy, sz,
@@ -871,11 +857,12 @@ function drawScene() {
 						angZBoardAux = angleZ_board[j] + 180;
 					}
 					if (facesPlayer[0] !== facesPlayer[1]) {
+						//console.log(board_tx[j] + globalTx);
 						if (player_angZZ[tileIndex] === angleZ_board[j] || player_angZZ[tileIndex] === angZBoardAux) {
-							// left of the board piece
+							// left of the board piec
 							if (ends[i].includes("e")) {
-								if (player_tx[tileIndex] - board_tx[j] > -2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.8/*3*/) {
-									if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+								if (player_tx[tileIndex] - (board_tx[j] + localTx)> -2.5 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < -1.8/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.4) {
 										colorGreen();
 										snapTileIndex = j;
 									}
@@ -883,8 +870,8 @@ function drawScene() {
 							}
 							// right of the board piece
 							if (ends[i].includes("d")) {
-								if (player_tx[tileIndex] - board_tx[j] < 2.5 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.8/*3*/) {
-									if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+								if (player_tx[tileIndex] - (board_tx[j] + localTx) < 2.5 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) > 1.8/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.4) {
 										colorGreen();
 										snapTileIndex = j;
 									}
@@ -892,8 +879,8 @@ function drawScene() {
 							}
 							//down of the board piece
 							if (ends[i].includes("b")) {
-								if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-									if (player_ty[tileIndex] - board_ty[j] > -2.5 && player_ty[tileIndex] - board_ty[j] < -1.8) {
+								if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.4/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[j] + localTy) > -2.5 && player_ty[tileIndex] - (board_ty[j] + localTy) < -1.8) {
 										colorGreen();
 										snapTileIndex = j;
 									}
@@ -901,8 +888,8 @@ function drawScene() {
 							}
 							// up of the board piece
 							if (ends[i].includes("c")) {
-								if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-									if (player_ty[tileIndex] - board_ty[j] < 2.5 && player_ty[tileIndex] - board_ty[j] > 1.8) {
+								if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.4/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[j] + localTy) < 2.5 && player_ty[tileIndex] - (board_ty[j] + localTy) > 1.8) {
 										colorGreen();
 										snapTileIndex = j;
 									}
@@ -915,8 +902,8 @@ function drawScene() {
 					if (player_angZZ[tileIndex] !== angleZ_board[j] && player_angZZ[tileIndex] !== angZBoardAux) {
 						// left of the board piece
 						if (ends[i].includes("e")) {
-							if (player_tx[tileIndex] - board_tx[j] > -1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] < -1.4 /*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+							if (player_tx[tileIndex] - (board_tx[j] + localTx) > -1.9 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < -1.4 /*3*/) {
+								if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.4) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -924,8 +911,8 @@ function drawScene() {
 						}
 						// right of the board piece
 						if (ends[i].includes("d")) {
-							if (player_tx[tileIndex] - board_tx[j] < 1.9 /*-3*/ && player_tx[tileIndex] - board_tx[j] > 1.4/*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] > -0.4 && player_ty[tileIndex] - board_ty[j] < 0.4) {
+							if (player_tx[tileIndex] - (board_tx[j] + localTx) < 1.9 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) > 1.4/*3*/) {
+								if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.4) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -933,8 +920,8 @@ function drawScene() {
 						}
 						// down of the board piece
 						if (ends[i].includes("b")) {
-							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4 /*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] > -1.9 && player_ty[tileIndex] - board_ty[j] < -1.4) {
+							if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.4 /*3*/) {
+								if (player_ty[tileIndex] - (board_ty[j] + localTy)> -1.9 && player_ty[tileIndex] - (board_ty[j] + localTy) < -1.4) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -942,8 +929,8 @@ function drawScene() {
 						}
 						// up of the board piece
 						if (ends[i].includes("c")) {
-							if (player_tx[tileIndex] - board_tx[j] > -0.4 /*-3*/ && player_tx[tileIndex] - board_tx[j] < 0.4/*3*/) {
-								if (player_ty[tileIndex] - board_ty[j] < 1.9 && player_ty[tileIndex] - board_ty[j] > 1.4) {
+							if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.4/*3*/) {
+								if (player_ty[tileIndex] - (board_ty[j] + localTy) < 1.9 && player_ty[tileIndex] - (board_ty[j] + localTy) > 1.4) {
 									colorGreen();
 									snapTileIndex = j;
 								}
@@ -1116,21 +1103,6 @@ function animate() {
 
 			globalAngleZZ += globalRotationZZ_DIR * globalRotationZZ_SPEED * (90 * elapsed) / 1000.0;
 		}
-
-		// Local rotations
-		/*
-		if( rotationXX_ON ) {
-			angleXX += rotationXX_DIR * rotationXX_SPEED * (90 * elapsed) / 1000.0;
-	    }
-
-		if( rotationYY_ON ) {
-			angleYY += rotationYY_DIR * rotationYY_SPEED * (90 * elapsed) / 1000.0;
-	    }
-
-		if( rotationZZ_ON ) {
-			angleZZ += rotationZZ_DIR * rotationZZ_SPEED * (90 * elapsed) / 1000.0;
-	    }
-		 */
 	}
 	
 	lastTime = timeNow;
@@ -1288,9 +1260,10 @@ function handleMouseMove(event) {
 // Timer
 
 function tick() {
+	requestAnimFrame(tick);
 	drawScene();
 	if(!document.getElementById("lose").innerHTML.includes("You")) {
-		requestAnimFrame(tick);
+
 	    handleKeys();
 
 	    handlePlayerButtons();
@@ -1494,6 +1467,10 @@ function setEventListeners( canvas ) {
 
 	*/
 
+	document.getElementById("resetPosition").onclick = function () {
+		resetDeckPos();
+	};
+
 	document.getElementById("rotateDeckX").onclick = function () {
 		rotateDeckX = !rotateDeckX;
 		if(rotateDeckX){
@@ -1577,7 +1554,7 @@ function setEventListeners( canvas ) {
 		facesBoard = tileBoard.replace(".png", "").split("_");
 		//Paralelo
 		if (player_angZZ[tileIndex] === 0 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-(board_ty[snapTileIndex]+localTy)<0) {
 				if (facesPlayer[0] === facesBoard[1]) {
 					tile_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"], 1, 0);
 				}
@@ -1589,7 +1566,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex] === 90 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if (facesPlayer[1] === facesBoard[0]) {
 					tile_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"], 1, 0);
 				}
@@ -1601,7 +1578,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex] === 180 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
 				if (facesPlayer[1] === facesBoard[0]) {
 					tile_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"],1, 0);
 				}
@@ -1613,7 +1590,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex] === 270 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if (facesPlayer[0] === facesBoard[1]) {
 					tile_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"],1, 0);
 				}
@@ -1625,7 +1602,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
 				if (facesPlayer[0] === facesBoard[0]) {
 					tile_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"],1, 0);
 				}
@@ -1637,7 +1614,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if (facesPlayer[1] === facesBoard[1]) {
 					tile_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"],1, 0);
 				}
@@ -1649,7 +1626,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
 				if (facesPlayer[1] === facesBoard[1]) {
 					tile_to_board(facesPlayer, facesBoard, 0, -2, "b", ["b"],1, 0);
 				}
@@ -1661,7 +1638,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if (facesPlayer[0] === facesBoard[0]) {
 					tile_to_board(facesPlayer, facesBoard, -2, 0, "e", ["e"],1, 0);
 				}
@@ -1674,7 +1651,7 @@ function setEventListeners( canvas ) {
 		}
 		//PERPENDICULAR +90
 		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
 						tile_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["b","c"],1, 0);
@@ -1704,7 +1681,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
 						tile_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["d","e"],1, 0);
@@ -1734,7 +1711,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
 						tile_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["c","b"],1, 0);
@@ -1766,7 +1743,7 @@ function setEventListeners( canvas ) {
 
 		//MUDEI AQUI
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
 						tile_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"],1, 0);
@@ -1797,7 +1774,7 @@ function setEventListeners( canvas ) {
 		}
 		//PERPENDICULAR +180
 		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
 						tile_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["b","c"],1, 0);
@@ -1827,7 +1804,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[1] || facesPlayer[1] === facesBoard[1]){
 						tile_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["d","e"],1, 0);
@@ -1857,7 +1834,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]<0) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
 						tile_to_board(facesPlayer, facesBoard, -1.5, 0, "e", ["c","b"],1, 0);
@@ -1887,7 +1864,7 @@ function setEventListeners( canvas ) {
 			}
 		}
 		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]<0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
 				if(facesPlayer[0]===facesPlayer[1]){
 					if (facesPlayer[0] === facesBoard[0] || facesPlayer[1] === facesBoard[0]){
 						tile_to_board(facesPlayer, facesBoard, 0, -1.5, "b", ["e","d"],1, 0);
@@ -2400,22 +2377,28 @@ function handlePlayerButtons() {
 function handleSliders() {
 	document.getElementById("tx").value = globalTx;
 	document.getElementById("ty").value = globalTy;
-	if(projectionType === 1){
-		document.getElementById("tz").value = globalTzPesp;
-	} else {
-		document.getElementById("tz").value = globalTzOrtho;
-	}
+}
+
+function resetDeckPos(){
+	globalTx = 0.0;
+	globalTy = 0.0;
+	localTx = 0.0;
+	localTy = 0.0;
+	document.getElementById("myRange_tx").value = globalTx;
+	document.getElementById("myRange_ty").value = globalTy;
 }
 
 function hideOrShowTransSliders(){
 	if(rotateDeckX || rotateDeckY || rotateDeckZ){
 		document.getElementById("tx").style.display = "none";
 		document.getElementById("ty").style.display = "none";
-		document.getElementById("tz").style.display = "none";
+		document.getElementById("resetPosition").style.display = "none";
+		resetDeckPos();
+
 	} else{
 		document.getElementById("tx").style.display = "";
 		document.getElementById("ty").style.display = "";
-		document.getElementById("tz").style.display = "";
+		document.getElementById("resetPosition").style.display = "";
 	}
 }
 
@@ -2435,6 +2418,8 @@ function runWebGL() {
 	initBuffers();
 
 	initTextures();
+
+	resetDeckPos();
 
 	tick();		// A timer controls the rendering / animation
 
