@@ -956,6 +956,7 @@ function drawScene() {
 			document.getElementById("snapTile").style.display = "none";
 		}
 	}
+
 	if(deckLength===0) {
 		var lose = true;
 		for (let i = 0; i < player_tx.length; i++) {
@@ -1045,19 +1046,20 @@ function drawScene() {
 							}
 						}
 					}
+					if (!lose) {
+						break;
+					}
 				}
 				if (!lose) {
 					break;
 				}
-			}
-			if (!lose) {
-				break;
 			}
 		}
 		if (lose) {
 			document.getElementById("lose").innerHTML = "You lose";
 		}
 	}
+
 
 }
 
@@ -1074,11 +1076,25 @@ function collisionDetection(tx,ty,ang){
 						console.log(i);
 						return true;
 					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 1.1)))) {
+						console.log(i);
+						return true;
+					}
 				} else {
 					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 0.6)) ||
 						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 0.6))) &&
 						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 1.1)) ||
 							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 1.1)))) {
+						console.log(i);
+						return true;
+					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 1.1)))) {
 						console.log(i);
 						return true;
 					}
@@ -1092,11 +1108,25 @@ function collisionDetection(tx,ty,ang){
 						console.log(i);
 						return true;
 					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)))) {
+						console.log(i);
+						return true;
+					}
 				} else {
 					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[i] + 1.1)) ||
 						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 1.1))) &&
 						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 0.6)) ||
 							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 0.6)))) {
+						console.log(i);
+						return true;
+					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)))) {
 						console.log(i);
 						return true;
 					}
@@ -1983,7 +2013,7 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 			if (player_tx.length == 0) {
 				document.getElementById("lose").innerHTML = "You win!!";
 			}
-			pc_move();
+				pc_move();
 		}
 	}
 	// pc
