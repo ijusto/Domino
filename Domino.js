@@ -262,9 +262,9 @@ var rotateDeckX = false;
 var rotateDeckY = false;
 var rotateDeckZ = false;
 
-var playerTotalPoints = 0;
-var pcTotalPoints = 0;
-
+var playerOutcomeString = "";
+var pc_can_play = true;
+var player_can_play = true;
 
 //console.log(tiles.slice(0, tiles.length));
 
@@ -583,7 +583,7 @@ function drawScene() {
 
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
-
+	// handle sliders
 	for (let id of ["tx", "ty", "near_ortho", "far_ortho", "fovy_persp", "aspect_persp", "near_persp", "far_persp"]) {
 		let elemId = "myRange_" + id;
 		let slider = document.getElementById(elemId);
@@ -637,7 +637,6 @@ function drawScene() {
 	}
 
 	// Computing the Projection Matrix
-
 	if (projectionType === 0) {
 
 		// the default orthogonal view volume
@@ -703,7 +702,6 @@ function drawScene() {
 	}
 
 	// Passing the Projection Matrix to apply the current projection
-
 	let pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
 
 	gl.uniformMatrix4fv(pUniform, false, new Float32Array(flatten(pMatrix)));
@@ -715,11 +713,12 @@ function drawScene() {
 	// Call the drawDominoModel function
 
 	// Player pieces
-	// Disable and hideall tile buttons
+	// Disable and hide all tile buttons
 	for(let i = player_tx.length + 1; i < 22; i++){
 		document.getElementById("tile" + i).disabled = true;
 		document.getElementById("tile" + i).style.display = "none";
 	}
+
 	// Draw all the player tiles and Enable and Display all the player tile buttons
 	let id = 0;
 	for (let i = 0; i < player_tx.length; i++) {
@@ -742,7 +741,6 @@ function drawScene() {
 			document.getElementById("tile" + id).style.display = "";
 			document.getElementById("tile" + id).disabled = false;
 		}
-		//TODO: Update player tiles
 	}
 
 	// Board pieces
@@ -758,8 +756,13 @@ function drawScene() {
 	}
 
 	// Computer pieces
+	let pc_tile_ang = 180;
+	// when the game ends, pc tiles became visible
+	if(document.getElementById("lose").innerHTML.includes("You")) {
+		pc_tile_ang = 0;
+	}
 	for(let i = 0; i < pcTextures.length; i++){
-		drawDominoModel( 0, 180/*for testing purposes: 0*/, 0,
+		drawDominoModel( 0, pc_tile_ang, 0,
 			sx, sy, sz,
 			pc_tx[i]*sx, pc_ty[i]*sy, pc_tz[i]*sz,
 			mvMatrix,
@@ -769,11 +772,7 @@ function drawScene() {
 		);
 	}
 
-	j = player_tx.length + 1;
-	for (j; j > player_tx.length && j <= 21; j++) {
-		document.getElementById("tile" + j.toString()).disabled = true;
-	}
-
+	// handle R keypress
 	if (rotateZ && tileIndex !== null) {
 		if (player_angZZ[tileIndex] === 0) {
 			player_angZZ[tileIndex] = 270;
@@ -782,7 +781,7 @@ function drawScene() {
 			player_angZZ[tileIndex] -= 90;
 		}
 		rotateZ = false;
-		console.log(player_angZZ[tileIndex]);
+		//console.log(player_angZZ[tileIndex]);
 	}
 
 	checker = false;
@@ -1004,7 +1003,9 @@ function drawScene() {
 			}
 		}
 		if (lose) {
-			document.getElementById("lose").innerHTML = "You lose";
+			pc_can_play = false;
+			pontuation();
+			document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 		}
 	}
 
@@ -1015,20 +1016,20 @@ function collisionDetection(tx,ty,ang){
 	check = false;
 	for(let i = 0;i<board_tx.length;i++){
 		if(i!==snapTileIndex) {
-			if (angleZ_board[i] == 0 || angleZ_board[i] == 180) {
-				if (ang == 0 || ang == 180) {
+			if (angleZ_board[i] === 0 || angleZ_board[i] === 180) {
+				if (ang === 0 || ang === 180) {
 					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[i] + 0.6)) ||
 						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 0.6))) &&
 						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 1.1)) ||
 							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 1.1)))) {
-						console.log(i);
+						//console.log(i);
 						return true;
 					}
 					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 0.6)) ||
 						((board_tx[snapTileIndex] + tx) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 0.6))) &&
 						(((board_ty[snapTileIndex] + ty) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 1.1)) ||
 							((board_ty[snapTileIndex] + ty) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 1.1)))) {
-						console.log(i);
+						//console.log(i);
 						return true;
 					}
 				} else {
@@ -1036,7 +1037,7 @@ function collisionDetection(tx,ty,ang){
 						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 0.6))) &&
 						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 1.1)) ||
 							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 1.1) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 1.1)))) {
-						console.log(i);
+						//console.log(i);
 						return true;
 					}
 					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 0.6)) ||
@@ -1053,14 +1054,14 @@ function collisionDetection(tx,ty,ang){
 						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[i] + 1.1))) &&
 						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[i] + 0.6)) ||
 							((board_ty[snapTileIndex] + ty + 1) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[i] + 0.6)))) {
-						console.log(i);
+						//console.log(i);
 						return true;
 					}
 					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1)) ||
 						((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1))) &&
 						(((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)) ||
 							((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)))) {
-						console.log(i);
+						//console.log(i);
 						return true;
 					}
 				} else {
@@ -1068,14 +1069,14 @@ function collisionDetection(tx,ty,ang){
 						((board_tx[snapTileIndex] + tx + 1) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[i] + 1.1))) &&
 						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[i] + 0.6)) ||
 							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[i] + 0.6)))) {
-						console.log(i);
+						//console.log(i);
 						return true;
 					}
 					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1)) ||
 						((board_tx[snapTileIndex] + tx) > (board_tx[i] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[i] + 1.1))) &&
 						(((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)) ||
 							((board_ty[snapTileIndex] + ty) > (board_ty[i] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[i] + 0.6)))) {
-						console.log(i);
+						//console.log(i);
 						return true;
 					}
 				}
@@ -1353,6 +1354,7 @@ function setEventListeners( canvas ) {
 		}
 		hideOrShowTransSliders();
 	};
+
 	document.getElementById("rotateDeckY").onclick = function () {
 		rotateDeckY = !rotateDeckY;
 		if(rotateDeckY){
@@ -1362,6 +1364,7 @@ function setEventListeners( canvas ) {
 		}
 		hideOrShowTransSliders();
 	};
+
 	document.getElementById("rotateDeckZ").onclick = function () {
 		rotateDeckZ = !rotateDeckZ;
 		if(rotateDeckZ){
@@ -1400,7 +1403,7 @@ function setEventListeners( canvas ) {
 
 				player_tz_ortho[player_tz_ortho.length] = 0;
 				player_tz_persp[player_tz_persp.length] = -25;
-				console.log("otho: " + player_tz_ortho.length + "persp: " + player_tz_persp.length);
+				//console.log("otho: " + player_tz_ortho.length + "persp: " + player_tz_persp.length);
 
 				player_angX[player_angX.length] = 0;
 				player_angYY[player_angYY.length] = 0;
@@ -1413,7 +1416,6 @@ function setEventListeners( canvas ) {
 			pc_move();
 		}
 	};
-
 
 	document.getElementById("snapTile").onclick = function () {
 		tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
@@ -1771,8 +1773,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 		if (!collisionDetection(tx, ty, player_angZZ[tileIndex])) {
 			dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
 			dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-			playerTotalPoints += pontuation(type, rem, add, pc_ang, dicBoardKey);
-			document.getElementById("player_points").innerHTML = String(playerTotalPoints);
+			// console.log("player: "+pontuation(type, rem, add, pc_ang, dicBoardKey));
+			// playerTotalPoints += pontuation(type, rem, add, pc_ang, dicBoardKey);
+			// document.getElementById("player_points").innerHTML = String(playerTotalPoints);
 
 			addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
 			board_tx[board_tx.length] = board_tx[snapTileIndex] + tx;
@@ -1799,7 +1802,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 				document.getElementById(id).style.backgroundColor = "#87877f";
 			}
 			if (player_tx.length === 0) {
-				document.getElementById("lose").innerHTML = "You win!!";
+				player_can_play = false;
+				pontuation();
+				document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 			}
 			pc_move();
 		}
@@ -1811,8 +1816,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 		if (!collisionDetection(tx, ty, pc_ang)) {
 			dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
 			dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-			pcTotalPoints += pontuation(type, rem, add, pc_ang, dicBoardKey);
-			document.getElementById("pc_points").innerHTML = String(pcTotalPoints);
+			// console.log("pc: "+pontuation(type, rem, add, pc_ang, dicBoardKey));
+			// pcTotalPoints += pontuation(type, rem, add, pc_ang, dicBoardKey);
+			// document.getElementById("pc_points").innerHTML = String(pcTotalPoints);
 
 			addTextureToList(boardTextures, boardTextures.length, ["grey_" + pcTextures[pcIndex].image.src.split("imgs/")[1]]);
 			board_tx[board_tx.length] = board_tx[snapTileIndex] + tx;
@@ -1835,7 +1841,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 			board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
 			board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
 			if (pc_tx.length == 0) {
-				document.getElementById("lose").innerHTML = "You lose";
+				pc_can_play = false;
+				pontuation();
+				document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 			}
 		} else {
 			if (deckLength !== 0) {
@@ -1866,7 +1874,9 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 					document.getElementById("getTile").style.display = "none";
 				}
 			} else {
-				document.getElementById("lose").innerHTML = "You Win!!";
+				pc_can_play = false;
+				pontuation();
+				document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 			}
 		}
 	}
@@ -2094,7 +2104,8 @@ function pc_move(){
 			}
 		}
 		else{
-			document.getElementById("lose").innerHTML = "You Win!!";
+			pontuation();
+			document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 		}
 	}
 }
@@ -2121,6 +2132,7 @@ function addToTz(list, index, value){
         lst_ortho[index] = value;
 	}
 }
+
 function changeTileToBoard(type) {
     if (type === 1){
         angleX_board[angleX_board.length] = player_angX[tileIndex];
@@ -2147,6 +2159,7 @@ function changeTileToBoard(type) {
         addToTz(board_tz, board_tz.length, board_tz[0]);
     }
 }
+
 function deletefromTz(list){
     let lst_ortho = [], lst_persp = [];
     switch (list) {
@@ -2170,11 +2183,43 @@ function deletefromTz(list){
     }
 }
 
+function pontuation(){
+	let pcPoints = points(playerTextures);
+	let playerPoints = points(pcTextures);
+	document.getElementById("player_points").innerHTML = String(playerPoints);
+	document.getElementById("pc_points").innerHTML = String(pcPoints);
+	if(playerPoints === pcPoints){
+		playerOutcomeString = "draw";
+	} else if(playerPoints > pcPoints){
+		playerOutcomeString = "win!!";
+	} else {
+		playerOutcomeString = "lose";
+	}
+}
 
-function pontuation(type, rem, add, pc_ang, dicBoardKey){
+function points(list) {
+	let points = 0;
+	for(let tile of list){
+		let tile_name =tile.image.src.split(
+			"imgs/")[1].split(
+			".")[0].replace(
+			"green_", "").replace(
+			"red_", "").replace(
+			"blue_", "").replace(
+			"grey_", "");
+		points += parseInt(tile_name.split("_")[0]);
+		points += parseInt(tile_name.split("_")[1]);
+	}
+	return points;
+}
+
+// add points to each player after a play (every dot on every end of the board tiles is consider)
+function other_method_pontuation(type, rem, add, pc_ang, dicBoardKey){
 	// player
 	let points = 0;
 	if(type === 1) {
+
+		// points of new tile
 		let player_tile_name = playerTextures[tileIndex].image.src.split(
 			"imgs/")[1].split(
 			".")[0].replace(
@@ -2209,12 +2254,13 @@ function pontuation(type, rem, add, pc_ang, dicBoardKey){
 				}
 			}
 		}
-
+		let num_of_ends = 0;
+		// points of other tiles
 		for (let end_tile_name in ends) {
 			// points to consider
 			for (let k = 0; k < ends[end_tile_name].length; k++) {
 				for (let board_ind = 0; board_ind < boardTextures.length; board_ind++) {
-					let board_tile_name = boardTextures[board_ind].image.src.split(
+					let board_tile_name = boardTextures[num_of_ends].image.src.split(
 						"imgs/")[1].split(
 						".")[0].replace(
 						"green_", "").replace(
@@ -2278,6 +2324,7 @@ function pontuation(type, rem, add, pc_ang, dicBoardKey){
 					}
 				}
 			}
+			num_of_ends += 1;
 		}
 	}
 	// pc
@@ -2393,9 +2440,13 @@ function pontuation(type, rem, add, pc_ang, dicBoardKey){
 }
 
 function selectPlayerTile() {
+	// only change when the selected tile is different from the previous selected tile
 	if(selectedTile !== tileIndex) {
 		let tile = null;
+
+		// Tile Selected now
 		if (!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("red_")) {
+			// if the tile is in the first position
 			if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("blue_")){
 				tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
 				player_angX[tileIndex] = angleX_board[0];
@@ -2405,28 +2456,36 @@ function selectPlayerTile() {
 				player_tx[tileIndex] = 0;
 				player_tz[tileIndex] = board_tz[0];
 				addToTz(player_tz, tileIndex, board_tz[0]);
-			} else if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("green_")){
+			}
+			// if the tile isn't on a "snapable" position
+			else if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("green_")){
 				tile = playerTextures[tileIndex].image.src.split("imgs/blue_")[1];
-			} else {
+			}
+			// if the tile is on a "snapable" position
+			else {
 				tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
 			}
+			// change the texture to red
 			bindImgToTexture(playerTextures, tileIndex, null);
-			//console.log("imgs/red_" + tile);
 			playerTextures[tileIndex].image.src = "imgs/red_" + tile;
 		}
 
-		if ( selectedTile !== null && playerTextures[selectedTile].image.src.split("imgs/")[1].includes("red_")) {
-			tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("red_")[1];
-			bindImgToTexture(playerTextures, selectedTile, null);
-			//console.log("imgs/red_" + tile);
-			playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
-		} else if ( selectedTile !== null && playerTextures[selectedTile].image.src.split("imgs/")[1].includes("green_")) {
-			tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("green_")[1];
-			bindImgToTexture(playerTextures, selectedTile, null);
-			//console.log("imgs/red_" + tile);
-			playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
+		// Tile previously selected
+		if (selectedTile !== null){
+			if(playerTextures[selectedTile].image.src.split("imgs/")[1].includes("red_")){
+				// change the texture to blue
+				tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("red_")[1];
+				bindImgToTexture(playerTextures, selectedTile, null);
+				playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
+			} else if (playerTextures[selectedTile].image.src.split("imgs/")[1].includes("green_")){
+				// change the texture to blue
+				tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("green_")[1];
+				bindImgToTexture(playerTextures, selectedTile, null);
+				playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
+			}
 		}
 
+		// update selected tile
 		selectedTile = tileIndex;
 	}
 }
