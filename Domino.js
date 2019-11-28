@@ -1261,7 +1261,6 @@ function tick() {
 	drawScene();
 	if(!document.getElementById("lose").innerHTML.includes("You")) {
 	    handleKeys();
-
 	    handlePlayerButtons();
 	    handleSliders();
         animate();
