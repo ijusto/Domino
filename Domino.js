@@ -904,7 +904,7 @@ function drawScene() {
 		}
 	}
 
-	if(deckLength===0) {
+	if(deckLength === 0) {
 		var lose = true;
 		for (let i = 0; i < player_tx.length; i++) {
 			let player_ends = playerTextures[i].image.src.split(
@@ -916,7 +916,6 @@ function drawScene() {
 			for (let key in ends) {
 				for (let j = 0; j < boardTextures.length; j++) {
 					if (boardTextures[j].image.src.includes(key)) {
-						snapTileIndex = j;
 						let end_num = key.split("_");
 						if (angleZ_board[j] === 0) {
 							if (ends[key][0].includes("c")) {
@@ -993,13 +992,13 @@ function drawScene() {
 							}
 						}
 					}
-					if (!lose) {
-						break;
-					}
 				}
-				if (!lose) {
+				if(!lose){
 					break;
 				}
+			}
+			if(!lose){
+				break;
 			}
 		}
 		if (lose) {
@@ -1008,7 +1007,6 @@ function drawScene() {
 			document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 		}
 	}
-
 
 }
 
@@ -1769,34 +1767,7 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 	// player
 	if (type === 1) {
 		if (!collisionDetection(tx, ty, player_angZZ[tileIndex])) {
-			/*
-			dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-			dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-
-			addTextureToList(boardTextures, boardTextures.length, [playerTextures[tileIndex].image.src.split("imgs/green_")[1]]);
-			board_tx[board_tx.length] = board_tx[snapTileIndex] + tx;
-			board_ty[board_ty.length] = board_ty[snapTileIndex] + ty;
-			board_tz[board_tz.length] = board_tz[snapTileIndex];
-			angleZ_board[angleZ_board.length] = player_angZZ[tileIndex];
-			*/
 			changeTileToBoard(1, facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang);
-
-			/*
-			if (ends[dicBoardKey].length === 1) {
-				delete ends[dicBoardKey];
-			} else {
-				for (let k = 0; k < ends[dicBoardKey].length; k++) {
-					if (ends[dicBoardKey][k] === rem) {
-						ends[dicBoardKey].splice(k, 1);
-					}
-				}
-			}
-			ends[dicPlayerKey] = add;
-			board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
-			board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
-			*/
-
-
 			for (let j = 1; j < playerTextures.length + 1; j++) {
 				let id = "tile" + j;
 				document.getElementById(id).style.backgroundColor = "#87877f";
@@ -1808,47 +1779,18 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 			}
 			pc_move();
 		}
-
-
 	}
 	// pc
 	else if (type === 0) {
 		if (!collisionDetection(tx, ty, pc_ang)) {
-			/*
-			dicBoardKey = facesBoard[0] + "_" + facesBoard[1];
-			dicPlayerKey = facesPlayer[0] + "_" + facesPlayer[1];
-
-			addTextureToList(boardTextures, boardTextures.length, ["grey_" + pcTextures[pcIndex].image.src.split("imgs/")[1]]);
-			board_tx[board_tx.length] = board_tx[snapTileIndex] + tx;
-			board_ty[board_ty.length] = board_ty[snapTileIndex] + ty;
-			board_tz[board_tz.length] = board_tz[snapTileIndex];
-			angleZ_board[angleZ_board.length] = pc_ang;
-			*/
 			changeTileToBoard(0, facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang);
-
-			/*
-			if (ends[dicBoardKey].length === 1) {
-				delete ends[dicBoardKey];
-			} else {
-				for (let k = 0; k < ends[dicBoardKey].length; k++) {
-					if (ends[dicBoardKey][k] === rem) {
-						ends[dicBoardKey].splice(k, 1);
-					}
-				}
-			}
-			ends[dicPlayerKey] = add;
-			board_tz_ortho[board_tz_ortho.length] = board_tz_ortho[0];
-			board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
-			*/
-
-
-
 			if (pc_tx.length === 0) {
 				pc_can_play = false;
 				pontuation();
 				document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 			}
 		} else {
+			// get tile pc
 			if (deckLength !== 0) {
 				let index = pcTextures.length;
 				let random_tile = Math.floor(Math.random() * deckTextures.length);
