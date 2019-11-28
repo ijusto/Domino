@@ -158,12 +158,6 @@
                         <button class="button" id="tile20" style="display: none;">Tile 20</button>
                         <button class="button" id="tile21" style="display: none;">Tile 21</button>
                     </p>
-                    <p style="text-align: left; font-size: 9px">
-                        <img src="imgs/zoom-in-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom in: "/>&#x20;&#x20;<img src="imgs/Page_Up.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Up key "/>
-                        &#x20;
-                        <img src="imgs/zoom-out-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom out: "/>&#x20;&#x20;<img src="imgs/Page_Down.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Down key "/>
-                        (<- Only on orthogonal projection)
-                    </p>
                     <p style="text-align: left; font-size: 20px">&#8631;&#x20;&#x20;&#x20;&#x20;- <img src="imgs/r-butoon-md.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="R"/></p>
                     <p style="text-align: left">Move: <img src="imgs/arrows.png" style="float: inside;height: 50px; alignment-baseline: auto" alt="&#8592; &#8593; &#8595; &#8594; : arrow keys"/></p>
                     <br/>
@@ -195,26 +189,32 @@
                     <div style="position: absolute; top:200px;">
                         Board:
                         <div class="slidecontainer" id="tx">
-                            tx: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_tx"> <span id="demo_tx">  </span>
+                            Move board on x: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_tx"> <span id="demo_tx">  </span>
                         </div>
 
                         <div class="slidecontainer" id="ty">
-                            ty: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_ty"> <span id="demo_ty">  </span>
+                            Move board on y: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_ty"> <span id="demo_ty">  </span>
                         </div>
                         <div class="slidecontainer">
                             <button class="button" id="resetPosition">Reset Deck Position</button>
                         </div>
-
-                        <div class="slidecontainer" id="near_ortho">
+                        <br/>
+                        <div class="slidecontainer" id="zoom_ortho">
+                            <img src="imgs/zoom-in-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom in: "/>&#x20;&#x20;<img src="imgs/Page_Up.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Up key "/>
+                            &#x20;
+                            <img src="imgs/zoom-out-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom out: "/>&#x20;&#x20;<img src="imgs/Page_Down.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Down key "/>
+                        </div>
+                        <br/>
+                        <div class="slidecontainer" id="near_ortho" hidden>
                             near_ortho: <input type="range" min="-10" max="5" value="-10" class="slider" id="myRange_near_ortho"> <span id="demo_near_ortho">  </span>
                         </div>
 
-                        <div class="slidecontainer" id="far_ortho">
+                        <div class="slidecontainer" id="far_ortho" hidden>
                             far_ortho: <input type="range" min="-10" max="20" value="10" class="slider" id="myRange_far_ortho"> <span id="demo_far_ortho">  </span>
                         </div>
 
                         <div class="slidecontainer" id="fovy_persp" hidden>
-                            fovy_persp: <input type="range" min="0" max="300" value="173" class="slider" id="myRange_fovy_persp"> <span id="demo_fovy_persp">  </span>
+                            Zoom in/out (field of view):<br/> <input type="range" min="16" max="135" value="45" class="slider" id="myRange_fovy_persp"> <span id="demo_fovy_persp">  </span>
                         </div>
 
                         <div class="slidecontainer" id="aspect_persp" hidden>

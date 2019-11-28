@@ -1314,8 +1314,9 @@ function setEventListeners( canvas ) {
 		switch (p) {
 			case 0 :
 				projectionType = 0;
-				document.getElementById("near_ortho").hidden = false;
-				document.getElementById("far_ortho").hidden = false;
+				document.getElementById("zoom_ortho").hidden = false;
+				document.getElementById("near_ortho").hidden = true;
+				document.getElementById("far_ortho").hidden = true;
 				document.getElementById("fovy_persp").hidden = true;
 				document.getElementById("aspect_persp").hidden = true;
 				document.getElementById("near_persp").hidden = true;
@@ -1323,12 +1324,13 @@ function setEventListeners( canvas ) {
 				break;
 			case 1 :
 				projectionType = 1;
+				document.getElementById("zoom_ortho").hidden = true;
 				document.getElementById("near_ortho").hidden = true;
 				document.getElementById("far_ortho").hidden = true;
 				document.getElementById("fovy_persp").hidden = false;
-				document.getElementById("aspect_persp").hidden = false;
-				document.getElementById("near_persp").hidden = false;
-				document.getElementById("far_persp").hidden = false;
+				document.getElementById("aspect_persp").hidden = true;
+				document.getElementById("near_persp").hidden = true;
+				document.getElementById("far_persp").hidden = true;
 				break;
 		}
 	});
@@ -2032,6 +2034,8 @@ function pc_move(){
 	}
 	if(!pc_can_play && !player_can_play){
 		pontuation();
+		document.getElementById("getTile").disabled = true;
+		document.getElementById("getTile").style.display = "none";
 		document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
 	}
 }
