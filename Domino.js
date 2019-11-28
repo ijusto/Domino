@@ -258,9 +258,9 @@ var globalTy = 0;
 var localTx = 0;
 var localTy = 0;
 
-var rotateDeckX = false;
-var rotateDeckY = false;
-var rotateDeckZ = false;
+var rotateBoardX = false;
+var rotateBoardY = false;
+var rotateBoardZ = false;
 
 var playerOutcomeString = "";
 var pc_can_play = true;
@@ -439,12 +439,12 @@ function drawDominoModel(angx, angy, angz,
 	// GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
 	if (board){
 
-		if(rotateDeckX || rotateDeckY || rotateDeckZ) {
+		if(rotateBoardX || rotateBoardY || rotateBoardZ) {
 			if(projectionType === 1) {
 				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
 			}
 		}
-		if(rotateDeckZ) {
+		if(rotateBoardZ) {
 			if(projectionType === 1) {
 				mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ));
 			} else {
@@ -452,7 +452,7 @@ function drawDominoModel(angx, angy, angz,
 				mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ));
 			}
 		}
-		if(rotateDeckY) {
+		if(rotateBoardY) {
 			if(projectionType === 1) {
 				mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY));
 			} else {
@@ -460,7 +460,7 @@ function drawDominoModel(angx, angy, angz,
 				mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY));
 			}
 		}
-		if(rotateDeckX) {
+		if(rotateBoardX) {
 			if(projectionType === 1) {
 				mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX));
 			} else {
@@ -478,7 +478,7 @@ function drawDominoModel(angx, angy, angz,
 		}
 	} else {
 		if(board){
-			if(rotateDeckX || rotateDeckY || rotateDeckZ) {
+			if(rotateBoardX || rotateBoardY || rotateBoardZ) {
 				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, 0));
 			} else {
 				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty  + globalTy, tz));
@@ -565,7 +565,7 @@ function drawTextures(texture, textureBuffer, vertexBuffer) {
 
 	// The vertex indices
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertexBuffer);
-	// Drawing the triangles --- NEW --- DRAWING ELEMENTS
+	// Drawing the triangles DRAWING ELEMENTS
 	gl.drawElements(gl.TRIANGLES, vertexBuffer.itemSize, gl.UNSIGNED_SHORT, 0);
 }
 
@@ -1338,35 +1338,35 @@ function setEventListeners( canvas ) {
 
 	// Button events
 	document.getElementById("resetPosition").onclick = function () {
-		resetDeckPos();
+		resetBoardPos();
 	};
 
-	document.getElementById("rotateDeckX").onclick = function () {
-		rotateDeckX = !rotateDeckX;
-		if(rotateDeckX){
-			document.getElementById("rotateDeckX").style.backgroundColor = "#317bf4";
+	document.getElementById("rotateBoardX").onclick = function () {
+		rotateBoardX = !rotateBoardX;
+		if(rotateBoardX){
+			document.getElementById("rotateBoardX").style.backgroundColor = "#317bf4";
 		} else {
-			document.getElementById("rotateDeckX").style.backgroundColor = "#87877f";
+			document.getElementById("rotateBoardX").style.backgroundColor = "#87877f";
 		}
 		hideOrShowTransSliders();
 	};
 
-	document.getElementById("rotateDeckY").onclick = function () {
-		rotateDeckY = !rotateDeckY;
-		if(rotateDeckY){
-			document.getElementById("rotateDeckY").style.backgroundColor = "#317bf4";
+	document.getElementById("rotateBoardY").onclick = function () {
+		rotateBoardY = !rotateBoardY;
+		if(rotateBoardY){
+			document.getElementById("rotateBoardY").style.backgroundColor = "#317bf4";
 		} else {
-			document.getElementById("rotateDeckY").style.backgroundColor = "#87877f";
+			document.getElementById("rotateBoardY").style.backgroundColor = "#87877f";
 		}
 		hideOrShowTransSliders();
 	};
 
-	document.getElementById("rotateDeckZ").onclick = function () {
-		rotateDeckZ = !rotateDeckZ;
-		if(rotateDeckZ){
-			document.getElementById("rotateDeckZ").style.backgroundColor = "#317bf4";
+	document.getElementById("rotateBoardZ").onclick = function () {
+		rotateBoardZ = !rotateBoardZ;
+		if(rotateBoardZ){
+			document.getElementById("rotateBoardZ").style.backgroundColor = "#317bf4";
 		} else {
-			document.getElementById("rotateDeckZ").style.backgroundColor = "#87877f";
+			document.getElementById("rotateBoardZ").style.backgroundColor = "#87877f";
 		}
 		hideOrShowTransSliders();
 	};
@@ -2156,14 +2156,18 @@ function deletefromTz(list){
 function pontuation(){
 	let pcPoints = points(playerTextures);
 	let playerPoints = points(pcTextures);
-	document.getElementById("player_points").innerHTML = String(playerPoints);
-	document.getElementById("pc_points").innerHTML = String(pcPoints);
 	if(playerPoints === pcPoints){
 		playerOutcomeString = "draw";
+		document.getElementById("player_points").innerHTML = "Player: " + String(playerPoints);
+		document.getElementById("pc_points").innerHTML = "Pc: " + String(pcPoints);
 	} else if(playerPoints > pcPoints){
 		playerOutcomeString = "win!!";
+		document.getElementById("player_points").innerHTML = "Player: " + String(playerPoints);
+		document.getElementById("pc_points").innerHTML = "Pc: " + String(pcPoints);
 	} else {
 		playerOutcomeString = "lose";
+		document.getElementById("player_points").innerHTML = "Player: " + String(playerPoints);
+		document.getElementById("pc_points").innerHTML = "Pc: " + String(pcPoints);
 	}
 }
 
@@ -2519,7 +2523,7 @@ function handleSliders() {
 	document.getElementById("ty").value = globalTy;
 }
 
-function resetDeckPos(){
+function resetBoardPos(){
 	globalTx = 0.0;
 	globalTy = 0.0;
 	localTx = 0.0;
@@ -2529,11 +2533,11 @@ function resetDeckPos(){
 }
 
 function hideOrShowTransSliders(){
-	if(rotateDeckX || rotateDeckY || rotateDeckZ){
+	if(rotateBoardX || rotateBoardY || rotateBoardZ){
 		document.getElementById("tx").style.display = "none";
 		document.getElementById("ty").style.display = "none";
 		document.getElementById("resetPosition").style.display = "none";
-		resetDeckPos();
+		resetBoardPos();
 	} else {
 		document.getElementById("tx").style.display = "";
 		document.getElementById("ty").style.display = "";
@@ -2558,7 +2562,7 @@ function runWebGL() {
 
 	initTextures();
 
-	resetDeckPos();
+	resetBoardPos();
 
 	tick();		// A timer controls the rendering / animation
 

@@ -171,12 +171,17 @@
                 </div>
                 <div class="column middle" style="padding: 0">
                     <canvas id="my-canvas" style="border:1px solid #000000;" width="630" height="630"></canvas>
-                    <div style="position: absolute; top: 280px; left:520px;  font-size: 60pt;"><span id="lose"></span></div>
+                    <div style="position: absolute; top: 180px; left:520px;  font-size: 60pt;">
+                        <span id="lose"></span>
+                    </div>
+                    <div style="position: absolute; top: 300px; left:520px;  font-size: 30pt;">
+                        <span id="pc_points"></span>
+                        <br/>
+                        <span id="player_points"></span>
+                    </div>
                 </div>
                 <div class="column right">
                     <div style="position: absolute; top: 20px;">Number of tiles in deck: <span id="deck_tile_number"></span></div>
-                    <div style="position: absolute; top: 40px;">Pc points: <span id="pc_points">0</span></div>
-                    <div style="position: absolute; top: 60px;">Player points: <span id="player_points">0</span></div>
                     <br/>
                     <div style="position: absolute; top: 90px;"><b>Projection type:</b></div>
                     <div style="position: absolute; top: 115px;">
@@ -196,7 +201,7 @@
                             Move board on y: <input type="range" min="-10" max="10" value="0" class="slider" id="myRange_ty"> <span id="demo_ty">  </span>
                         </div>
                         <div class="slidecontainer">
-                            <button class="button" id="resetPosition">Reset Deck Position</button>
+                            <button class="button" id="resetPosition">Reset Board Position</button>
                         </div>
                         <br/>
                         <div class="slidecontainer" id="zoom_ortho">
@@ -229,9 +234,9 @@
                             far_persp: <input type="range" min="-10.0" max="101" value="100" class="slider" id="myRange_far_persp"> <span id="demo_far_persp">  </span>
                         </div>
                         <div class="slidecontainer">
-                            <button class="button" id="rotateDeckX">Rotate Deck X</button>
-                            <button class="button" id="rotateDeckY">Rotate Deck Y</button>
-                            <button class="button" id="rotateDeckZ">Rotate Deck Z</button>
+                            <button class="button" id="rotateBoardX">Rotate Board X</button>
+                            <button class="button" id="rotateBoardY">Rotate Board Y</button>
+                            <button class="button" id="rotateBoardZ">Rotate Board Z</button>
                         </div>
                     </div>
 
