@@ -158,10 +158,20 @@
                         <button class="button" id="tile20" style="display: none;">Tile 20</button>
                         <button class="button" id="tile21" style="display: none;">Tile 21</button>
                     </p>
-                    <p style="text-align: left; font-size: 20px"><img src="imgs/zoom-in-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom in: "/>&#x20; - &#x20;<img src="imgs/Page_Up.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Up key "/></p>
-                    <p style="text-align: left; font-size: 20px"><img src="imgs/zoom-out-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom out: "/>&#x20; - &#x20;<img src="imgs/Page_Down.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Down key "/></p>
+                    <p style="text-align: left; font-size: 9px">
+                        <img src="imgs/zoom-in-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom in: "/>&#x20;&#x20;<img src="imgs/Page_Up.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Up key "/>
+                        &#x20;
+                        <img src="imgs/zoom-out-64x64.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="zoom out: "/>&#x20;&#x20;<img src="imgs/Page_Down.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="Page Down key "/>
+                        (<- Only on orthogonal projection)
+                    </p>
                     <p style="text-align: left; font-size: 20px">&#8631;&#x20;&#x20;&#x20;&#x20;- <img src="imgs/r-butoon-md.png" style="float: inside;height: 20px; alignment-baseline: auto" alt="R"/></p>
                     <p style="text-align: left">Move: <img src="imgs/arrows.png" style="float: inside;height: 50px; alignment-baseline: auto" alt="&#8592; &#8593; &#8595; &#8594; : arrow keys"/></p>
+                    <br/>
+                    <p style="text-align: left">
+                        <img src="imgs/snap_simple_tile.png" style="float: inside;height: 150px; alignment-baseline: auto" alt=" "/>
+                        &#x20;&#x20;&#x20;&#x20;
+                        <img src="imgs/snap_double_tile.png" style="float: inside;height: 150px; alignment-baseline: auto" alt=" "/>
+                    </p>
                     <!-- TODO -->
                     <!--<p style="text-align: left">Press any mouse button and move the cursor to rotate the board models.</p>-->
                 </div>
@@ -182,7 +192,6 @@
                         </select>
                     </div>
                     <br/>
-                    <div style="position: absolute; top: 160px;">Values:</div>
                     <div style="position: absolute; top:200px;">
                         Board:
                         <div class="slidecontainer" id="tx">
