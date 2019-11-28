@@ -1,15 +1,10 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-//  WebGL_example_28.js 
+//  Adapted from http://sweet.ua.pt/jmadeira/WebGL/WebGL_Aula_09.zip, J. Madeira - November 2015
 //
-//  Applying a texture
-//
-//  Adapted from learningwebgl.com
-//
-//  J. Madeira - November 2015
+//	Inês Justo, Rafael Maio - November 2019
 //
 //////////////////////////////////////////////////////////////////////////////
-
 
 
 //----------------------------------------------------------------------------
