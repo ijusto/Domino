@@ -22,22 +22,26 @@ var gl = null; // WebGL context
 var shaderProgram = null; 
 
 // Buffers
-
 var cubeVertexPositionBuffer = null;
-
-var cubeVertexIndexBufferFrontFace = null;
-var cubeVertexIndexBufferNotFrontFace = null;
-
+var cubeVertexIndexBufferFrontFace = null, cubeVertexIndexBufferNotFrontFace = null;
 var cubeVertexTextureCoordBufferFrontFace = null, cubeVertexTextureCoordBufferNotFrontFace = null;
 
 // The global transformation parameters
 
-// The translation vector
-var player_tx = [-9.4];
-var player_bottom_pos_x = [-9.4];
-var player_bottom_pos_y = [-7];
 var dist_between_tiles = 1.1; // 1.7
 var totalDist = -9.4;
+
+// The translation vector
+var player_tx = [-9.4];
+for(let i = 1; i < 7; i++) {
+	totalDist = totalDist + dist_between_tiles;
+	player_tx[i] = player_tx[i-1] + dist_between_tiles;
+}
+var player_ty = [-7, -7, -7, -7, -7, -7, -7];
+var player_tz = [0, 0, 0, 0, 0, 0, 0];
+
+var player_bottom_pos_x = [-9.4];
+var player_bottom_pos_y = [-7];
 for(let i = 1; i < 18; i++) {
 	player_bottom_pos_x[i] = player_bottom_pos_x[i-1] + dist_between_tiles;
 	player_bottom_pos_y[i] = -7;
@@ -46,27 +50,26 @@ for(let i = 18; i < 21; i++){
 	player_bottom_pos_x[i] = player_bottom_pos_x[i-18];
 	player_bottom_pos_y[i] = -9;
 }
-for(let i = 1; i < 7; i++) {
-	totalDist = totalDist+dist_between_tiles;
-	player_tx[i] = player_tx[i-1] + dist_between_tiles;
-}
-var player_ty = [-7, -7, -7, -7, -7, -7, -7];
-var player_tz = [0, 0, 0, 0, 0, 0, 0];
+
 var player_tz_ortho = [0, 0, 0, 0, 0, 0, 0];
 var player_tz_persp = [-25, -25, -25, -25, -25, -25, -25];
+
 var pc_tx = [-9.4];
 for(let i = 1; i < 6; i++) {
 	pc_tx[i] = pc_tx[i-1] + dist_between_tiles;
 }
 var pc_ty = [8.8, 8.8, 8.8, 8.8, 8.8, 8.8];
 var pc_tz = [-3, -3, -3, -3, -3, -3];
+
 var pc_tz_ortho = [-40, -40, -40, -40, -40, -40];
 var pc_tz_persp = [-40, -40, -40, -40, -40, -40];
+
 var pcIndex = null;
 
 var board_tx = [0];
 var board_ty = [0];
 var board_tz = [0];
+
 var board_tz_ortho = [0];
 var board_tz_persp = [-25];
 
@@ -74,32 +77,31 @@ var change_proj = false;
 
 // The rotation angles in degrees
 
-var angleXX = 0.0, angleYY = 0.0, angleZZ = 0.0;
+var angleXX = 0.0, angleYY = 0.0;
 var rotateZ = false;
 
 var player_angX = [0, 0, 0, 0, 0, 0, 0];
 var player_angYY = [0, 0, 0, 0, 0, 0, 0];
 var player_angZZ = [0, 0, 0, 0, 0, 0, 0];
 
-var tileIndex = null;
-
-var selectedTile = null;
+var angleX_board = [0], angleY_board = [0], angleZ_board = [90];
 
 // Textures player
-var playerTextures = [null,null,null,null,null,null,null];
-var playerTiles = [];
+var playerTextures = [null, null, null, null, null, null, null];
 
 // Textures computer
 var pcTextures = [];
 
 // Textures "deck"
 var deckTextures = [];
-var deckLength = 0;
-var deckTiles = [];
 
 // Textures board tiles
 var boardTextures = [];
-var angleX_board = [0]/*12*/, angleY_board = [0]/*339*/, angleZ_board = [90]/*266*/;
+
+var deckLength = 0;
+
+var playerTiles = [];
+var deckTiles = [];
 
 // The scaling factors
 var sx = 0.10;
@@ -107,15 +109,15 @@ var sy = 0.10;
 var sz = 0.10;
 
 var ends = {};
-var snapTileIndex;
 
-// To allow choosing the way of drawing the model triangles
-var primitiveType = null;
- 
+var snapTileIndex;
+var tileIndex = null;
+var selectedTile = null;
+
 // To allow choosing the projection type
 var projectionType = 0;
 var left_ortho = -1.0, right_ortho = 1.0, bottom_ortho = -1.0, top_ortho = 1.0, near_ortho = -1.0, far_ortho = 1.0;
-var fovy_persp = 45;//45; // angle in degrees
+var fovy_persp = 45; // angle in degrees
 var aspect_persp = 1;
 var near_persp = 0.05, far_persp = 70;
 
@@ -208,7 +210,7 @@ var textureCoordsNotFrontFace = [
 // Vertex indices defining the triangles
         
 var cubeVertexIndicesFrontFace = [
-	0, 1, 2, 	0, 3, 2    // Front face
+	0, 1, 2, 	0, 2, 3    // Front face
 ];
 
 var cubeVertexIndicesNotFrontFace = [
@@ -216,9 +218,9 @@ var cubeVertexIndicesNotFrontFace = [
 
 	8, 9, 10,     8, 10, 11,  // Top face
 
-	12, 13, 14,   13, 15, 14, // Bottom face
+	12, 13, 14,   12, 14, 15, // Bottom face
 
-	16, 17, 18,   17, 19, 18, // Right face
+	16, 17, 18,   16, 18, 19, // Right face
 
 	20, 21, 22,   20, 22, 23  // Left face
 ];
@@ -231,7 +233,7 @@ for(let main_number = 0; main_number < 7; main_number++) {
 	}
 }
 
-var checker = false;
+var tileIsGreen = false;
 
 // GLOBAL Animation controls
 
@@ -266,7 +268,7 @@ var playerOutcomeString = "";
 var pc_can_play = true;
 var player_can_play = true;
 
-//console.log(tiles.slice(0, tiles.length));
+var webGLTexture_black_faces = null;
 
 //----------------------------------------------------------------------------
 //
@@ -291,10 +293,7 @@ function handleLoadedTexture(texture) {
 		gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
-var webGLTexture_black_faces = null;
-
 function initTextures() {
-	// 6_6.png
 	bindImgToTexture(boardTextures, 0, null);
 	boardTextures[0].image.src = "imgs/" + tiles[27];
 	tiles.splice(27, 1);
@@ -305,13 +304,15 @@ function initTextures() {
 		addTextureToList(pcTextures, i, tiles);
 		i++;
 	}
-	i=0;
-	while(tiles.length>14 && tiles.length <=21) {
+
+	i = 0;
+	while(tiles.length > 14 && tiles.length <= 21) {
 		addTextureToList(playerTextures, i, tiles);
 		i++;
 	}
-	i=0;
-	while(tiles.length>0 && tiles.length<=14) {
+
+	i = 0;
+	while(tiles.length > 0 && tiles.length <= 14) {
 		addTextureToList(deckTextures, i, tiles);
 		i++;
 	}
@@ -411,6 +412,7 @@ function initBuffers() {
 
 }
 
+/*
 function initBuffer(isVertexIndices, buffer, coords, itemSize, numItems) {
 	buffer = gl.createBuffer();
 	if(isVertexIndices === true){
@@ -423,6 +425,7 @@ function initBuffer(isVertexIndices, buffer, coords, itemSize, numItems) {
 	buffer.itemSize = itemSize;
 	buffer.numItems = numItems;
 }
+*/
 
 //----------------------------------------------------------------------------
 
@@ -432,71 +435,48 @@ function drawDominoModel(angx, angy, angz,
 						 sx, sy, sz,
 						 tx, ty, tz,
 						 mvMatrix,
-						 primitiveType,
 						 front_face_texture,
 						 board) {
     // Pay attention to transformation order !!
 	// GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
+
+	// Handle board tiles
 	if (board){
-
+		// Rotating board on any projection
 		if(rotateBoardX || rotateBoardY || rotateBoardZ) {
-			if(projectionType === 1) {
-				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
-			}
-		}
-		if(rotateBoardZ) {
-			if(projectionType === 1) {
-				mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ));
-			} else {
-				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+			mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+			if (rotateBoardZ) {
 				mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ));
 			}
-		}
-		if(rotateBoardY) {
-			if(projectionType === 1) {
-				mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY));
-			} else {
-				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+			if (rotateBoardY) {
 				mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY));
 			}
-		}
-		if(rotateBoardX) {
-			if(projectionType === 1) {
-				mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX));
-			} else {
-				mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
+			if (rotateBoardX) {
 				mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX));
 			}
-		}
-	}
 
-	if(projectionType === 0) {
-		if(board){
-			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, tz));
-		} else {
-			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
-		}
-	} else {
-		if(board){
-			if(rotateBoardX || rotateBoardY || rotateBoardZ) {
+			if(projectionType === 1){
 				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, 0));
-			} else {
-				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty  + globalTy, tz));
 			}
-		} else {
-			mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
+		}
+		// Steady board on perspective projection
+		else if(projectionType === 1){
+				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty  + globalTy, tz));
 		}
 
+		// Rotating or Steady board on orthogonal projection
+		if(projectionType === 0) {
+			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, tz));
+		}
 	}
-	if(board) {
-		mvMatrix = mult(mvMatrix, rotationZZMatrix(angz /*+ angleZZ*/));
-		mvMatrix = mult(mvMatrix, rotationYYMatrix(angy /*+ angleYY*/));
-		mvMatrix = mult(mvMatrix, rotationXXMatrix(angx /*+ angleXX*/));
-	} else {
-		mvMatrix = mult(mvMatrix, rotationZZMatrix(angz));
-		mvMatrix = mult(mvMatrix, rotationYYMatrix(angy));
-		mvMatrix = mult(mvMatrix, rotationXXMatrix(angx));
+	// Handle Player and Pc tiles
+	else {
+		mvMatrix = mult(mvMatrix, translationMatrix(tx, ty, tz));
 	}
+
+	mvMatrix = mult(mvMatrix, rotationZZMatrix(angz));
+	mvMatrix = mult(mvMatrix, rotationYYMatrix(angy));
+	mvMatrix = mult(mvMatrix, rotationXXMatrix(angx));
 
 	mvMatrix = mult(mvMatrix, scalingMatrix(sx, sy, sz));
 
@@ -555,6 +535,7 @@ function drawDominoModel(angx, angy, angz,
 
 }
 
+/*
 function drawTextures(texture, textureBuffer, vertexBuffer) {
 	// Textures
 	gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
@@ -568,6 +549,7 @@ function drawTextures(texture, textureBuffer, vertexBuffer) {
 	// Drawing the triangles DRAWING ELEMENTS
 	gl.drawElements(gl.TRIANGLES, vertexBuffer.itemSize, gl.UNSIGNED_SHORT, 0);
 }
+ */
 
 //----------------------------------------------------------------------------
 
@@ -726,7 +708,6 @@ function drawScene() {
 			sx, sy, sz,
 			player_tx[i] * sx, player_ty[i] * sy, player_tz[i] * sz,
 			mvMatrix,
-			primitiveType,
 			playerTextures[i],
 			false
 		);
@@ -749,7 +730,6 @@ function drawScene() {
 			sx, sy, sz,
 			board_tx[i]*sx, board_ty[i]*sy, board_tz[i]*sz,
 			mvMatrix,
-			primitiveType,
 			boardTextures[i],
 			true
 		);
@@ -766,7 +746,6 @@ function drawScene() {
 			sx, sy, sz,
 			pc_tx[i]*sx, pc_ty[i]*sy, pc_tz[i]*sz,
 			mvMatrix,
-			primitiveType,
 			pcTextures[i],
 			false
 		);
@@ -784,59 +763,59 @@ function drawScene() {
 		//console.log(player_angZZ[tileIndex]);
 	}
 
-	checker = false;
+	tileIsGreen = false;
 	// parallel to board piece
 	let angZBoardAux;
 	if (tileIndex !== null) {
-		for (var i in ends) {
-			for (let j = 0; j < boardTextures.length; j++) {
-				if (boardTextures[j].image.src.includes(i)) {
+		for (var end_tile_name in ends) {
+			for (let boardIndex = 0; boardIndex < boardTextures.length; boardIndex++) {
+				if (boardTextures[boardIndex].image.src.includes(end_tile_name)) {
 					// parallel to board piece
-					tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
+					let tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
 					tile = tile.replace("red_", "");
 					tile = tile.replace("green_", "");
-					facesPlayer = tile.replace(".png", "").split("_");
-					if (angleZ_board[j] + 180 >= 360) {
-						angZBoardAux = angleZ_board[j] + 180 - 360;
+					let facesPlayer = tile.replace(".png", "").split("_");
+					if (angleZ_board[boardIndex] + 180 >= 360) {
+						angZBoardAux = angleZ_board[boardIndex] + 180 - 360;
 					} else {
-						angZBoardAux = angleZ_board[j] + 180;
+						angZBoardAux = angleZ_board[boardIndex] + 180;
 					}
 					if (facesPlayer[0] !== facesPlayer[1]) {
 						//console.log(board_tx[j] + globalTx);
-						if (player_angZZ[tileIndex] === angleZ_board[j] || player_angZZ[tileIndex] === angZBoardAux) {
+						if (player_angZZ[tileIndex] === angleZ_board[boardIndex] || player_angZZ[tileIndex] === angZBoardAux) {
 							// left of the board piec
-							if (ends[i].includes("e")) {
-								if (player_tx[tileIndex] - (board_tx[j] + localTx) > -2.5 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < -1.8/*3*/) {
-									if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.4) {
+							if (ends[end_tile_name].includes("e")) {
+								if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > -2.5 /*-3*/ && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < -1.8/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < 0.4) {
 										colorGreen();
-										snapTileIndex = j;
+										snapTileIndex = boardIndex;
 									}
 								}
 							}
 							// right of the board piece
-							if (ends[i].includes("d")) {
-								if (player_tx[tileIndex] - (board_tx[j] + localTx) < 2.5 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) > 1.8/*3*/) {
-									if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.4) {
+							if (ends[end_tile_name].includes("d")) {
+								if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < 2.5 /*-3*/ && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > 1.8/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > -0.4 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < 0.4) {
 										colorGreen();
-										snapTileIndex = j;
+										snapTileIndex = boardIndex;
 									}
 								}
 							}
 							//down of the board piece
-							if (ends[i].includes("b")) {
-								if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.4/*3*/) {
-									if (player_ty[tileIndex] - (board_ty[j] + localTy) > -2.5 && player_ty[tileIndex] - (board_ty[j] + localTy) < -1.8) {
+							if (ends[end_tile_name].includes("b")) {
+								if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < 0.4/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > -2.5 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < -1.8) {
 										colorGreen();
-										snapTileIndex = j;
+										snapTileIndex = boardIndex;
 									}
 								}
 							}
 							// up of the board piece
-							if (ends[i].includes("c")) {
-								if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.4/*3*/) {
-									if (player_ty[tileIndex] - (board_ty[j] + localTy) < 2.5 && player_ty[tileIndex] - (board_ty[j] + localTy) > 1.8) {
+							if (ends[end_tile_name].includes("c")) {
+								if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > -0.4 /*-3*/ && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < 0.4/*3*/) {
+									if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < 2.5 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > 1.8) {
 										colorGreen();
-										snapTileIndex = j;
+										snapTileIndex = boardIndex;
 									}
 								}
 							}
@@ -844,40 +823,40 @@ function drawScene() {
 						}
 					}
 					// prependicular to board piece
-					if (player_angZZ[tileIndex] !== angleZ_board[j] && player_angZZ[tileIndex] !== angZBoardAux) {
+					if (player_angZZ[tileIndex] !== angleZ_board[boardIndex] && player_angZZ[tileIndex] !== angZBoardAux) {
 						// left of the board piece
-						if (ends[i].includes("e")) {
-							if (player_tx[tileIndex] - (board_tx[j] + localTx) > -1.9 && player_tx[tileIndex] - (board_tx[j] + localTx) < -1.4) {
-								if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.6 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.6) {
+						if (ends[end_tile_name].includes("e")) {
+							if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > -1.9 && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < -1.4) {
+								if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > -0.6 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < 0.6) {
 									colorGreen();
-									snapTileIndex = j;
+									snapTileIndex = boardIndex;
 								}
 							}
 						}
 						// right of the board piece
-						if (ends[i].includes("d")) {
-							if (player_tx[tileIndex] - (board_tx[j] + localTx) < 1.9 && player_tx[tileIndex] - (board_tx[j] + localTx) > 1.4) {
-								if (player_ty[tileIndex] - (board_ty[j] + localTy) > -0.6 && player_ty[tileIndex] - (board_ty[j] + localTy) < 0.6) {
+						if (ends[end_tile_name].includes("d")) {
+							if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < 1.9 && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > 1.4) {
+								if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > -0.6 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < 0.6) {
 									colorGreen();
-									snapTileIndex = j;
+									snapTileIndex = boardIndex;
 								}
 							}
 						}
 						// down of the board piece
-						if (ends[i].includes("b")) {
-							if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.6 && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.6) {
-								if (player_ty[tileIndex] - (board_ty[j] + localTy) > -1.9 && player_ty[tileIndex] - (board_ty[j] + localTy) < -1.4) {
+						if (ends[end_tile_name].includes("b")) {
+							if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > -0.6 && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < 0.6) {
+								if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > -1.9 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < -1.4) {
 									colorGreen();
-									snapTileIndex = j;
+									snapTileIndex = boardIndex;
 								}
 							}
 						}
 						// up of the board piece
-						if (ends[i].includes("c")) {
-							if (player_tx[tileIndex] - (board_tx[j] + localTx) > -0.6 && player_tx[tileIndex] - (board_tx[j] + localTx) < 0.6) {
-								if (player_ty[tileIndex] - (board_ty[j] + localTy) < 1.9 && player_ty[tileIndex] - (board_ty[j] + localTy) > 1.4) {
+						if (ends[end_tile_name].includes("c")) {
+							if (player_tx[tileIndex] - (board_tx[boardIndex] + localTx) > -0.6 && player_tx[tileIndex] - (board_tx[boardIndex] + localTx) < 0.6) {
+								if (player_ty[tileIndex] - (board_ty[boardIndex] + localTy) < 1.9 && player_ty[tileIndex] - (board_ty[boardIndex] + localTy) > 1.4) {
 									colorGreen();
-									snapTileIndex = j;
+									snapTileIndex = boardIndex;
 								}
 							}
 						}
@@ -888,8 +867,8 @@ function drawScene() {
 		}
 
 		if (!playerTextures[tileIndex].image.src.includes("imgs/red")) {
-			if (checker === false) {
-				tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
+			if (tileIsGreen === false) {
+				let tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
 				playerTextures[tileIndex].image.src = "imgs/red_" + tile;
 				document.getElementById("snapTile").disabled = true;
 				document.getElementById("snapTile").style.display = "none";
@@ -913,12 +892,12 @@ function drawScene() {
 				"green_", "").replace(
 				"red_", "").replace(
 				"blue_", "").split("_");
-			for (let key in ends) {
+			for (let end_tile_name in ends) {
 				for (let j = 0; j < boardTextures.length; j++) {
-					if (boardTextures[j].image.src.includes(key)) {
-						let end_num = key.split("_");
+					if (boardTextures[j].image.src.includes(end_tile_name)) {
+						let end_num = end_tile_name.split("_");
 						if (angleZ_board[j] === 0) {
-							if (ends[key][0].includes("c")) {
+							if (ends[end_tile_name][0].includes("c")) {
 								if (end_num[0] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -926,7 +905,7 @@ function drawScene() {
 									cant_play = false;
 									break;
 								}
-							} else if (ends[key][0].includes("b")) {
+							} else if (ends[end_tile_name][0].includes("b")) {
 								if (end_num[1] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -936,7 +915,7 @@ function drawScene() {
 								}
 							}
 						} else if (angleZ_board[j] === 90) {
-							if (ends[key][0].includes("e")) {
+							if (ends[end_tile_name][0].includes("e")) {
 								if (end_num[0] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -944,7 +923,7 @@ function drawScene() {
 									cant_play = false;
 									break;
 								}
-							} else if (ends[key][0].includes("d")) {
+							} else if (ends[end_tile_name][0].includes("d")) {
 								if (end_num[1] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -955,7 +934,7 @@ function drawScene() {
 							}
 						}
 						if (angleZ_board[j] === 180) {
-							if (ends[key][0].includes("c")) {
+							if (ends[end_tile_name][0].includes("c")) {
 								if (end_num[1] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -963,7 +942,7 @@ function drawScene() {
 									cant_play = false;
 									break;
 								}
-							} else if (ends[key][0].includes("b")) {
+							} else if (ends[end_tile_name][0].includes("b")) {
 								if (end_num[0] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -973,7 +952,7 @@ function drawScene() {
 								}
 							}
 						} else if (angleZ_board[j] === 270) {
-							if (ends[key][0].includes("e")) {
+							if (ends[end_tile_name][0].includes("e")) {
 								if (end_num[1] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -981,7 +960,7 @@ function drawScene() {
 									cant_play = false;
 									break;
 								}
-							} else if (ends[key][0].includes("d")) {
+							} else if (ends[end_tile_name][0].includes("d")) {
 								if (end_num[0] === player_ends[0]) {
 									cant_play = false;
 									break;
@@ -1082,7 +1061,7 @@ function collisionDetection(tx, ty, ang){
 }
 
 function colorGreen(){
-	checker = true;
+	tileIsGreen = true;
 	if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
 		let tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
 		playerTextures[tileIndex].image.src = "imgs/green_" + tile;
@@ -1822,7 +1801,7 @@ function tile_to_board(facesPlayer, facesBoard, tx, ty, rem, add, type, pc_ang){
 
 function pc_move(){
 	if(pc_can_play){
-		var pc_play = false;
+		let pc_play = false;
 		for (let pc_tile_ind = 0; pc_tile_ind < pcTextures.length; pc_tile_ind++) {
 			let pc_tile_numbers = pcTextures[pc_tile_ind].image.src.split(
 				"imgs/")[1].split(
@@ -2040,26 +2019,36 @@ function pc_move(){
 	}
 }
 
-function addToTz(list, index, value){
-    let lst_ortho = [], lst_persp = [];
-    switch (list) {
-        case player_tz:
-            lst_ortho = player_tz_ortho;
-            lst_persp = player_tz_persp;
-            break;
-        case board_tz:
-            lst_ortho = board_tz_ortho;
-            lst_persp = board_tz_persp;
-            break;
-        case pc_tz:
-            lst_ortho = pc_tz_ortho;
-            lst_persp = pc_tz_persp;
-            break;
-    }
-	if(projectionType === 1){
-        lst_persp[index] = value;
+function changeAllTz(add, list, index, value) {
+	let lst_ortho, lst_persp;
+	lst_ortho = [];
+	lst_persp = [];
+	switch (list) {
+		case player_tz:
+			lst_ortho = player_tz_ortho;
+			lst_persp = player_tz_persp;
+			break;
+		case board_tz:
+			lst_ortho = board_tz_ortho;
+			lst_persp = board_tz_persp;
+			break;
+		case pc_tz:
+			lst_ortho = pc_tz_ortho;
+			lst_persp = pc_tz_persp;
+			break;
+	}
+	if(add){
+		if(projectionType === 1){
+			lst_persp[index] = value;
+		} else {
+			lst_ortho[index] = value;
+		}
 	} else {
-        lst_ortho[index] = value;
+		if(projectionType === 1){
+			lst_persp.splice(tileIndex,1);
+		} else {
+			lst_ortho.splice(tileIndex,1);
+		}
 	}
 }
 
@@ -2102,8 +2091,10 @@ function changeTileToBoard(type, facesPlayer, facesBoard, tx, ty, rem, add, type
 		pos_tx.splice(index, 1);
 		pos_ty.splice(index, 1);
 		pos_tz.splice(index, 1);
-		deletefromTz(pos_tz);
-		addToTz(board_tz, board_tz.length, board_tz[0]);
+		// remove from tz
+		changeAllTz(false, pos_tz, null, null);
+		// add to tz
+		changeAllTz(true, board_tz, board_tz.length, board_tz[0]);
 
 		if(type === 1){
 			player_angX.splice(tileIndex,1);
@@ -2128,29 +2119,6 @@ function changeTileToBoard(type, facesPlayer, facesBoard, tx, ty, rem, add, type
 		board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
 
 	}
-}
-
-function deletefromTz(list){
-    let lst_ortho = [], lst_persp = [];
-    switch (list) {
-        case player_tz:
-            lst_ortho = player_tz_ortho;
-            lst_persp = player_tz_persp;
-            break;
-        case board_tz:
-            lst_ortho = board_tz_ortho;
-            lst_persp = board_tz_persp;
-            break;
-        case pc_tz:
-            lst_ortho = pc_tz_ortho;
-            lst_persp = pc_tz_persp;
-            break;
-    }
-    if(projectionType === 1){
-        lst_persp.splice(tileIndex,1);
-    } else {
-        lst_ortho.splice(tileIndex,1);
-    }
 }
 
 function pontuation(){
@@ -2429,7 +2397,8 @@ function selectPlayerTile() {
 				player_ty[tileIndex] = -3;
 				player_tx[tileIndex] = 0;
 				player_tz[tileIndex] = board_tz[0];
-				addToTz(player_tz, tileIndex, board_tz[0]);
+				// add to tz
+				changeAllTz(true, player_tz, tileIndex, board_tz[0]);
 			}
 			// if the tile isn't on a "snapable" position
 			else if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("green_")){
@@ -2480,10 +2449,6 @@ function initWebGL( canvas ) {
 		// DEFAULT: The viewport occupies the whole canvas
 
 		// DEFAULT: The viewport background color is WHITE
-
-		// Drawing the triangles defining the model
-
-		primitiveType = gl.TRIANGLES;
 
 		// DEFAULT: The Depth-Buffer is DISABLED
 
