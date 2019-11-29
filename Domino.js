@@ -61,12 +61,17 @@ var pc_tz_persp = [-40, -40, -40, -40, -40, -40];
 
 var pcIndex = null;
 
+let boardTxCenter = 0;
+let boardTyCenter = 0;
+let boardTzCenterOrtho = 0;
+let boardTzCenterPersp = -25;
+
 var board_tx = [0];
 var board_ty = [0];
 var board_tz = [0];
 
-var board_tz_ortho = [0];
-var board_tz_persp = [-25];
+var board_tz_ortho = [boardTzCenterOrtho];
+var board_tz_persp = [boardTzCenterPersp];
 
 var change_proj = false;
 
@@ -372,7 +377,7 @@ function initBuffers() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBufferFrontFace);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordsFrontFace), gl.STATIC_DRAW);
 	cubeVertexTextureCoordBufferFrontFace.itemSize = 2;
-	cubeVertexTextureCoordBufferFrontFace.numItems = 4;//24;
+	cubeVertexTextureCoordBufferFrontFace.numItems = 4;
 
 	// Vertex indices
 	// front face
@@ -434,35 +439,27 @@ function drawDominoModel(angx, angy, angz,
 						 board) {
     // Pay attention to transformation order !!
 	// GLOBAL TRANSFORMATION FOR THE WHOLE SCENE
-
+	let boardTzCenter;
+	if(projectionType === 0) { boardTzCenter = boardTzCenterOrtho; }
+	else { boardTzCenter = boardTzCenterPersp; }
 	// Handle board tiles
 	if (board){
-		// Rotating board on any projection
+		// Rotating board
 		if(rotateBoardX || rotateBoardY || rotateBoardZ) {
-			mvMatrix = mult(mvMatrix, translationMatrix(0, 0, tz));
-			if (rotateBoardZ) {
-				mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ));
-			}
-			if (rotateBoardY) {
-				mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY));
-			}
-			if (rotateBoardX) {
-				mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX));
-			}
+			mvMatrix = mult(mvMatrix, translationMatrix(boardTxCenter, boardTyCenter, boardTzCenter*sz));
 
-			if(projectionType === 1){
-				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, 0));
-			}
-		}
-		// Steady board on perspective projection
-		else if(projectionType === 1){
-				mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty  + globalTy, tz));
-		}
+			if (rotateBoardZ) { mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ)); }
+			if (rotateBoardY) { mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY)); }
+			if (rotateBoardX) { mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX)); }
 
-		// Rotating or Steady board on orthogonal projection
-		if(projectionType === 0) {
+			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx - boardTxCenter, ty + globalTy - boardTyCenter, tz - boardTzCenter*sz));
+		}
+		// Steady board
+		else {
 			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, tz));
 		}
+
+
 	}
 	// Handle Player and Pc tiles
 	else {
@@ -2370,7 +2367,7 @@ function selectPlayerTile() {
 // WebGL Initialization
 //
 
-function initWebGL( canvas ) {
+function initWebGL(canvas) {
 	try {
 		// Create the WebGL context
 
@@ -2443,7 +2440,6 @@ function hideOrShowTransSliders(){
 }
 
 //----------------------------------------------------------------------------
-
 
 function runWebGL() {
 
