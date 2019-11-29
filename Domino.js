@@ -446,20 +446,22 @@ function drawDominoModel(angx, angy, angz,
 	if (board){
 		// Rotating board
 		if(rotateBoardX || rotateBoardY || rotateBoardZ) {
-			mvMatrix = mult(mvMatrix, translationMatrix(boardTxCenter, boardTyCenter, boardTzCenter*sz));
+			mvMatrix = mult(mvMatrix, translationMatrix(boardTxCenter*sx,
+														boardTyCenter*sy,
+														boardTzCenter*sz));
 
 			if (rotateBoardZ) { mvMatrix = mult(mvMatrix, rotationZZMatrix(globalAngleZZ)); }
 			if (rotateBoardY) { mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY)); }
 			if (rotateBoardX) { mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX)); }
 
-			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx - boardTxCenter, ty + globalTy - boardTyCenter, tz - boardTzCenter*sz));
+			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx - boardTxCenter*sx,
+														ty + globalTy - boardTyCenter*sy,
+														tz - boardTzCenter*sz));
 		}
 		// Steady board
 		else {
 			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx, ty + globalTy, tz));
 		}
-
-
 	}
 	// Handle Player and Pc tiles
 	else {
