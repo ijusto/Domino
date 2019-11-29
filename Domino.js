@@ -56,7 +56,7 @@ for(let i = 1; i < 6; i++) {
 var pc_ty = [8.8, 8.8, 8.8, 8.8, 8.8, 8.8];
 var pc_tz = [-3, -3, -3, -3, -3, -3];
 
-var pc_tz_ortho = [-40, -40, -40, -40, -40, -40];
+var pc_tz_ortho = [-3, -3, -3, -3, -3, -3];
 var pc_tz_persp = [-40, -40, -40, -40, -40, -40];
 
 var pcIndex = null;
@@ -851,9 +851,70 @@ function drawScene() {
 		}
 		if (cant_play) {
 			player_can_play = false;
-			pc_move();
+			pcMove();
 		}
 	}
+}
+
+function selectPlayerTile() {
+	// only change when the selected tile is different from the previous selected tile
+	if(selectedTile !== tileIndex) {
+		let tile = null;
+
+		// Tile Selected now
+		if (!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("red_")) {
+			// if the tile is in the first position
+			if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("blue_")){
+				tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
+				player_angX[tileIndex] = angleX_board[0];
+				player_angYY[tileIndex] = angleY_board[0];
+				player_angZZ[tileIndex] = angleZ_board[0];
+				player_ty[tileIndex] = -3;
+				player_tx[tileIndex] = 0;
+				player_tz[tileIndex] = board_tz[0];
+				// add to tz
+				changeAllTz(true, player_tz, tileIndex, board_tz[0]);
+			}
+			// if the tile isn't on a "snapable" position
+			else if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("green_")){
+				tile = playerTextures[tileIndex].image.src.split("imgs/blue_")[1];
+			}
+			// if the tile is on a "snapable" position
+			else {
+				tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
+			}
+			// change the texture to red
+			bindImgToTexture(playerTextures, tileIndex, null);
+			colorRed(tile);
+		}
+
+		// Tile previously selected
+		if (selectedTile !== null){
+			if(playerTextures[selectedTile].image.src.split("imgs/")[1].includes("red_")){
+				// change the texture to blue
+				tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("red_")[1];
+				bindImgToTexture(playerTextures, selectedTile, null);
+				playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
+			} else if (playerTextures[selectedTile].image.src.split("imgs/")[1].includes("green_")){
+				// change the texture to blue
+				tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("green_")[1];
+				bindImgToTexture(playerTextures, selectedTile, null);
+				playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
+			}
+		}
+
+		// update selected tile
+		selectedTile = tileIndex;
+	}
+}
+
+function getSideNumbersOfTile(tile_src_name){
+	return tile_src_name.split("imgs/")[1].replace(
+		"red_", "").replace(
+		"green_", "").replace(
+		"blue_", "").replace(
+		"grey_", "").replace(
+		".png", "").split("_");
 }
 
 function boardTilesWithEnds(){
@@ -869,15 +930,6 @@ function boardTilesWithEnds(){
 		}
 	}
 	return boardEndTiles;
-}
-
-function getSideNumbersOfTile(tile_src_name){
-	return tile_src_name.split("imgs/")[1].replace(
-		"red_", "").replace(
-		"green_", "").replace(
-		"blue_", "").replace(
-			"grey_", "").replace(
-		".png", "").split("_");
 }
 
 function possibleAttachBoardTileIndex(){
@@ -974,720 +1026,7 @@ function possibleAttachBoardTileIndex(){
 	return null;
 }
 
-function colorRed(tileName){
-	playerTextures[tileIndex].image.src = "imgs/red_" + tileName;
-	document.getElementById("snapTile").disabled = true;
-	document.getElementById("snapTile").style.display = "none";
-}
-
-function collisionDetection(tx, ty, ang){
-	for(let boardIndex = 0; boardIndex < board_tx.length; boardIndex++){
-		if(boardIndex !== snapTileIndex) {
-			if (angleZ_board[boardIndex] === 0 || angleZ_board[boardIndex] === 180) {
-				if (ang === 0 || ang === 180) {
-					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[boardIndex] + 0.6)) ||
-						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[boardIndex] + 0.6))) &&
-						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[boardIndex] + 1.1)) ||
-							((board_ty[snapTileIndex] + ty + 1) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[boardIndex] + 1.1)))) {
-						return true;
-					}
-					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6)) ||
-						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6))) &&
-						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)) ||
-							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)))) {
-						return true;
-					}
-				} else {
-					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[boardIndex] + 0.6)) ||
-						((board_tx[snapTileIndex] + tx + 1) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[boardIndex] + 0.6))) &&
-						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[boardIndex] + 1.1)) ||
-							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[boardIndex] + 1.1)))) {
-						return true;
-					}
-					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6)) ||
-						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6))) &&
-						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)) ||
-							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)))) {
-						return true;
-					}
-				}
-			} else {
-				if (ang === 0 || ang === 180) {
-					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[boardIndex] + 1.1)) ||
-						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[boardIndex] + 1.1))) &&
-						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[boardIndex] + 0.6)) ||
-							((board_ty[snapTileIndex] + ty + 1) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[boardIndex] + 0.6)))) {
-						return true;
-					}
-					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1)) ||
-						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1))) &&
-						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)) ||
-							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)))) {
-						return true;
-					}
-				} else {
-					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[boardIndex] + 1.1)) ||
-						((board_tx[snapTileIndex] + tx + 1) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[boardIndex] + 1.1))) &&
-						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[boardIndex] + 0.6)) ||
-							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[boardIndex] + 0.6)))) {
-						return true;
-					}
-					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1)) ||
-						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1))) &&
-						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)) ||
-							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)))) {
-						return true;
-					}
-				}
-			}
-		}
-	}
-	return false;
-}
-
-function colorGreen(){
-	tileShouldBeGreen = true;
-	if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
-		let tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
-		playerTextures[tileIndex].image.src = "imgs/green_" + tile;
-		document.getElementById("snapTile").disabled = false;
-		document.getElementById("snapTile").style.display = "";
-	}
-}
-
-//----------------------------------------------------------------------------
-//
-//  Animation
-//
-
-// Animation --- Updating transformation parameters
-
-var lastTime = 0;
-
-function animate() {
-	
-	var timeNow = new Date().getTime();
-	
-	if( lastTime !== 0 ) {
-		
-		var elapsed = timeNow - lastTime;
-
-		// Global rotation
-
-		if( globalRotationYY_ON ) {
-
-			globalAngleYY += globalRotationYY_DIR * globalRotationYY_SPEED * (90 * elapsed) / 1000.0;
-		}
-		if( globalRotationXX_ON ) {
-
-			globalAngleXX += globalRotationXX_DIR * globalRotationXX_SPEED * (90 * elapsed) / 1000.0;
-		}
-		if( globalRotationZZ_ON ) {
-
-			globalAngleZZ += globalRotationZZ_DIR * globalRotationZZ_SPEED * (90 * elapsed) / 1000.0;
-		}
-	}
-	
-	lastTime = timeNow;
-}
-
-//----------------------------------------------------------------------------
-
-// Handling keyboard events
-
-// Adapted from www.learningwebgl.com
-
-var currentlyPressedKeys = {};
-
-function handleKeys() {
-	let valuePageUpOrDown;
-
-	if (currentlyPressedKeys[33] && !document.getElementById("lose").innerHTML.includes("You")) {
-		valuePageUpOrDown = 0.99;  // Page Up
-	} else if (currentlyPressedKeys[34] && !document.getElementById("lose").innerHTML.includes("You")) {
-		valuePageUpOrDown = 1.01;  // Page Down
-	}
-
-	if (currentlyPressedKeys[33] || currentlyPressedKeys[34]) {
-		sx *= valuePageUpOrDown;
-		sz = sy = sx;
-	} else {
-		if (currentlyPressedKeys[37]) {
-			// Left cursor key
-			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
-				player_tx[tileIndex] -= 0.05;
-			}
-		}
-		if (currentlyPressedKeys[39]) {
-			// Right cursor key
-			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
-				player_tx[tileIndex] += 0.05;
-			}
-		}
-		if (currentlyPressedKeys[38]) {
-			// Up cursor key
-			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
-				player_ty[tileIndex] += 0.05;
-			}
-		}
-
-		if (currentlyPressedKeys[40]) {
-			// Down cursor key
-			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
-				player_ty[tileIndex] -= 0.05;
-			}
-		}
-	}
-
-	document.addEventListener("keypress", function(event){
-
-		// Getting the pressed key and setting the bg color
-
-		var key = event.keyCode; // ASCII
-
-		switch(key){
-			case 114:
-				if(tileIndex !== null) {
-					rotateZ = true;
-				}
-				break;
-		}
-
-		// Render the viewport
-	});
-}
-
-//----------------------------------------------------------------------------
-
-// Handling mouse events
-
-// Adapted from www.learningwebgl.com
-
-
-var mouseDown = false;
-
-var lastMouseX = null;
-
-var lastMouseY = null;
-
-function handleMouseDown(event) {
-    mouseDown = true;
-
-    lastMouseX = event.clientX;
-
-    lastMouseY = event.clientY;
-}
-
-function handleMouseUp(event) {
-    mouseDown = false;
-}
-
-function handleMouseMove(event) {
-
-    if (!mouseDown) {
-
-      return;
-    }
-
-    // Rotation angles proportional to cursor displacement
-
-    var newX = event.clientX;
-
-    var newY = event.clientY;
-
-    var deltaX = newX - lastMouseX;
-
-    angleYY += radians( 10 * deltaX  );
-
-    var deltaY = newY - lastMouseY;
-
-    angleXX += radians( 10 * deltaY  );
-
-    lastMouseX = newX;
-
-    lastMouseY = newY;
-  }
-//----------------------------------------------------------------------------
-
-// Timer
-
-function tick() {
-	requestAnimFrame(tick);
-	drawScene();
-	if(!document.getElementById("lose").innerHTML.includes("You")) {
-	    handleKeys();
-	    handlePlayerButtons();
-	    handleSliders();
-        animate();
-    }
-}
-
-//----------------------------------------------------------------------------
-//
-//  User Interaction
-//
-
-function outputInfos(){
-    document.getElementById("deck_tile_number").innerHTML = deckLength;
-}
-
-//----------------------------------------------------------------------------
-
-function setEventListeners( canvas ) {
-
-	// Handling the mouse
-
-	// From learningwebgl.com
-
-	document.getElementById("lose").innerHTML = "";
-
-	canvas.onmousedown = handleMouseDown;
-
-	document.onmouseup = handleMouseUp;
-
-	document.onmousemove = handleMouseMove;
-
-	// Handling the keyboard
-
-	// From learningwebgl.com
-
-	function handleKeyDown(event) {
-		currentlyPressedKeys[event.keyCode] = true;
-	}
-
-	function handleKeyUp(event) {
-		currentlyPressedKeys[event.keyCode] = false;
-	}
-
-	document.onkeydown = handleKeyDown;
-
-	document.onkeyup = handleKeyUp;
-
-	// Dropdown list
-
-	var projection = document.getElementById("projection-selection");
-
-	projection.addEventListener("click", function () {
-		// Getting the selection
-		var p = projection.selectedIndex;
-
-		switch (p) {
-			case 0 :
-				projectionType = 0;
-				document.getElementById("zoom_ortho").hidden = false;
-				document.getElementById("near_ortho").hidden = true;
-				document.getElementById("far_ortho").hidden = true;
-				document.getElementById("fovy_persp").hidden = true;
-				document.getElementById("aspect_persp").hidden = true;
-				document.getElementById("near_persp").hidden = true;
-				document.getElementById("far_persp").hidden = true;
-				break;
-			case 1 :
-				projectionType = 1;
-				document.getElementById("zoom_ortho").hidden = true;
-				document.getElementById("near_ortho").hidden = true;
-				document.getElementById("far_ortho").hidden = true;
-				document.getElementById("fovy_persp").hidden = false;
-				document.getElementById("aspect_persp").hidden = true;
-				document.getElementById("near_persp").hidden = true;
-				document.getElementById("far_persp").hidden = true;
-				break;
-		}
-	});
-
-
-	// Button events
-	document.getElementById("resetPosition").onclick = function () {
-		resetBoardPos();
-	};
-
-	document.getElementById("rotateBoardX").onclick = function () {
-		rotateBoardX = !rotateBoardX;
-		if(rotateBoardX){
-			document.getElementById("rotateBoardX").style.backgroundColor = "#317bf4";
-		} else {
-			document.getElementById("rotateBoardX").style.backgroundColor = "#87877f";
-		}
-		hideOrShowTransSliders();
-	};
-
-	document.getElementById("rotateBoardY").onclick = function () {
-		rotateBoardY = !rotateBoardY;
-		if(rotateBoardY){
-			document.getElementById("rotateBoardY").style.backgroundColor = "#317bf4";
-		} else {
-			document.getElementById("rotateBoardY").style.backgroundColor = "#87877f";
-		}
-		hideOrShowTransSliders();
-	};
-
-	document.getElementById("rotateBoardZ").onclick = function () {
-		rotateBoardZ = !rotateBoardZ;
-		if(rotateBoardZ){
-			document.getElementById("rotateBoardZ").style.backgroundColor = "#317bf4";
-		} else {
-			document.getElementById("rotateBoardZ").style.backgroundColor = "#87877f";
-		}
-		hideOrShowTransSliders();
-	};
-
-	document.getElementById("getTile").onclick = function () {
-		if(!document.getElementById("lose").innerHTML.includes("You")) {
-			if (deckLength !== 0) {
-				getTileFromDeck(false);
-			}
-			pc_move();
-		}
-	};
-
-	document.getElementById("snapTile").onclick = function () {
-		let sideNumbersPlayerTile = getSideNumbersOfTile(playerTextures[tileIndex].image.src);
-		let sideNumbersBoardTile = getSideNumbersOfTile(boardTextures[snapTileIndex].image.src);
-		//Paralelo
-		if (player_angZZ[tileIndex] === 0 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-(board_ty[snapTileIndex]+localTy)<0) {
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"], false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex] === 90 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"], false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex] === 180 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"],false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex] === 270 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"],false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"],false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"],false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"],false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"],false, 0);
-				}
-			}
-			else{
-				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-					tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
-				}
-			}
-		}
-		//PERPENDICULAR +90
-		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["b","c"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["b","c"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
-					}
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["d","e"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["d","e"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
-					}
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["c","b"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["c","b"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
-					}
-				}
-			}
-		}
-
-		//MUDEI AQUI
-		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["e","d"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["e","d"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
-					}
-				}
-			}
-		}
-		//PERPENDICULAR +180
-		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 270) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["b","c"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["b","c"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
-					}
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 0) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["d","e"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["d","e"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
-					}
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 90) {
-			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["c","b"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["c","b"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
-					}
-				}
-			}
-		}
-		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 180) {
-			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["e","d"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
-					}
-				}
-			}
-			else{
-				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["e","d"],false, 0);
-					}
-				}
-				else {
-					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
-					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
-						tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
-					}
-				}
-			}
-		}
-	}
-}
-
-function tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, tx, ty, rem, add, isPc, pc_ang){
+function tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, tx, ty, rem, add, isPc, pc_ang){
 	// player
 	if (!isPc) {
 		if (!collisionDetection(tx, ty, player_angZZ[tileIndex])) {
@@ -1699,7 +1038,7 @@ function tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, tx, ty, rem,
 			if (player_tx.length === 0) {
 				player_can_play = false;
 			}
-			pc_move();
+			pcMove();
 		}
 	}
 	// pc
@@ -1716,230 +1055,6 @@ function tile_to_board(sideNumbersPlayerTile, sideNumbersBoardTile, tx, ty, rem,
 			} else {
 				pc_can_play = false;
 			}
-		}
-	}
-}
-
-function pc_move(){
-	let boardEndTiles = boardTilesWithEnds();
-	if(pc_can_play){
-		let pc_play = false;
-		for (let pc_tile_ind = 0; pc_tile_ind < pcTextures.length; pc_tile_ind++) {
-			let sideNumbersPcTile = getSideNumbersOfTile(pcTextures[pc_tile_ind].image.src);
-			pcIndex = pc_tile_ind;
-
-			for (let end_tile_name in boardEndTiles) {
-				// check if the property/key is defined in the object itself, not in parent
-				if (boardEndTiles.hasOwnProperty(end_tile_name)) {
-					let boardIndex = boardEndTiles[end_tile_name];
-
-					snapTileIndex = boardIndex;
-					let end_tile_numbers = end_tile_name.split("_");
-					if (angleZ_board[boardIndex] === 0) {
-						if (ends[end_tile_name][0] === "c") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, 1.5, "c", ["e", "d"], true, 90);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 180);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 0);
-									pc_play = true;
-									break;
-								}
-							}
-						} else if (ends[end_tile_name][0] === "b") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, -1.5, "b", ["e", "d"], true, 90);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 0);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 180);
-									pc_play = true;
-									break;
-								}
-							}
-						}
-					} else if (angleZ_board[boardIndex] === 90) {
-						if (ends[end_tile_name][0] === "e") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, -1.5, 0, "e", ["c", "b"], true, 0);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 270);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 90);
-									pc_play = true;
-									break;
-								}
-							}
-						} else if (ends[end_tile_name][0] === "d") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 1.5, 0, "d", ["c", "b"], true, 0);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 90);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 270);
-									pc_play = true;
-									break;
-								}
-							}
-						}
-					} else if (angleZ_board[boardIndex] === 180) {
-						if (ends[end_tile_name][0] === "c") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, 1.5, "c", ["e", "d"], true, 90);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 180);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 0);
-									pc_play = true;
-									break;
-								}
-							}
-						} else if (ends[end_tile_name][0] === "b") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, -1.5, "b", ["e", "d"], true, 90);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 0);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 180);
-									pc_play = true;
-									break;
-								}
-							}
-						}
-					} else if (angleZ_board[boardIndex] === 270) {
-						if (ends[end_tile_name][0] === "e") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, -1.5, 0, "e", ["c", "b"], true, 0);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 270);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 90);
-									pc_play = true;
-									break;
-								}
-							}
-						} else if (ends[end_tile_name][0] === "d") {
-							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 1.5, 0, "d", ["c", "b"], true, 0);
-									pc_play = true;
-									break;
-								}
-							} else {
-								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 90);
-									pc_play = true;
-									break;
-								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
-									tile_to_board(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 270);
-									pc_play = true;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (pc_play) {
-				break;
-			}
-		}
-
-		if (!pc_play) {
-			if (deckLength !== 0) {
-				getTileFromDeck(true)
-			} else {
-				pc_can_play = false;
-			}
-		}
-	}
-	if(!pc_can_play && !player_can_play){
-		score();
-		document.getElementById("getTile").disabled = true;
-		document.getElementById("getTile").style.display = "none";
-		document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
-	}
-}
-
-function changeAllTz(add, list, index, value) {
-	let lst_ortho, lst_persp;
-	lst_ortho = [];
-	lst_persp = [];
-	switch (list) {
-		case player_tz:
-			lst_ortho = player_tz_ortho;
-			lst_persp = player_tz_persp;
-			break;
-		case board_tz:
-			lst_ortho = board_tz_ortho;
-			lst_persp = board_tz_persp;
-			break;
-		case pc_tz:
-			lst_ortho = pc_tz_ortho;
-			lst_persp = pc_tz_persp;
-			break;
-	}
-	if(add){
-		if(projectionType === 1){
-			lst_persp[index] = value;
-		} else {
-			lst_ortho[index] = value;
-		}
-	} else {
-		if(projectionType === 1){
-			lst_persp.splice(tileIndex,1);
-		} else {
-			lst_ortho.splice(tileIndex,1);
 		}
 	}
 }
@@ -2011,6 +1126,363 @@ function changeTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, tx, ty, 
 	board_tz_persp[board_tz_persp.length] = board_tz_persp[0];
 }
 
+function pcMove(){
+	let boardEndTiles = boardTilesWithEnds();
+	if(pc_can_play){
+		let pc_play = false;
+		for (let pc_tile_ind = 0; pc_tile_ind < pcTextures.length; pc_tile_ind++) {
+			let sideNumbersPcTile = getSideNumbersOfTile(pcTextures[pc_tile_ind].image.src);
+			pcIndex = pc_tile_ind;
+
+			for (let end_tile_name in boardEndTiles) {
+				// check if the property/key is defined in the object itself, not in parent
+				if (boardEndTiles.hasOwnProperty(end_tile_name)) {
+					let boardIndex = boardEndTiles[end_tile_name];
+
+					snapTileIndex = boardIndex;
+					let end_tile_numbers = end_tile_name.split("_");
+					if (angleZ_board[boardIndex] === 0) {
+						if (ends[end_tile_name][0] === "c") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, 1.5, "c", ["e", "d"], true, 90);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 180);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 0);
+									pc_play = true;
+									break;
+								}
+							}
+						} else if (ends[end_tile_name][0] === "b") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, -1.5, "b", ["e", "d"], true, 90);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 0);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 180);
+									pc_play = true;
+									break;
+								}
+							}
+						}
+					} else if (angleZ_board[boardIndex] === 90) {
+						if (ends[end_tile_name][0] === "e") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, -1.5, 0, "e", ["c", "b"], true, 0);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 270);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 90);
+									pc_play = true;
+									break;
+								}
+							}
+						} else if (ends[end_tile_name][0] === "d") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 1.5, 0, "d", ["c", "b"], true, 0);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 90);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 270);
+									pc_play = true;
+									break;
+								}
+							}
+						}
+					} else if (angleZ_board[boardIndex] === 180) {
+						if (ends[end_tile_name][0] === "c") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, 1.5, "c", ["e", "d"], true, 90);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 180);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, 2, "c", "c", true, 0);
+									pc_play = true;
+									break;
+								}
+							}
+						} else if (ends[end_tile_name][0] === "b") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, -1.5, "b", ["e", "d"], true, 90);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 0);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 0, -2, "b", "b", true, 180);
+									pc_play = true;
+									break;
+								}
+							}
+						}
+					} else if (angleZ_board[boardIndex] === 270) {
+						if (ends[end_tile_name][0] === "e") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, -1.5, 0, "e", ["c", "b"], true, 0);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[1] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 270);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[1] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, -2, 0, "e", "e", true, 90);
+									pc_play = true;
+									break;
+								}
+							}
+						} else if (ends[end_tile_name][0] === "d") {
+							if (sideNumbersPcTile[0] === sideNumbersPcTile[1]) {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 1.5, 0, "d", ["c", "b"], true, 0);
+									pc_play = true;
+									break;
+								}
+							} else {
+								if (end_tile_numbers[0] === sideNumbersPcTile[0]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 90);
+									pc_play = true;
+									break;
+								} else if (end_tile_numbers[0] === sideNumbersPcTile[1]) {
+									tryTileToBoard(sideNumbersPcTile, end_tile_numbers, 2, 0, "d", "d", true, 270);
+									pc_play = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			if (pc_play) {
+				break;
+			}
+		}
+
+		if (!pc_play) {
+			if (deckLength !== 0) {
+				getTileFromDeck(true)
+			} else {
+				pc_can_play = false;
+			}
+		}
+	}
+	if(!pc_can_play && !player_can_play){
+		score();
+		document.getElementById("getTile").disabled = true;
+		document.getElementById("getTile").style.display = "none";
+		document.getElementById("lose").innerHTML = "You " + playerOutcomeString;
+	}
+}
+
+function getTileFromDeck(isPc){
+	let index;
+	let random_tile = Math.floor(Math.random() * deckTextures.length);
+	if(isPc){
+		index = pcTextures.length;
+		pcTextures[index] = deckTextures[random_tile];
+		pc_tx[pc_tx.length] = pc_tx[pc_tx.length - 1] + dist_between_tiles;
+		pc_ty[pc_ty.length] = pc_ty[pc_ty.length - 1];
+		if (projectionType === 0) {
+			pc_tz[pc_tz.length] = 0;
+		} else {
+			pc_tz[pc_tz.length] = -40;
+		}
+		pc_tz_ortho[pc_tz_ortho.length] = 0;
+		pc_tz_persp[pc_tz_persp.length] = -40;
+	} else {
+		index = playerTextures.length;
+		playerTextures[index] = deckTextures[random_tile];
+		playerTiles[index] = deckTiles[random_tile];
+		totalDist += dist_between_tiles;
+		player_tx[player_tx.length] = totalDist;
+		player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
+		if (projectionType === 0) {
+			player_tz[player_tz.length] = 0;
+		} else {
+			player_tz[player_tz.length] = -25;
+		}
+		player_tz_ortho[player_tz_ortho.length] = 0;
+		player_tz_persp[player_tz_persp.length] = -25;
+		player_angX[player_angX.length] = 0;
+		player_angYY[player_angYY.length] = 0;
+		player_angZZ[player_angZZ.length] = 0;
+	}
+	deckTextures.splice(random_tile, 1);
+	deckTiles.splice(random_tile, 1);
+	deckLength = deckTextures.length;
+	document.getElementById("deck_tile_number").innerHTML = deckLength;
+	if (deckLength === 0) {
+		document.getElementById("getTile").disabled = true;
+		document.getElementById("getTile").style.display = "none";
+	}
+}
+
+function colorRed(tileName){
+	playerTextures[tileIndex].image.src = "imgs/red_" + tileName;
+	document.getElementById("snapTile").disabled = true;
+	document.getElementById("snapTile").style.display = "none";
+}
+
+function colorGreen(){
+	tileShouldBeGreen = true;
+	if(!playerTextures[tileIndex].image.src.includes("imgs/green")) {
+		let tile = playerTextures[tileIndex].image.src.split("imgs/red_")[1];
+		playerTextures[tileIndex].image.src = "imgs/green_" + tile;
+		document.getElementById("snapTile").disabled = false;
+		document.getElementById("snapTile").style.display = "";
+	}
+}
+
+function collisionDetection(tx, ty, ang){
+	for(let boardIndex = 0; boardIndex < board_tx.length; boardIndex++){
+		if(boardIndex !== snapTileIndex) {
+			if (angleZ_board[boardIndex] === 0 || angleZ_board[boardIndex] === 180) {
+				if (ang === 0 || ang === 180) {
+					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[boardIndex] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[boardIndex] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[boardIndex] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty + 1) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[boardIndex] + 1.1)))) {
+						return true;
+					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)))) {
+						return true;
+					}
+				} else {
+					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[boardIndex] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx + 1) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[boardIndex] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[boardIndex] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[boardIndex] + 1.1)))) {
+						return true;
+					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 0.6) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 0.6))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 1.1) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 1.1)))) {
+						return true;
+					}
+				}
+			} else {
+				if (ang === 0 || ang === 180) {
+					if ((((board_tx[snapTileIndex] + tx - 0.5) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx - 0.5) < (board_tx[boardIndex] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx + 0.5) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx + 0.5) < (board_tx[boardIndex] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty - 1) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty - 1) < (board_ty[boardIndex] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty + 1) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty + 1) < (board_ty[boardIndex] + 0.6)))) {
+						return true;
+					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)))) {
+						return true;
+					}
+				} else {
+					if ((((board_tx[snapTileIndex] + tx - 1) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx - 1) < (board_tx[boardIndex] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx + 1) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx + 1) < (board_tx[boardIndex] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty - 0.5) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty - 0.5) < (board_ty[boardIndex] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty + 0.5) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty + 0.5) < (board_ty[boardIndex] + 0.6)))) {
+						return true;
+					}
+					else if ((((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1)) ||
+						((board_tx[snapTileIndex] + tx) > (board_tx[boardIndex] - 1.1) && (board_tx[snapTileIndex] + tx) < (board_tx[boardIndex] + 1.1))) &&
+						(((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)) ||
+							((board_ty[snapTileIndex] + ty) > (board_ty[boardIndex] - 0.6) && (board_ty[snapTileIndex] + ty) < (board_ty[boardIndex] + 0.6)))) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+function changeAllTz(add, list, index, value) {
+	let lst_ortho, lst_persp;
+	lst_ortho = [];
+	lst_persp = [];
+	switch (list) {
+		case player_tz:
+			lst_ortho = player_tz_ortho;
+			lst_persp = player_tz_persp;
+			break;
+		case board_tz:
+			lst_ortho = board_tz_ortho;
+			lst_persp = board_tz_persp;
+			break;
+		case pc_tz:
+			lst_ortho = pc_tz_ortho;
+			lst_persp = pc_tz_persp;
+			break;
+	}
+	if(add){
+		if(projectionType === 1){
+			lst_persp[index] = value;
+		} else {
+			lst_ortho[index] = value;
+		}
+	} else {
+		if(projectionType === 1){
+			lst_persp.splice(tileIndex,1);
+		} else {
+			lst_ortho.splice(tileIndex,1);
+		}
+	}
+}
+
+function points(list) {
+	let points = 0;
+	for(let tile of list){
+		let tile_name = getSideNumbersOfTile(tile.image.src);
+		points += parseInt(tile_name.split("_")[0]) + parseInt(tile_name.split("_")[1]);
+	}
+	return points;
+}
+
 function score(){
 	let pcPoints = points(playerTextures);
 	let playerPoints = points(pcTextures);
@@ -2027,15 +1499,6 @@ function score(){
 		document.getElementById("player_points").innerHTML = "Player: " + String(playerPoints);
 		document.getElementById("pc_points").innerHTML = "Pc: " + String(pcPoints);
 	}
-}
-
-function points(list) {
-	let points = 0;
-	for(let tile of list){
-		let tile_name = getSideNumbersOfTile(tile.image.src);
-		points += parseInt(tile_name.split("_")[0]) + parseInt(tile_name.split("_")[1]);
-	}
-	return points;
 }
 
 /*
@@ -2269,98 +1732,626 @@ function other_method_score(type, rem, add, pc_ang, dicBoardKey){
 }
  */
 
-function getTileFromDeck(isPc){
-	let index;
-	let random_tile = Math.floor(Math.random() * deckTextures.length);
-	if(isPc){
-		index = pcTextures.length;
-		pcTextures[index] = deckTextures[random_tile];
-		pc_tx[pc_tx.length] = pc_tx[pc_tx.length - 1] + dist_between_tiles;
-		pc_ty[pc_ty.length] = pc_ty[pc_ty.length - 1];
-		if (projectionType === 0) {
-			pc_tz[pc_tz.length] = 0;
-		} else {
-			pc_tz[pc_tz.length] = -40;
+//----------------------------------------------------------------------------
+//
+//  Animation
+//
+
+// Animation --- Updating transformation parameters
+
+var lastTime = 0;
+
+function animate() {
+	
+	var timeNow = new Date().getTime();
+	
+	if( lastTime !== 0 ) {
+		
+		var elapsed = timeNow - lastTime;
+
+		// Global rotation
+
+		if( globalRotationYY_ON ) {
+
+			globalAngleYY += globalRotationYY_DIR * globalRotationYY_SPEED * (90 * elapsed) / 1000.0;
 		}
-		pc_tz_ortho[pc_tz_ortho.length] = 0;
-		pc_tz_persp[pc_tz_persp.length] = -40;
-	} else {
-		index = playerTextures.length;
-		playerTextures[index] = deckTextures[random_tile];
-		playerTiles[index] = deckTiles[random_tile];
-		totalDist += dist_between_tiles;
-		player_tx[player_tx.length] = totalDist;
-		player_ty[player_ty.length] = player_bottom_pos_y[playerTiles.length - 1];
-		if (projectionType === 0) {
-			player_tz[player_tz.length] = 0;
-		} else {
-			player_tz[player_tz.length] = -25;
+		if( globalRotationXX_ON ) {
+
+			globalAngleXX += globalRotationXX_DIR * globalRotationXX_SPEED * (90 * elapsed) / 1000.0;
 		}
-		player_tz_ortho[player_tz_ortho.length] = 0;
-		player_tz_persp[player_tz_persp.length] = -25;
-		player_angX[player_angX.length] = 0;
-		player_angYY[player_angYY.length] = 0;
-		player_angZZ[player_angZZ.length] = 0;
+		if( globalRotationZZ_ON ) {
+
+			globalAngleZZ += globalRotationZZ_DIR * globalRotationZZ_SPEED * (90 * elapsed) / 1000.0;
+		}
 	}
-	deckTextures.splice(random_tile, 1);
-	deckTiles.splice(random_tile, 1);
-	deckLength = deckTextures.length;
-	document.getElementById("deck_tile_number").innerHTML = deckLength;
-	if (deckLength === 0) {
-		document.getElementById("getTile").disabled = true;
-		document.getElementById("getTile").style.display = "none";
-	}
+	
+	lastTime = timeNow;
 }
 
-function selectPlayerTile() {
-	// only change when the selected tile is different from the previous selected tile
-	if(selectedTile !== tileIndex) {
-		let tile = null;
+//----------------------------------------------------------------------------
 
-		// Tile Selected now
-		if (!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("red_")) {
-			// if the tile is in the first position
-			if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("blue_")){
-				tile = playerTextures[tileIndex].image.src.split("imgs/")[1];
-				player_angX[tileIndex] = angleX_board[0];
-				player_angYY[tileIndex] = angleY_board[0];
-				player_angZZ[tileIndex] = angleZ_board[0];
-				player_ty[tileIndex] = -3;
-				player_tx[tileIndex] = 0;
-				player_tz[tileIndex] = board_tz[0];
-				// add to tz
-				changeAllTz(true, player_tz, tileIndex, board_tz[0]);
+// Handling keyboard events
+
+// Adapted from www.learningwebgl.com
+
+var currentlyPressedKeys = {};
+
+function handleKeys() {
+	let valuePageUpOrDown;
+
+	if (currentlyPressedKeys[33] && !document.getElementById("lose").innerHTML.includes("You")) {
+		valuePageUpOrDown = 0.99;  // Page Up
+	} else if (currentlyPressedKeys[34] && !document.getElementById("lose").innerHTML.includes("You")) {
+		valuePageUpOrDown = 1.01;  // Page Down
+	}
+
+	if (currentlyPressedKeys[33] || currentlyPressedKeys[34]) {
+		sx *= valuePageUpOrDown;
+		sz = sy = sx;
+	} else {
+		if (currentlyPressedKeys[37]) {
+			// Left cursor key
+			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
+				player_tx[tileIndex] -= 0.05;
 			}
-			// if the tile isn't on a "snapable" position
-			else if(!playerTextures[tileIndex].image.src.split("imgs/")[1].includes("green_")){
-				tile = playerTextures[tileIndex].image.src.split("imgs/blue_")[1];
-			}
-			// if the tile is on a "snapable" position
-			else {
-				tile = playerTextures[tileIndex].image.src.split("imgs/green_")[1];
-			}
-			// change the texture to red
-			bindImgToTexture(playerTextures, tileIndex, null);
-			colorRed(tile);
 		}
-
-		// Tile previously selected
-		if (selectedTile !== null){
-			if(playerTextures[selectedTile].image.src.split("imgs/")[1].includes("red_")){
-				// change the texture to blue
-				tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("red_")[1];
-				bindImgToTexture(playerTextures, selectedTile, null);
-				playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
-			} else if (playerTextures[selectedTile].image.src.split("imgs/")[1].includes("green_")){
-				// change the texture to blue
-				tile = playerTextures[selectedTile].image.src.split("imgs/")[1].split("green_")[1];
-				bindImgToTexture(playerTextures, selectedTile, null);
-				playerTextures[selectedTile].image.src = "imgs/blue_" + tile;
+		if (currentlyPressedKeys[39]) {
+			// Right cursor key
+			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
+				player_tx[tileIndex] += 0.05;
+			}
+		}
+		if (currentlyPressedKeys[38]) {
+			// Up cursor key
+			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
+				player_ty[tileIndex] += 0.05;
 			}
 		}
 
-		// update selected tile
-		selectedTile = tileIndex;
+		if (currentlyPressedKeys[40]) {
+			// Down cursor key
+			if (tileIndex !== null && !document.getElementById("lose").innerHTML.includes("You")) {
+				player_ty[tileIndex] -= 0.05;
+			}
+		}
+	}
+
+	document.addEventListener("keypress", function(event){
+
+		// Getting the pressed key and setting the bg color
+
+		var key = event.keyCode; // ASCII
+
+		switch(key){
+			case 114:
+				if(tileIndex !== null) {
+					rotateZ = true;
+				}
+				break;
+		}
+
+		// Render the viewport
+	});
+}
+
+//----------------------------------------------------------------------------
+
+// Handling mouse events
+
+// Adapted from www.learningwebgl.com
+
+
+var mouseDown = false;
+
+var lastMouseX = null;
+
+var lastMouseY = null;
+
+function handleMouseDown(event) {
+    mouseDown = true;
+
+    lastMouseX = event.clientX;
+
+    lastMouseY = event.clientY;
+}
+
+function handleMouseUp(event) {
+    mouseDown = false;
+}
+
+function handleMouseMove(event) {
+
+    if (!mouseDown) {
+
+      return;
+    }
+
+    // Rotation angles proportional to cursor displacement
+
+    var newX = event.clientX;
+
+    var newY = event.clientY;
+
+    var deltaX = newX - lastMouseX;
+
+    angleYY += radians( 10 * deltaX  );
+
+    var deltaY = newY - lastMouseY;
+
+    angleXX += radians( 10 * deltaY  );
+
+    lastMouseX = newX;
+
+    lastMouseY = newY;
+  }
+//----------------------------------------------------------------------------
+
+// Timer
+
+function tick() {
+	requestAnimFrame(tick);
+	drawScene();
+	if(!document.getElementById("lose").innerHTML.includes("You")) {
+	    handleKeys();
+	    handlePlayerButtons();
+	    handleChangesHtml();
+        animate();
+    }
+}
+
+//----------------------------------------------------------------------------
+
+function setEventListeners( canvas ) {
+
+	// Handling the mouse
+
+	// From learningwebgl.com
+
+	document.getElementById("lose").innerHTML = "";
+
+	canvas.onmousedown = handleMouseDown;
+
+	document.onmouseup = handleMouseUp;
+
+	document.onmousemove = handleMouseMove;
+
+	// Handling the keyboard
+
+	// From learningwebgl.com
+
+	function handleKeyDown(event) {
+		currentlyPressedKeys[event.keyCode] = true;
+	}
+
+	function handleKeyUp(event) {
+		currentlyPressedKeys[event.keyCode] = false;
+	}
+
+	document.onkeydown = handleKeyDown;
+
+	document.onkeyup = handleKeyUp;
+
+	// Dropdown list
+
+	var projection = document.getElementById("projection-selection");
+
+	projection.addEventListener("click", function () {
+		// Getting the selection
+		var p = projection.selectedIndex;
+
+		switch (p) {
+			case 0 :
+				projectionType = 0;
+				document.getElementById("zoom_ortho").hidden = false;
+				document.getElementById("near_ortho").hidden = true;
+				document.getElementById("far_ortho").hidden = true;
+				document.getElementById("fovy_persp").hidden = true;
+				document.getElementById("aspect_persp").hidden = true;
+				document.getElementById("near_persp").hidden = true;
+				document.getElementById("far_persp").hidden = true;
+				break;
+			case 1 :
+				projectionType = 1;
+				document.getElementById("zoom_ortho").hidden = true;
+				document.getElementById("near_ortho").hidden = true;
+				document.getElementById("far_ortho").hidden = true;
+				document.getElementById("fovy_persp").hidden = false;
+				document.getElementById("aspect_persp").hidden = true;
+				document.getElementById("near_persp").hidden = true;
+				document.getElementById("far_persp").hidden = true;
+				break;
+		}
+	});
+
+
+	// Button events
+	document.getElementById("resetPosition").onclick = function () {
+		resetBoardPos();
+	};
+
+	document.getElementById("rotateBoardX").onclick = function () {
+		rotateBoardX = !rotateBoardX;
+		if(rotateBoardX){
+			document.getElementById("rotateBoardX").style.backgroundColor = "#317bf4";
+		} else {
+			document.getElementById("rotateBoardX").style.backgroundColor = "#87877f";
+		}
+		hideOrShowTransSliders();
+	};
+
+	document.getElementById("rotateBoardY").onclick = function () {
+		rotateBoardY = !rotateBoardY;
+		if(rotateBoardY){
+			document.getElementById("rotateBoardY").style.backgroundColor = "#317bf4";
+		} else {
+			document.getElementById("rotateBoardY").style.backgroundColor = "#87877f";
+		}
+		hideOrShowTransSliders();
+	};
+
+	document.getElementById("rotateBoardZ").onclick = function () {
+		rotateBoardZ = !rotateBoardZ;
+		if(rotateBoardZ){
+			document.getElementById("rotateBoardZ").style.backgroundColor = "#317bf4";
+		} else {
+			document.getElementById("rotateBoardZ").style.backgroundColor = "#87877f";
+		}
+		hideOrShowTransSliders();
+	};
+
+	document.getElementById("getTile").onclick = function () {
+		if(!document.getElementById("lose").innerHTML.includes("You")) {
+			if (deckLength !== 0) {
+				getTileFromDeck(false);
+			}
+			pcMove();
+		}
+	};
+
+	document.getElementById("snapTile").onclick = function () {
+		let sideNumbersPlayerTile = getSideNumbersOfTile(playerTextures[tileIndex].image.src);
+		let sideNumbersBoardTile = getSideNumbersOfTile(boardTextures[snapTileIndex].image.src);
+		//Paralelo
+		if (player_angZZ[tileIndex] === 0 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-(board_ty[snapTileIndex]+localTy)<0) {
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"], false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex] === 90 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"], false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex] === 180 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"],false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex] === 270 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"],false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"],false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"],false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -2, "b", ["b"],false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +2, "c", ["c"],false, 0);
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -2, 0, "e", ["e"],false, 0);
+				}
+			}
+			else{
+				if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+					tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +2, 0, "d", ["d"],false, 0);
+				}
+			}
+		}
+		//PERPENDICULAR +90
+		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["b","c"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["b","c"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
+					}
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["d","e"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["d","e"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
+					}
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["c","b"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["c","b"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
+					}
+				}
+			}
+		}
+
+		//MUDEI AQUI
+		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["e","d"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["e","d"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
+					}
+				}
+			}
+		}
+		//PERPENDICULAR +180
+		else if (player_angZZ[tileIndex]===0 && angleZ_board[snapTileIndex] === 270) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["b","c"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["b","c"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
+					}
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===90 && angleZ_board[snapTileIndex] === 0) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["d","e"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["d","e"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
+					}
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===180 && angleZ_board[snapTileIndex] === 90) {
+			if(player_tx[tileIndex]-board_tx[snapTileIndex]-localTx<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, 0, "e", ["c","b"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, +0.5, "e", ["c"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -1.5, -0.5, "e", ["b"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, 0, "d", ["c","b"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, +0.5, "d", ["c"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +1.5, -0.5, "d", ["b"],false, 0);
+					}
+				}
+			}
+		}
+		else if (player_angZZ[tileIndex]===270 && angleZ_board[snapTileIndex] === 180) {
+			if(player_ty[tileIndex]-board_ty[snapTileIndex]-localTy<0) {
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, -1.5, "b", ["e","d"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, -1.5, "b", ["e"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[0]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, -1.5, "b", ["d"],false, 0);
+					}
+				}
+			}
+			else{
+				if(sideNumbersPlayerTile[0]===sideNumbersPlayerTile[1]){
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1] || sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]){
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, 0, +1.5, "c", ["e","d"],false, 0);
+					}
+				}
+				else {
+					if (sideNumbersPlayerTile[0] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, -0.5, +1.5, "c", ["e"],false, 0);
+					} else if (sideNumbersPlayerTile[1] === sideNumbersBoardTile[1]) {
+						tryTileToBoard(sideNumbersPlayerTile, sideNumbersBoardTile, +0.5, +1.5, "c", ["d"],false, 0);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -2414,9 +2405,10 @@ function handlePlayerButtons() {
 	}
 }
 
-function handleSliders() {
+function handleChangesHtml() {
 	document.getElementById("tx").value = globalTx;
 	document.getElementById("ty").value = globalTy;
+	document.getElementById("deck_tile_number").innerHTML = deckLength;
 }
 
 function resetBoardPos(){
@@ -2461,7 +2453,6 @@ function runWebGL() {
 
 	tick();		// A timer controls the rendering / animation
 
-	outputInfos();
 }
 
 
