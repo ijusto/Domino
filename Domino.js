@@ -454,8 +454,8 @@ function drawDominoModel(angx, angy, angz,
 			if (rotateBoardY) { mvMatrix = mult(mvMatrix, rotationYYMatrix(globalAngleYY)); }
 			if (rotateBoardX) { mvMatrix = mult(mvMatrix, rotationXXMatrix(globalAngleXX)); }
 
-			mvMatrix = mult(mvMatrix, translationMatrix(tx + globalTx - boardTxCenter*sx,
-														ty + globalTy - boardTyCenter*sy,
+			mvMatrix = mult(mvMatrix, translationMatrix(tx - boardTxCenter*sx,
+														ty - boardTyCenter*sy,
 														tz - boardTzCenter*sz));
 		}
 		// Steady board
